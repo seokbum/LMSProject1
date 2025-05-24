@@ -18,9 +18,40 @@ public class LearningService {
 	}
 	
 	public List<String> getColleges() {
-		
-		return null;
-	}
+        return courseMapper.getColleges();
+    }
+
+    public List<DeptDto> getDepartments(String college) {
+        return courseMapper.getDepartments(college);
+    }
+
+    public Map<String, Object> searchCourse(SearchDto searchDto, PaginationDto pageDto) {
+        Integer pageSize = pageDto.getItemsPerPage() != null ? pageDto.getItemsPerPage() : 10;
+        Integer currentPage = pageDto.getCurrentPage() != null ? pageDto.getCurrentPage() : 1;
+        Integer offset = (currentPage - 1) * pageSize;
+        Integer totalRows = courseMapper.countCourses(searchDto);
+        Integer totalPages = (int) Math.ceil((double) totalRows / pageSize);
+
+        pageDto.setCurrentPage(currentPage);
+        pageDto.setTotalRows(totalRows);
+        pageDto.setTotalPages(totalPages);
+        pageDto.setOffset(offset);
+
+        CoursePagingDto cpDto = new CoursePagingDto();
+        cpDto.setSearchDto(searchDto);
+        cpDto.setPaginationDto(pageDto);
+
+        List<CourseDto> courses = courseMapper.searchCourse(cpDto);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("courses", courses);
+        response.put("pagination", pageDto);
+        return response;
+    }
+
+    public List<RegistrationDto> searchRegistrationCourses(String studentId) {
+        return courseMapper.searchRegistrationCourses(studentId);
+    }
 	
 	
 	@Transactional

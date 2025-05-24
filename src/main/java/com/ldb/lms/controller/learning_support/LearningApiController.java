@@ -5,14 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ldb.lms.dto.learning_support.DeptDto;
+import com.ldb.lms.dto.learning_support.SearchDto;
+import com.ldb.lms.dto.professor_support.PaginationDto;
 import com.ldb.lms.mapper.TestMapper;
 import com.ldb.lms.service.learning_support.LearningService;
 
@@ -38,43 +38,31 @@ private final LearningService learningService;
     }
 	
 	@GetMapping("colleges")
-	public String getColleges (HttpServletRequest request, HttpServletResponse response) {
-		
-		List<String> colleges = learningService.getColleges();
-		
-        ObjectMapper mapper = new ObjectMapper();
-        String json;
-        
-		try {
-			json = mapper.writeValueAsString(colleges);
-			request.setAttribute("json", json);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
+    public ResponseEntity<List<String>> getColleges() {
+        return ResponseEntity.ok(learningService.getColleges());
+    }
 
-		}
-		return "/pages/learning_support/ajax_learning_support";
-	}
-	
-	@GetMapping("departments")
-	public String getDepartments (HttpServletRequest request, HttpServletResponse response) {
-		
-		String college = request.getParameter("college");
-		System.out.println("college: " + college);
-		List<DeptDto> departments = courseDao.getDepartments(college);
-		
-        ObjectMapper mapper = new ObjectMapper();
-        String json;
-        
-		try {
-			json = mapper.writeValueAsString(departments);
-			request.setAttribute("json", json);
-		} catch (IOException e) {
-			e.printStackTrace();
+    @GetMapping("departments")
+    public ResponseEntity<List<DeptDto>> getDepartments(@RequestParam String college) {
+        return ResponseEntity.ok(learningService.getDepartments(college));
+    }
 
-		}
-		return "/pages/learning_support/ajax_learning_support";
-	}
+    @GetMapping("searchCourse")
+    public ResponseEntity<Map<String, Object>> searchCourse(
+            @ModelAttribute SearchDto searchDto,
+            @ModelAttribute PaginationDto pageDto) {
+    	
+        String studentId = "S001"; // 테스트용 하드코딩
+        searchDto.setStudentId(studentId);
+        
+        return ResponseEntity.ok(learningService.searchCourse(searchDto, pageDto));
+    }
+
+    @GetMapping("searchRegistrationCourses")
+    public ResponseEntity<List<RegistrationDto>> searchRegistrationCourses() {
+        String studentId = "S001"; // 테스트용 하드코딩
+        return ResponseEntity.ok(learningService.searchRegistrationCourses(studentId));
+    }
 	
 	@PostMapping("registerCourse")
 	@ResponseBody
@@ -106,92 +94,20 @@ private final LearningService learningService;
         }
 	}
 	
-	@GetMapping("searchCourse")
-	public String searchCourse (HttpServletRequest request, HttpServletResponse response) {
-		//세션 불러오기
-		String studentId = (String) request.getSession().getAttribute("login");
-		
-		SearchDto searchDto = new SearchDto();
-		PaginationDto pageDto = new PaginationDto();
-		CoursePagingDto cpDto = new CoursePagingDto();
-		
-		try {
-			BeanUtils.populate(searchDto, request.getParameterMap());
-			searchDto.setStudentId(studentId);
-			BeanUtils.populate(pageDto, request.getParameterMap());
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		// 페이징처리 
-		Integer pageSize = pageDto.getItemsPerPage(); 
-		Integer currentPage = pageDto.getCurrentPage();
-		currentPage = currentPage != null ? currentPage : 1;
-		Integer offset = (currentPage - 1) * pageSize;
-		Integer totalRows = courseDao.countCourses(searchDto);
-		Integer totalPages = (int) Math.ceil((double)totalRows / pageSize); 
-		
-		pageDto.setCurrentPage(currentPage);
-		pageDto.setTotalRows(totalRows);
-		pageDto.setTotalPages(totalPages);
-		pageDto.setOffset(offset);
-
-		cpDto.setPaginationDto(pageDto);
-		cpDto.setSearchDto(searchDto);
-
-		List<CourseDto> courses = courseDao.searchCourse(cpDto);
-		
-		ObjectMapper mapper = new ObjectMapper();
-        
-		Map<String, Object> responseMap = new HashMap<String, Object>();
-		responseMap.put("courses", courses);
-		responseMap.put("pagination", pageDto);
-		
-		try {
-			String json = mapper.writeValueAsString(responseMap);
-			request.setAttribute("json", json);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-        return "/pages/learning_support/ajax_learning_support";
-	}
-	
-	@GetMapping("searchRegistrationCourses")
-	public String searchRegistrationCourses (HttpServletRequest request, HttpServletResponse response) {
-		
-		String studentId = (String) request.getSession().getAttribute("login");
-		
-		List<RegistrationDto> result = courseDao.searchRegistrationCourses(studentId);
-		ObjectMapper mapper = new ObjectMapper();
-        String json;
-        
-		try {
-			json = mapper.writeValueAsString(result);
-			request.setAttribute("json", json);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-        return "/pages/learning_support/ajax_learning_support";
-	}
-	
-	
-	@PostMapping("deleteCourse")
-	public String deleteCourse (HttpServletRequest request, HttpServletResponse response) {
-
-		String studentId = (String) request.getSession().getAttribute("login");
-		
-		String registrationId = request.getParameter("registrationId");
-		String courseId = request.getParameter("courseId");
-		
-		try {
-			courseDao.deleteCourse(registrationId,courseId, studentId);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		return "/pages/dummy";
-	}
+//	@PostMapping("deleteCourse")
+//	public String deleteCourse (HttpServletRequest request, HttpServletResponse response) {
+//
+//		String studentId = (String) request.getSession().getAttribute("login");
+//		
+//		String registrationId = request.getParameter("registrationId");
+//		String courseId = request.getParameter("courseId");
+//		
+//		try {
+//			courseDao.deleteCourse(registrationId,courseId, studentId);
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return "/pages/dummy";
+//	}
 }
