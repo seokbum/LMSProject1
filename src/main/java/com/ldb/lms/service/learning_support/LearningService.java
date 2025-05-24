@@ -1,11 +1,18 @@
 package com.ldb.lms.service.learning_support;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ldb.lms.dto.learning_support.CourseDto;
+import com.ldb.lms.dto.learning_support.CoursePagingDto;
+import com.ldb.lms.dto.learning_support.DeptDto;
+import com.ldb.lms.dto.learning_support.RegistrationDto;
+import com.ldb.lms.dto.learning_support.SearchDto;
+import com.ldb.lms.dto.professor_support.PaginationDto;
 import com.ldb.lms.mapper.learning_support.CourseMapper;
 
 @Service

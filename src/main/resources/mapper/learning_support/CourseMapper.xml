@@ -2,16 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.ldb.lms.mapper.course.CourseMapper">
+<mapper namespace="com.ldb.lms.mapper.learning_support">
 
-	<select id="selectColleges" resultType="string">
+	<select id="getColleges" resultType="string">
 	    SELECT DISTINCT college
 	    FROM dept
 	    WHERE college IS NOT NULL
 	    ORDER BY college
 	</select>
 	
-	<select id="selectDepartments" resultType="DeptDto">
+	<select id="getDepartments" resultType="DeptDto">
 	    select dept_id, dept_name
 		from   dept
 		where  1=1

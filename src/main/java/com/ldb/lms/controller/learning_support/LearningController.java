@@ -21,17 +21,5 @@ public class LearningController {
 	public String callRegisterCourse () {
 		return "learning_support/registerCourse";
 	}
-
-	
-	
-	
-	
-	
-
-	
-	
-	
-	
-	
 	
 }

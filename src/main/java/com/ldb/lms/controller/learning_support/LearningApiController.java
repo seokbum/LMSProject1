@@ -19,14 +19,17 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ldb.lms.dto.learning_support.DeptDto;
+import com.ldb.lms.dto.learning_support.RegistrationDto;
 import com.ldb.lms.dto.learning_support.SearchDto;
 import com.ldb.lms.dto.professor_support.PaginationDto;
 import com.ldb.lms.mapper.TestMapper;
 import com.ldb.lms.service.learning_support.LearningService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
 
+@Slf4j
 @RestController
 @RequestMapping("/api/learning_support")
 public class LearningApiController {

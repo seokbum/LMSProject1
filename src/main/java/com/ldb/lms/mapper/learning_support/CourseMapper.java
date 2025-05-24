@@ -11,13 +11,15 @@ import org.apache.ibatis.session.SqlSession;
 import com.ldb.lms.dto.learning_support.CourseDto;
 import com.ldb.lms.dto.learning_support.CoursePagingDto;
 import com.ldb.lms.dto.learning_support.DeptDto;
+import com.ldb.lms.dto.learning_support.RegistrationDto;
+import com.ldb.lms.dto.learning_support.SearchDto;
 
 @Mapper
 public interface CourseMapper {
 		 
-	List<String> selectColleges();
+	List<String> getColleges();
 	
-	List<DeptDto> selectDepartments(String college);
+	List<DeptDto> getDepartments(String college);
 	
 	List<CourseDto> searchCourse(CoursePagingDto cpDto);
 
@@ -38,6 +40,10 @@ public interface CourseMapper {
     Long getScoreIdNumber();
     
     Map<String, String> getStudentInfo(Map<String, Object> param);
+
+	Integer countCourses(SearchDto searchDto);
+
+	List<RegistrationDto> searchRegistrationCourses(String studentId);
     
 
 
