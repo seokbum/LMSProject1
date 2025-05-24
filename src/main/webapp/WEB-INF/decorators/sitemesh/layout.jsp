@@ -9,13 +9,12 @@
 <!--begin::Head-->
 <head>
 <script
-	src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script
 	src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
 <script src="https://cdn.tailwindcss.com"></script>
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -249,7 +248,7 @@ body {
 								</p>
 						</a>
 							<ul class="nav nav-treeview">
-								<li class="nav-item"><a href="/registerCourse"
+								<li class="nav-item"><a href="/learning_support/registerCourse"
 									class="nav-link"> <i class="nav-icon bi bi-circle"></i>
 										<p>수강신청</p>
 								</a></li>

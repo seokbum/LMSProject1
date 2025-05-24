@@ -1,4 +1,4 @@
-package com.ldb.lms.controller;
+package com.ldb.lms.dto;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,13 +8,7 @@ import com.ldb.lms.mapper.TestMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-@Controller
-public class HomeController {
 
-    @GetMapping("/")
-    public String home(HttpServletRequest request,  Model model) {
-
-        return "index";
-    }
-
+public class TestDto {
+	
 }

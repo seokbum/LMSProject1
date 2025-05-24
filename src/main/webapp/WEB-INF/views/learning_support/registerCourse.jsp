@@ -1,8 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
-<c:set var="path" value="${pageContext.request.contextPath}" scope="application" />
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 
 <!doctype html>
 <html lang="ko">
@@ -272,7 +271,7 @@
         $(document).ready(function() {
             // 대학 목록 로드
             $.ajax({
-                url: "${path}/learning_support/colleges",
+                url: "/api/learning_support/colleges",
                 type: "get",
                 dataType: "json",
                 success: function(data) {
@@ -351,7 +350,7 @@
         function updateDepartments() {
             var college = $('#collegeSelect').val();
             $.ajax({
-                url: '${path}/learning_support/departments',
+                url: '/api/learning_support/departments',
                 method: 'GET',
                 data: { college: college },
                 dataType: "json",
@@ -381,7 +380,7 @@
                 itemsPerPage: pageSize,
             };
             $.ajax({
-                url: "${path}/learning_support/searchCourse",
+                url: "/api/learning_support/searchCourse",
                 type: "get",
                 data: params,
                 dataType: "json",
@@ -470,8 +469,8 @@
         // 과목 추가
         function addCourse(courseId, professorId) {
             $.ajax({
-                url: "${path}/learning_support/addCourse",
-                type: "get",
+                url: "/api/learning_support/registerCourse",
+                type: "post",
                 data: { courseId: courseId, professorId: professorId },
                 dataType: "json",
                 success: function(data) {
@@ -491,7 +490,7 @@
         // 신청 내역 로드
         function loadRegistrations() {
             $.ajax({
-                url: "${path}/learning_support/searchRegistrationCourses",
+                url: "/api/learning_support/searchRegistrationCourses",
                 type: "get",
                 dataType: "json",
                 success: function(data) {
@@ -527,8 +526,8 @@
         // 신청 삭제
         function deleteCourse(registrationId, courseId) {
             $.ajax({
-                url: "${path}/learning_support/deleteCourse",
-                type: "get",
+                url: "/api/learning_support/deleteCourse",
+                type: "post",
                 data: { registrationId: registrationId, courseId: courseId },
                 dataType: "json",
                 success: function(data) {
