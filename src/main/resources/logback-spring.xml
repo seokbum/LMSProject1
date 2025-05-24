@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <logger name="com.ldb.lms.mapper" level="DEBUG"/>
+
+    <logger name="org.apache.ibatis.logging.jdbc.ResultSetLogger" level="TRACE"/>
+    <logger name="org.apache.ibatis.logging.jdbc.StatementLogger" level="DEBUG"/>
+    <logger name="org.apache.ibatis.logging.jdbc.PreparedStatementLogger" level="DEBUG"/>
+    <logger name="org.apache.ibatis.logging.jdbc.CallableStatementLogger" level="DEBUG"/>
+
+</configuration>

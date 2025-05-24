@@ -57,7 +57,8 @@ private final LearningService learningService;
     	
         String studentId = "S001"; // 테스트용 하드코딩
         searchDto.setStudentId(studentId);
-        
+        System.out.println("dto확인: " + searchDto.toString());
+        System.out.println("dto확인: " + pageDto.toString());
         return ResponseEntity.ok(learningService.searchCourse(searchDto, pageDto));
     }
 
