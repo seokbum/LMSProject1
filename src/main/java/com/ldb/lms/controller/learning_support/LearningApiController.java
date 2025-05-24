@@ -36,8 +36,11 @@ public class LearningApiController {
 	
 private final LearningService learningService;
 	
+	private final ObjectMapper objectMapper;
+	
 	public LearningApiController(LearningService learningService) {
         this.learningService = learningService;
+		this.objectMapper = new ObjectMapper();
     }
 	
 	@GetMapping("colleges")
@@ -47,7 +50,18 @@ private final LearningService learningService;
 
     @GetMapping("departments")
     public ResponseEntity<List<DeptDto>> getDepartments(@RequestParam String college) {
-        return ResponseEntity.ok(learningService.getDepartments(college));
+    	log.info("함수호출 확인!!!!!");
+    	List<DeptDto> depts = learningService.getDepartments(college);
+    	log.info("부서 디버그: {}", depts);
+    	
+    	try {
+            String json = objectMapper.writeValueAsString(depts);
+            log.info("Departments JSON: {}", json);
+        } catch (Exception e) {
+        	log.error("Serialization error: ", e);
+        }
+    	
+    	return ResponseEntity.ok(depts);
     }
 
     @GetMapping("searchCourse")
