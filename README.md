@@ -76,41 +76,55 @@
 ---
 
 ## 🖥️ 프로젝트 구조
-
 ```
-📁 src/
-├── 📁 main/
-│   ├── 📁 java/
-│   │   │
-│   │   ├── 📁 controller/
-│   │   │   ├── 📁 board/              # 게시판 컨트롤러
-│   │   │   ├── 📁 learning_support/   # 수강신청 컨트롤러
-│   │   │   ├── 📁 mypage/            # 마이페이지 컨트롤러
-│   │   │   └── 📁 professor_support/  # 교수 기능 컨트롤러
-│   │   ├── 📁 config/                # 설정 클래스
-│   │   ├── 📁 domain/                # 엔티티 또는 도메인 객체
-│   │   ├── 📁 filter/                # 서블릿 필터
-│   │   ├── 📁 model/
-│   │   │   ├── 📁 dao/               # MyBatis Mapper 인터페이스
-│   │   │   └── 📁 dto/               # DTO 클래스
-│   │   └── 📁 sitemesh/              # SiteMesh 설정
-│   ├── 📁 resources/
-│   │   ├── 📁 mapper/
-│   │   │   ├── 📁 board/                 # 게시판 Mapper XML
-│   │   │   ├── 📁 learning_support/      # 수강신청 Mapper XML
-│   │   │   ├── 📁 mypage/                # 마이페이지 Mapper XML
-│   │   │   └── 📁 professor_support/     # 교수 기능 Mapper XML
-│   │   ├── mybatis.properties           # MyBatis 설정
-│   │   └── mybatis-config.xml           # MyBatis 구성
-│   └── 📁 webapp/
-│       ├── 📁 dis/
-│       │   ├── 📁 assets/               # CSS, JS, 이미지 등
-│       │   └── 📁 pages/                # JSP 파일 (화면별)
-│       └── WEB-INF/
-│           └── web.xml                  # 서블릿 설정
+LMS-Project/
+├── 📄 .gitattributes
+├── 📄 .gitignore
+├── ⚙️ .mvn/                  # Maven Wrapper 관련 파일
+│   └── 📁 wrapper/
+│       ├── 📄 maven-wrapper.jar
+│       └── 📄 maven-wrapper.properties
+├── 📄 pom.xml                # Maven 빌드 설정 파일
+├── 📄 README.md              # 프로젝트 정보 문서 (이 문서가 들어갈 위치)
+└── 📦 src/
+    └── 📂 main/
+        ├── ☕ java/
+        │   └── 📂 com/
+        │       └── 📂 ldb/
+        │           └── 📂 lms/
+        │               ├── 🌐 controller/  # 웹 요청 처리 및 응답 담당
+        │               │   ├── 📁 board/ # 게시판 컨트롤러
+        │               │   ├── 📁 learning_support/ # 수강신청 컨트롤러
+        │               │   ├── 📁 mypage/ # 마이페이지 컨트롤러
+        │               │   └── 📁 professor_support/ # 교수 기능 컨트롤러
+        │               ├── ⚙️ config/      # 애플리케이션 설정 클래스
+        │               ├── 📚 domain/      # 데이터베이스 테이블과 매핑되는 도메인 객체
+        │               ├── 🚀 DemoApplication.java # Spring Boot 애플리케이션 시작점
+        │               ├── 🧩 mapper/      # MyBatis Mapper 인터페이스 (SQL 호출)
+        │               └── 🛠️ service/     # 비즈니스 로직 처리 계층
+        ├── 📝 resources/     # 각종 리소스 및 설정 파일
+        │   ├── 🗃️ mapper/      # MyBatis SQL Mapper XML 파일
+        │   │   ├── 📁 board/ # 게시판 Mapper XML
+        │   │   ├── 📁 learning_support/ # 수강신청 Mapper XML
+        │   │   ├── 📁 mypage/ # 마이페이지 Mapper XML
+        │   │   └── 📁 professor_support/ # 교수 기능 Mapper XML
+        │   ├── 📄 mybatis.properties # MyBatis 설정 파일
+        │   ├── 📄 mybatis-config.xml # MyBatis 구성 파일
+        │   └── 🌐 static/       # 웹에서 직접 접근 가능한 정적 리소스 (CSS, JS, 이미지)
+        │       ├── 🎨 css/
+        │       ├── 🖼️ img/
+        │       └── 💡 js/
+        └── 🖥️ webapp/        # 웹 애플리케이션 관련 파일
+            └── 🔒 WEB-INF/    # 보안상 외부 직접 접근 불가 영역
+                └── 📄 views/     # JSP 화면 파일
+                    ├── 📁 admin/
+                    ├── 📁 board/
+                    ├── 📄 home.jsp
+                    ├── 📁 lecture/
+                    ├── 📄 login.jsp
+                    └── 📁 mypage/
 ```
 ---
-
 ## 🔧 향후 개선 예정
 
 > 학사 관리 시스템은 현재 **Spring Boot 3와 Maven으로의 마이그레이션**을 진행 중이며, 이를 통해 현대적인 웹 애플리케이션으로 전환하고자 합니다.  
