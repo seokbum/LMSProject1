@@ -22,7 +22,6 @@ import com.ldb.lms.dto.learning_support.DeptDto;
 import com.ldb.lms.dto.learning_support.RegistrationDto;
 import com.ldb.lms.dto.learning_support.SearchDto;
 import com.ldb.lms.dto.professor_support.PaginationDto;
-import com.ldb.lms.mapper.TestMapper;
 import com.ldb.lms.service.learning_support.LearningService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,17 +49,7 @@ private final LearningService learningService;
 
     @GetMapping("departments")
     public ResponseEntity<List<DeptDto>> getDepartments(@RequestParam String college) {
-    	log.info("함수호출 확인!!!!!");
-    	List<DeptDto> depts = learningService.getDepartments(college);
-    	log.info("부서 디버그: {}", depts);
-    	
-    	try {
-            String json = objectMapper.writeValueAsString(depts);
-            log.info("Departments JSON: {}", json);
-        } catch (Exception e) {
-        	log.error("Serialization error: ", e);
-        }
-    	
+    	List<DeptDto> depts = learningService.getDepartments(college);	
     	return ResponseEntity.ok(depts);
     }
 
@@ -71,8 +60,7 @@ private final LearningService learningService;
     	
         String studentId = "S001"; // 테스트용 하드코딩
         searchDto.setStudentId(studentId);
-        System.out.println("dto확인: " + searchDto.toString());
-        System.out.println("dto확인: " + pageDto.toString());
+
         return ResponseEntity.ok(learningService.searchCourse(searchDto, pageDto));
     }
 
