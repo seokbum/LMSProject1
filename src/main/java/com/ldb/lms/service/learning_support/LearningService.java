@@ -15,14 +15,13 @@ import com.ldb.lms.dto.learning_support.SearchDto;
 import com.ldb.lms.dto.professor_support.PaginationDto;
 import com.ldb.lms.mapper.learning_support.CourseMapper;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class LearningService {
 	
 	private final CourseMapper courseMapper;
-
-	public LearningService(CourseMapper courseMapper) {
-		this.courseMapper = courseMapper;
-	}
 	
 	public List<String> getColleges() {
         return courseMapper.getColleges();
