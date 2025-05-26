@@ -1,13 +1,10 @@
 package com.ldb.lms.controller.learning_support;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +21,6 @@ import com.ldb.lms.dto.learning_support.SearchDto;
 import com.ldb.lms.dto.professor_support.PaginationDto;
 import com.ldb.lms.service.learning_support.LearningService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 
