@@ -1,12 +1,9 @@
 package com.ldb.lms.mapper.learning_support;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.exceptions.PersistenceException;
-import org.apache.ibatis.session.SqlSession;
 
 import com.ldb.lms.dto.learning_support.CourseDto;
 import com.ldb.lms.dto.learning_support.CoursePagingDto;
