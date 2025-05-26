@@ -20,7 +20,6 @@ public class NoticeApiController {
 		this.noticeService = noticeService;
 	}
 	
-	@PostMapping("getNotice")
 	
 	
 	
