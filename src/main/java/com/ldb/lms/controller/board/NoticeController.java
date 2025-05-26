@@ -24,7 +24,7 @@ public class NoticeController {
 		this.noticeService = noticeService; 
 	}
 	
-	@GetMapping("list")
+	@GetMapping("getNotice")
 	public String listNotice(
 			@ModelAttribute NoticeSearchDto searchDto,
 			@ModelAttribute NoticePaginationDto pageDto,
