@@ -102,7 +102,53 @@ public class LearningService {
         map.put("deptId", deptId);
         courseMapper.addScore(map);
     }
+	
+	@Transactional
+	public void deleteCourse(Map<String, Object> map) {
+		
+		// 현재 수강인원 조회
+		Map<String, Object> courseInfo = courseMapper.getCurrentEnrollments((String) map.get("courseId"));
+		Integer enrollment = (Integer) courseInfo.get("course_current_enrollment");
+		
+		if (enrollment == null || enrollment <= 0) {
+		    enrollment = 0;
+		} else {
+			enrollment--;
+		}
+		
+		// 과목 인원수정보 갱신, 학생수강신청목록 삭제, 성적테이블 삭제
+		try {
+			map.put("enrollment", enrollment);
+			courseMapper.updateEnrollment(map);
+			courseMapper.deleteCourse((String) map.get("registrationId"));
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
 
 	
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

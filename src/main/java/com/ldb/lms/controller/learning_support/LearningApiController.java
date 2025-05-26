@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ldb.lms.dto.ApiResponseDto;
 import com.ldb.lms.dto.learning_support.DeptDto;
 import com.ldb.lms.dto.learning_support.RegistrationDto;
 import com.ldb.lms.dto.learning_support.SearchDto;
@@ -29,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/learning_support")
 public class LearningApiController {
 	
-private final LearningService learningService;
+	private final LearningService learningService;
 	
 	private final ObjectMapper objectMapper;
 	
@@ -96,20 +98,30 @@ private final LearningService learningService;
         }
 	}
 	
-//	@PostMapping("deleteCourse")
-//	public String deleteCourse (HttpServletRequest request, HttpServletResponse response) {
-//
-//		String studentId = (String) request.getSession().getAttribute("login");
-//		
-//		String registrationId = request.getParameter("registrationId");
-//		String courseId = request.getParameter("courseId");
-//		
-//		try {
-//			courseDao.deleteCourse(registrationId,courseId, studentId);
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//		}
-//		
-//		return "/pages/dummy";
-//	}
+	@PostMapping("deleteCourse")
+	public ResponseEntity<ApiResponseDto<Void>> deleteCourse (
+			@RequestParam Map<String, Object> map,
+			@SessionAttribute(value = "login", required = false) String studentId
+			) {
+
+		if (studentId == null) {
+			// login 처리전까지 하드코딩
+//            response.put("success", false);
+//            response.put("errorMsg", "Login required");
+//            return ResponseEntity.badRequest().body(response);
+			studentId = "S001";
+        }
+		
+		try {
+			learningService.deleteCourse(map);
+			return ResponseEntity.ok(new ApiResponseDto<>(true, "삭제처리 성공", null));
+		} catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity
+					.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ApiResponseDto<>(false, "수정 실패: " + e.getMessage(), null));
+		}
+		
+		
+	}
 }

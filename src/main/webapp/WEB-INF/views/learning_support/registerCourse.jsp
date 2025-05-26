@@ -530,7 +530,11 @@
                 type: "post",
                 data: { registrationId: registrationId, courseId: courseId },
                 dataType: "json",
-                success: function(data) {
+                success: function(response) {
+                    if (!response.success) {
+						alert('작업에 실패하였습니다. 관리자에게 문의 부탁드립니다.');
+						return;
+                        }
                     loadRegistrations();
                     loadCourses();
                 },
