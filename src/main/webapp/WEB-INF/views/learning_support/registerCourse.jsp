@@ -474,7 +474,7 @@
                 data: { courseId: courseId, professorId: professorId },
                 dataType: "json",
                 success: function(data) {
-                    if (data.errorMsg && data.errorMsg.indexOf('full') !== -1) {
+                    if (data.message && data.message.indexOf('full') !== -1) {
                         alert('해당강의는 정원이 초과하였습니다.');
                     }
                     loadRegistrations();
@@ -530,7 +530,11 @@
                 type: "post",
                 data: { registrationId: registrationId, courseId: courseId },
                 dataType: "json",
-                success: function(data) {
+                success: function(response) {
+                    if (!response.success) {
+						alert('작업에 실패하였습니다. 관리자에게 문의 부탁드립니다.');
+						return;
+                        }
                     loadRegistrations();
                     loadCourses();
                 },

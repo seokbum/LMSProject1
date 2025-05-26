@@ -1,39 +1,87 @@
 package com.ldb.lms.service.mypage;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import com.ldb.lms.dto.mypage.LoginDto;
-import com.ldb.lms.mapper.learning_support.CourseMapper;
 import com.ldb.lms.mapper.mypage.ProStuMapper;
 import com.ldb.lms.mapper.mypage.ProfessorMapper;
 import com.ldb.lms.mapper.mypage.StudentMapper;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+
 
 
 @Service
 @RequiredArgsConstructor
 public class MypageService {
 	
-	@Autowired
+	
 	private final StudentMapper studentMapper;
-	@Autowired
+	
 	private final ProfessorMapper professroMapper;
-	@Autowired
+	
 	private final ProStuMapper proStuMapper;
 	
-	public Map<String,String> login(LoginDto dto) {
-		Map<String, String> loginChk = proStuMapper.loginChk(dto);
-		if(loginChk == null) {
+	public Map<String,String> login(String id , String password , HttpServletRequest request) {
+		LoginDto dto = new LoginDto();
+		dto.setProfessorId(id);
+		dto.setStudentId(id);
+		
+		Map<String, String> map = proStuMapper.loginChk(dto);
+		request.setAttribute("out", "out");
+		if(map == null) {
 			return null;
 		}
 		else {
-			return loginChk;
+			
+			String dbId="";
+			String dbPw="";
+			String dbName="";
+			Set<Entry<String,String>> entrySet = map.entrySet();
+			for (Entry<String, String> entry : entrySet) {
+				if(entry.getKey().contains("id")) {
+					dbId = entry.getValue();
+				}
+				else if(entry.getKey().contains("password")) {
+					dbPw = entry.getValue();
+				}
+				else {
+					dbName = entry.getValue();
+				}
+			} //dbId,dbPw,dbName 꺼내기종료
+			
+			//Bcrypt.checkpw(입력,검증) : 입력과 검증(암호화된비번) 을 비교할수있음
+			if(BCrypt.checkpw(password, dbPw) ){
+				System.out.println("비밀번호비교성공");
+				
+				if(dbId.contains("S")) { //학생 중 퇴학상태인 학생을 검증하는 단계
+					if(studentMapper.selectStatus(dbId).equals("퇴학")) { 
+						return null;
+					}
+				}
+
+				request.getSession().setAttribute("login", dbId);
+				request.setAttribute("out",null);
+				return map;
+
+			}
+			else{
+				request.setAttribute("msg", "비번을 확인하세요");
+				request.setAttribute("url","doLogin");
+				return null;
+			}
+
+			
 		}
 		
 	}
+
+
 
 }

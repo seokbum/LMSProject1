@@ -3,7 +3,7 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.ldb.lms.mypage.ScheduleMapper">
+<mapper namespace="com.ldb.lms.mapper.mypage.ScheduleMapper">
 
     <!-- 모든 일정 조회 -->
     <select id="listAll" resultType="Schedule">
