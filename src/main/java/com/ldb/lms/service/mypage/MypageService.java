@@ -5,10 +5,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.ldb.lms.dto.mypage.LoginDto;
-import com.ldb.lms.mapper.learning_support.CourseMapper;
-import com.ldb.lms.mapper.mypage.ProStuMapper;
-import com.ldb.lms.mapper.mypage.ProfessorMapper;
-import com.ldb.lms.mapper.mypage.StudentMapper;
+
 
 @Service
 public class MypageService {
