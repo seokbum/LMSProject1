@@ -24,7 +24,7 @@ public class NoticeController {
 		this.noticeService = noticeService; 
 	}
 	
-	@GetMapping("getNotice")
+	@GetMapping("getNotices")
 	public String listNotice(
 			@ModelAttribute NoticeSearchDto searchDto,
 			@ModelAttribute NoticePaginationDto pageDto,
@@ -36,6 +36,6 @@ public class NoticeController {
 		model.addAttribute("pagination",response.get("pagination"));
 		model.addAttribute("searchDto",searchDto);
 		model.addAttribute("today", new java.util.Date());
-		return "notice/list";
+		return "board/notice/getNotice";
 	}
 }
