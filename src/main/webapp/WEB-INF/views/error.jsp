@@ -53,7 +53,7 @@
     </c:if>
 
     <p>잠시 후 다시 시도하거나, 메인 페이지로 돌아가주세요.</p>
-    <a href="/LMSProject1/mypage/index" class="btn btn-danger home-btn">홈으로 이동</a>
+    <a href="/" class="btn btn-danger home-btn">홈으로 이동</a>
 </div>
 </body>
 </html>
