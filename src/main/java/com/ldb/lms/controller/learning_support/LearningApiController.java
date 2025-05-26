@@ -70,7 +70,7 @@ public class LearningApiController {
 	
 	@PostMapping("registerCourse")
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> registerCourse (
+	public ResponseEntity<ApiResponseDto<Void>> registerCourse (
 			@RequestParam Map<String, Object> map,
             @SessionAttribute(value = "login", required = false) String studentId) {
 		
@@ -87,15 +87,14 @@ public class LearningApiController {
         map.put("studentId", studentId);
         
         try {
-            learningService.registerCourse(map);
-            response.put("success", true);
-            response.put("message", "Course registered successfully");
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            response.put("success", false);
-            response.put("errorMsg", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
+			learningService.registerCourse(map);
+			return ResponseEntity.ok(new ApiResponseDto<>(true, "등록처리 성공", null));
+		} catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity
+					.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ApiResponseDto<>(false, "수정 실패: " + e.getMessage(), null));
+		}
 	}
 	
 	@PostMapping("deleteCourse")
@@ -110,6 +109,7 @@ public class LearningApiController {
 //            response.put("errorMsg", "Login required");
 //            return ResponseEntity.badRequest().body(response);
 			studentId = "S001";
+			map.put("studentId", studentId);
         }
 		
 		try {
@@ -121,7 +121,6 @@ public class LearningApiController {
 					.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(new ApiResponseDto<>(false, "수정 실패: " + e.getMessage(), null));
 		}
-		
 		
 	}
 }

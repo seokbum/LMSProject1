@@ -161,10 +161,22 @@
 		 where student_id = #{studentId}
     </select>
     
-    <update id="updateEnrollment" parameterType="java.util.Map">
-    	update  course
-		set 	course_current_enrollment = #{enrollment}
-		where 	course_id = #{courseId}
+    <update id="increaseEnrollment">
+    	<![CDATA[
+        UPDATE course
+        SET course_current_enrollment = course_current_enrollment + 1
+        WHERE course_id = #{courseId}
+        AND course_current_enrollment < course_max_cnt
+    	]]>
+    </update>
+    
+    <update id="decrementEnrollment">
+    	<![CDATA[
+        UPDATE course
+        SET course_current_enrollment = course_current_enrollment - 1
+        WHERE course_id = #{courseId}
+        AND course_current_enrollment > 0
+        ]]>
     </update>
     
     <!-- 현재 수강생, 정원 조회 -->
@@ -212,7 +224,7 @@
 		and   c.course_id = ct.course_id
 	</select>
 	
-    <delete id="deleteCourse" parameterType="string">
+    <delete id="deleteRegistration" parameterType="string">
         DELETE FROM registration
         WHERE registration_id = #{registrationId}
     </delete>

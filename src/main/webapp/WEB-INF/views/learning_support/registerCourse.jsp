@@ -474,7 +474,7 @@
                 data: { courseId: courseId, professorId: professorId },
                 dataType: "json",
                 success: function(data) {
-                    if (data.errorMsg && data.errorMsg.indexOf('full') !== -1) {
+                    if (data.message && data.message.indexOf('full') !== -1) {
                         alert('해당강의는 정원이 초과하였습니다.');
                     }
                     loadRegistrations();
