@@ -34,11 +34,12 @@ public class MypageService {
 		dto.setStudentId(id);
 		
 		Map<String, String> map = proStuMapper.loginChk(dto);
-		System.out.println(map);
+		request.setAttribute("out", "out");
 		if(map == null) {
 			return null;
 		}
 		else {
+			
 			String dbId="";
 			String dbPw="";
 			String dbName="";
@@ -54,22 +55,19 @@ public class MypageService {
 					dbName = entry.getValue();
 				}
 			} //dbId,dbPw,dbName 꺼내기종료
+			
 			//Bcrypt.checkpw(입력,검증) : 입력과 검증(암호화된비번) 을 비교할수있음
 			if(BCrypt.checkpw(password, dbPw) ){
 				System.out.println("비밀번호비교성공");
 				
 				if(dbId.contains("S")) { //학생 중 퇴학상태인 학생을 검증하는 단계
 					if(studentMapper.selectStatus(dbId).equals("퇴학")) { 
-						/*request.setAttribute("msg","퇴학한사람은 로그인할수없어요");
-						request.setAttribute("url","doLogin");
-						return "alert";*/
 						return null;
 					}
 				}
 
 				request.getSession().setAttribute("login", dbId);
-				request.setAttribute("msg", dbName+"님이 로그인 하셨습니다");
-				request.setAttribute("url","index");
+				request.setAttribute("out",null);
 				return map;
 
 			}

@@ -34,14 +34,7 @@ public class MypageController {
 	@PostMapping("login")
 	public String login(@RequestParam String id , @RequestParam String password ,HttpServletRequest request) {
 		Map<String,String> login = mypageService.login(id,password,request);
-		if(login==null) {
-			return "mypage/doLogin";
-		}
-		else {
-			return "index";
-		}
-		
-		
+		return login==null? "mypage/doLogin;" : "index";
 	}
 	
 	
