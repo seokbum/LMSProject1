@@ -156,11 +156,11 @@ h4 {
 			<label class="form-label" style="text-align: center;">로그인</label>
 			<div class="mb-3">
 				<label for="id" class="form-label">아이디</label> <input type="text"
-					class="form-control" id="id" name="studentId" placeholder="아이디 입력">
+					class="form-control" id="id" name="id" placeholder="아이디 입력">
 			</div>
 			<div class="mb-3">
 				<label for="password" class="form-label">비밀번호</label> <input
-					type="password" class="form-control" id="password" name="professorId"
+					type="password" class="form-control" id="password" name="password"
 					placeholder="비밀번호 입력">
 			</div>
 			<button class="btn btn-primary">
