@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/learning_support")
 public class LearningApiController {
 	
-private final LearningService learningService;
+	private final LearningService learningService;
 	
 	private final ObjectMapper objectMapper;
 	
