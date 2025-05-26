@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- 콘솔 로깅 설정 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %cyan(%logger{36}) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 이 라인은 주석처리하거나 삭제 -->
+    <!-- <include resource="org/springframework/boot/logging/logback/base.xml"/> -->
+
+    <!-- 로깅 수준 설정 -->
+    <logger name="com.ldb.lms.mapper" level="DEBUG"/>
+    <logger name="org.apache.ibatis.logging.jdbc.ResultSetLogger" level="TRACE"/>
+    <logger name="org.apache.ibatis.logging.jdbc.StatementLogger" level="DEBUG"/>
+    <logger name="org.apache.ibatis.logging.jdbc.PreparedStatementLogger" level="DEBUG"/>
+    <logger name="org.apache.ibatis.logging.jdbc.CallableStatementLogger" level="DEBUG"/>
+
+    <!-- 루트 로거에 STDOUT appender 연결 -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

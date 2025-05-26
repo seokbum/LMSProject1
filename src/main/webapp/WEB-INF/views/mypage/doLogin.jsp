@@ -1,4 +1,3 @@
-
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>		
@@ -7,7 +6,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Login</title>
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -156,21 +154,26 @@ h4 {
 			<label class="form-label" style="text-align: center;">로그인</label>
 			<div class="mb-3">
 				<label for="id" class="form-label">아이디</label> <input type="text"
-					class="form-control" id="id" name="studentId" placeholder="아이디 입력">
+					class="form-control" id="id" name="id" placeholder="아이디 입력">
 			</div>
 			<div class="mb-3">
 				<label for="password" class="form-label">비밀번호</label> <input
-					type="password" class="form-control" id="password" name="professorId"
+					type="password" class="form-control" id="password" name="password"
 					placeholder="비밀번호 입력">
 			</div>
+			<c:if test="${out != null }">
+			<div class="mb-3">
+				<div id="errorMessage" style="color: red; font-size:20px" >입력한 정보가 틀립니다</div>
+			</div>
+			</c:if>
 			<button class="btn btn-primary">
 				<span class="ldb-text">LDB</span> 로그인
 			</button>
 		</form>
 		<div class="link-container">
-			<a href="javascript:goFindId()" class="btn-link-custom">아이디 찾기</a> <a
-				href="javascript:goFindPw()" class="btn-link-custom">비밀번호 찾기</a> <a
-				href="${pageContext.request.contextPath}/mypage/registerUser"
+			<a href="javascript:goFindId()" class="btn-link-custom">아이디 찾기</a> 
+			<a href="javascript:goFindPw()" class="btn-link-custom">비밀번호 찾기</a> 
+			<a href="${pageContext.request.contextPath}/mypage/registerUser"
 				class="btn-link-custom">회원가입</a>
 		</div>
 	</div>
@@ -178,31 +181,43 @@ h4 {
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
-    function input_check(form) {
-        if (!form.id.value.trim()) {
-            alert("아이디를 입력하세요.");
-            form.id.focus();
-            return false;
-        }
-        if (!form.password.value.trim()) {
-            alert("비밀번호를 입력하세요.");
-            form.password.focus();
-            return false;
-        }
-        return true;
-    }
-    
-    function goFindId(){
-    	let op = "width=500,height=500 ,top=50 ,left=150";
-    	window.open("findId","",op);
-    	
-    }
-    
-    function goFindPw(){
-    	let op = "width=500,height=500 ,top=50 ,left=150";
-    	window.open("findPw","",op);
-    	
-    }
-</script>
+		function input_check(form) {
+			if (!form.id.value.trim()) {
+				alert("아이디를 입력하세요.");
+				form.id.focus();
+				return false;
+			}
+			if (!form.password.value.trim()) {
+				alert("비밀번호를 입력하세요.");
+				form.password.focus();
+				return false;
+			}
+			return true;
+		}
+		
+		function goFindId() {
+			let op = "width=500,height=500,top=50,left=150";
+			window.open("findId", "", op);
+		}
+		
+		function goFindPw() {
+			let op = "width=500,height=500,top=50,left=150";
+			window.open("findPw", "", op);
+		}
+
+		// 입력 필드에 이벤트 리스너 추가
+		const idInput = document.getElementById('id');
+		const passwordInput = document.getElementById('password');
+		const errorMessage = document.getElementById('errorMessage');
+
+		if (errorMessage) {
+			idInput.addEventListener('input', function() {
+				errorMessage.style.display = 'none';
+			});
+			passwordInput.addEventListener('input', function() {
+				errorMessage.style.display = 'none';
+			});
+		}
+	</script>
 </body>
 </html>

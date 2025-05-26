@@ -3,7 +3,7 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.ldb.lms.mypage.StudentMapper">
+<mapper namespace="com.ldb.lms.mapper.mypage.StudentMapper">
 <select id="cnt" resultType="int" parameterType="String"> 
 		select count(*) from student where student_id=#{id}
 	</select>

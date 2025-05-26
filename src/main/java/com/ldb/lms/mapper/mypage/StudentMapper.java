@@ -1,7 +1,5 @@
 package com.ldb.lms.mapper.mypage;
 
-import java.util.List;
-
 import org.apache.ibatis.annotations.Mapper;
 
 import com.ldb.lms.domain.Student;
