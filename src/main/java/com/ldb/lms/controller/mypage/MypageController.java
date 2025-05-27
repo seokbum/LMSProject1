@@ -26,15 +26,15 @@ public class MypageController {
 	}
 	
 	@GetMapping("doLogin")
-	public String callDoLogin () {
-		//mypageService.loginChk();
+	public String callDoLogin (HttpServletRequest request) {
+		mypageService.loginChk(request);
 		return "mypage/doLogin";
 	}
 	
 	@PostMapping("login")
 	public String login(@RequestParam String id , @RequestParam String password ,HttpServletRequest request) {
 		Map<String,String> login = mypageService.login(id,password,request);
-		return login==null? "mypage/doLogin;" : "index";
+		return login==null?"mypage/doLogin":"index";
 	}
 	
 	

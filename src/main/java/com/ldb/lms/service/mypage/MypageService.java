@@ -28,14 +28,23 @@ public class MypageService {
 	
 	private final ProStuMapper proStuMapper;
 	
+	public void loginChk(HttpServletRequest request) {
+		String login = (String)request.getSession().getAttribute("login");
+		
+		
+		
+	}
+
+
 	public Map<String,String> login(String id , String password , HttpServletRequest request) {
 		LoginDto dto = new LoginDto();
 		dto.setProfessorId(id);
 		dto.setStudentId(id);
 		
 		Map<String, String> map = proStuMapper.loginChk(dto);
-		request.setAttribute("out", "out");
+		
 		if(map == null) {
+			request.setAttribute("out", "존재하지않는 정보");
 			return null;
 		}
 		else {
@@ -58,10 +67,10 @@ public class MypageService {
 			
 			//Bcrypt.checkpw(입력,검증) : 입력과 검증(암호화된비번) 을 비교할수있음
 			if(BCrypt.checkpw(password, dbPw) ){
-				System.out.println("비밀번호비교성공");
 				
 				if(dbId.contains("S")) { //학생 중 퇴학상태인 학생을 검증하는 단계
 					if(studentMapper.selectStatus(dbId).equals("퇴학")) { 
+						request.setAttribute("out", "퇴학한사람은 로그인 할 수 없어요");
 						return null;
 					}
 				}
@@ -72,8 +81,7 @@ public class MypageService {
 
 			}
 			else{
-				request.setAttribute("msg", "비번을 확인하세요");
-				request.setAttribute("url","doLogin");
+				request.setAttribute("out", "아이디혹은비밀번호를 확인해주세요");
 				return null;
 			}
 
@@ -81,6 +89,8 @@ public class MypageService {
 		}
 		
 	}
+
+	
 
 
 
