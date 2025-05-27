@@ -1,8 +1,12 @@
 package com.ldb.lms.controller.learning_support;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttribute;
+
+import com.ldb.lms.dto.learning_support.StudentRegistrationSummaryDto;
 import com.ldb.lms.service.learning_support.LearningService;
 
 
@@ -22,4 +26,36 @@ public class LearningController {
 		return "learning_support/registerCourse";
 	}
 	
+	@GetMapping("viewCourse")
+	public String callViewCourse (
+			@SessionAttribute(value = "login", required = false) String studentId,
+			Model model
+	) {
+		
+		if (studentId == null) {
+			// login 처리전까지 하드코딩
+//            response.put("success", false);
+//            response.put("errorMsg", "Login required");
+//            return ResponseEntity.badRequest().body(response);
+			studentId = "S001";
+        }
+		
+		StudentRegistrationSummaryDto registList = learningService.getStudentRegistrationSummary(studentId);
+		
+		model.addAttribute("registration", registList.getRegistrations());
+		model.addAttribute("totalScore", registList.getTotalScore());
+		
+		return "learning_support/viewCourse";
+	}
 }
+
+
+
+
+
+
+
+
+
+
+

@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.ldb.lms.dto.learning_support.AttendanceDto;
 import com.ldb.lms.dto.learning_support.CourseDto;
 import com.ldb.lms.dto.learning_support.CoursePagingDto;
 import com.ldb.lms.dto.learning_support.DeptDto;
 import com.ldb.lms.dto.learning_support.RegistrationDto;
 import com.ldb.lms.dto.learning_support.SearchDto;
+import com.ldb.lms.dto.learning_support.StudentRegistrationSummaryDto;
 import com.ldb.lms.dto.professor_support.PaginationDto;
 import com.ldb.lms.mapper.learning_support.CourseMapper;
 
@@ -57,12 +59,29 @@ public class LearningService {
         response.put("pagination", pageDto);
         return response;
     }
-
+    
     public List<RegistrationDto> searchRegistrationCourses(String studentId) {
+
         return courseMapper.searchRegistrationCourses(studentId);
     }
+    
+    public StudentRegistrationSummaryDto getStudentRegistrationSummary(String studentId) {
+    	List<RegistrationDto> regList = courseMapper.searchRegistrationCourses(studentId);
+    	Integer totalScore = calcTotalScore(regList);
+    	
+        return new StudentRegistrationSummaryDto(regList, totalScore);
+    }
 	
-	
+    private Integer calcTotalScore(List<RegistrationDto> registList) {
+    	int totalScore = 0;
+		
+		for (RegistrationDto r : registList) {
+			totalScore += r.getCourseScore();
+		}
+		
+		return totalScore;
+	}
+    
 	@Transactional
     public void registerCourse(Map<String, Object> map) {
 		
@@ -194,6 +213,22 @@ public class LearningService {
             // 런타임 예외를 다시 던져서 트랜잭션 롤백을 유도하고, 컨트롤러로 전달
             throw new RuntimeException("수강 신청 삭제 실패: " + e.getMessage(), e);
 		}
+	}
+
+	public List<AttendanceDto> viewCourseTime(String studentId) {
+		List<AttendanceDto> timetable = null;
+		
+		try {
+			timetable = courseMapper.viewCourseTime(studentId);
+			
+		} catch (Exception e) {
+			// 오류 로그 기록
+            log.error("시간표조회 에러 ",e);
+            // 런타임 예외를 다시 던져서 트랜잭션 롤백을 유도하고, 컨트롤러로 전달
+            throw new RuntimeException("시간표조회 실패: " + e.getMessage(), e);
+		}
+		
+		return timetable;
 	}
 
 	
