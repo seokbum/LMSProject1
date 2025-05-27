@@ -4,8 +4,8 @@
     <select id="countNotices" parameterType="com.ldb.lms.dto.board.notice.NoticeSearchDto" resultType="int">
         SELECT COUNT(*)
         FROM notice n
-        LEFT JOIN student s ON n.user_id = s.student_id
-        LEFT JOIN professor p ON n.user_id = p.professor_id
+        LEFT JOIN student s ON n.writer_id = s.student_id
+        LEFT JOIN professor p ON n.writer_id = p.professor_id
         <where>
             <if test="searchType != null and searchKeyword != null and searchKeyword != ''">
                 <choose>
@@ -44,7 +44,6 @@
     <select id="listNotice" parameterType="map" resultType="com.ldb.lms.dto.board.notice.NoticeDto">
         SELECT 
             n.notice_id,
-            n.user_id,
             COALESCE(s.student_name, p.professor_name) AS userName,
             n.notice_title,
             n.notice_content,
@@ -54,8 +53,8 @@
             n.notice_read_count,
             n.notice_password
         FROM notice n
-        LEFT JOIN student s ON n.user_id = s.student_id
-        LEFT JOIN professor p ON n.user_id = p.professor_id
+        LEFT JOIN student s ON n.writer_id = s.student_id
+        LEFT JOIN professor p ON n.writer_id = p.professor_id
         <where>
             <if test="searchDto.searchType != null and searchDto.searchKeyword != null and searchDto.searchKeyword != ''">
                 <choose>
@@ -82,7 +81,7 @@
                     </when>
                     <when test="searchDto.searchType == 'noticeTitle,userName,noticeContent'">
                         (n.notice_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
-                         COALESCE(s.student_name, p.professor_name) LIKE CONCAT('%', #{searchKeyword}, '%') OR
+                         COALESCE(s.student_name, p.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
                          n.notice_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
                     </when>
                 </choose>
