@@ -163,7 +163,7 @@ h4 {
 			</div>
 			<c:if test="${out != null }">
 			<div class="mb-3">
-				<div id="errorMessage" style="color: red; font-size:20px" >입력한 정보가 틀립니다</div>
+				<div id="errorMessage" style="color: red; font-size:20px" >${out}</div>
 			</div>
 			</c:if>
 			<button class="btn btn-primary">
@@ -173,7 +173,7 @@ h4 {
 		<div class="link-container">
 			<a href="javascript:goFindId()" class="btn-link-custom">아이디 찾기</a> 
 			<a href="javascript:goFindPw()" class="btn-link-custom">비밀번호 찾기</a> 
-			<a href="${pageContext.request.contextPath}/mypage/registerUser"
+			<a href="/mypage/registerUser"
 				class="btn-link-custom">회원가입</a>
 		</div>
 	</div>
