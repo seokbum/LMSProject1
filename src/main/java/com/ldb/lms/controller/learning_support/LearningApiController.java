@@ -123,4 +123,56 @@ public class LearningApiController {
 		}
 		
 	}
+	
+	@GetMapping("viewCourseTime")
+	public ResponseEntity<ApiResponseDto<List<AttendanceDto>>> viewCourseTime(
+			@SessionAttribute(value = "login", required = false) String studentId
+			) {
+		
+		if (studentId == null) {
+			// login 처리전까지 하드코딩
+//            response.put("success", false);
+//            response.put("errorMsg", "Login required");
+//            return ResponseEntity.badRequest().body(response);
+			studentId = "S001";
+        }
+		
+		try {
+			List<AttendanceDto> timetable =  learningService.viewCourseTime(studentId);
+			return ResponseEntity.ok(new ApiResponseDto<List<AttendanceDto>>(true, "조회 성공", timetable));
+		} catch(Exception e) {
+			return ResponseEntity
+					.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ApiResponseDto<>(false, "조회 실패: " + e.getMessage(), null));
+		}
+		
+	}
+	
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

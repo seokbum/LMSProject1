@@ -15,9 +15,8 @@ public class SiteMeshConfig {
         filter.setFilter(new ConfigurableSiteMeshFilter() {
             @Override
             protected void applyCustomConfiguration(SiteMeshFilterBuilder builder) {
-                builder.addDecoratorPath("/*", "sitemesh/layout.jsp");
-                
-                builder.addExcludedPath("/api/*");   // API 경로는 데코레이터 제외
+                builder.addDecoratorPath("/*", "sitemesh/layout.jsp")
+                .addExcludedPath("/mypage/*");
             }
         });
         return filter;

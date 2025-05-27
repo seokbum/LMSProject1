@@ -26,17 +26,7 @@ public class MypageApiController {
     MypageApiController(MypageService mypageService) {
         this.mypageService = mypageService;
     }
-	
-	@PostMapping("login")
-	@ResponseBody
-	public ResponseEntity<Map<String,String>> doLogin(
-			@RequestParam Map<String, Object> map,
-			@SessionAttribute(value = "login", required = false)String studentId){
-		System.out.println("PostMapping");
-		//mypageService.login(studentId);
-		return null;
 
-	}
 	
 
 }
