@@ -15,7 +15,8 @@ public class SiteMeshConfig {
         filter.setFilter(new ConfigurableSiteMeshFilter() {
             @Override
             protected void applyCustomConfiguration(SiteMeshFilterBuilder builder) {
-                builder.addDecoratorPath("/*", "sitemesh/layout.jsp");
+                builder.addDecoratorPath("/*", "sitemesh/layout.jsp")
+                .addExcludedPath("/mypage/*");
             }
         });
         return filter;

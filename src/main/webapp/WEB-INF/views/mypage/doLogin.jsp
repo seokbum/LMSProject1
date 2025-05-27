@@ -173,7 +173,7 @@ h4 {
 		<div class="link-container">
 			<a href="javascript:goFindId()" class="btn-link-custom">아이디 찾기</a> 
 			<a href="javascript:goFindPw()" class="btn-link-custom">비밀번호 찾기</a> 
-			<a href="${pageContext.request.contextPath}/mypage/registerUser"
+			<a href="/mypage/registerUser"
 				class="btn-link-custom">회원가입</a>
 		</div>
 	</div>
