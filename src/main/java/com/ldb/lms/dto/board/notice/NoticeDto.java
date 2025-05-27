@@ -10,6 +10,7 @@ import lombok.ToString;
 @ToString
 public class NoticeDto {
     private String noticeId;
+    private String WriterId;
     private String userName; 
     private String noticeTitle;
     private String noticeContent;
