@@ -18,6 +18,5 @@ public class Notice {
     private Date noticeUpdatedAt;
     private String noticeFile; 
     private Integer noticeReadCount; 
-    private String noticePassword; 
-    private String writerName; 
+    private String noticePassword;
 }

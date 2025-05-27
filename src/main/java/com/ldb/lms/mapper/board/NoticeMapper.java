@@ -12,4 +12,5 @@ import com.ldb.lms.dto.board.notice.NoticeSearchDto;
 public interface NoticeMapper {
     List<NoticeDto> listNotice(Map<String, Object> param);
     Integer countNotices(NoticeSearchDto searchDto);
+    void insertNoitce(NoticeDto noticeDto);
 }

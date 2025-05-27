@@ -26,13 +26,15 @@ public class NoticeApiController {
 		this.noticeService = noticeService;
 	}
 	
-	@GetMapping("list")
+	@GetMapping("getNotices")
 	public ResponseEntity<Map<String, Object>> listNotice(
 			@ModelAttribute NoticeSearchDto searchDto,
 			@ModelAttribute NoticePaginationDto pageDto
 			){
 		return ResponseEntity.ok(noticeService.listNotice(searchDto,pageDto));
 	}
+	
+	
 	
 	
 	

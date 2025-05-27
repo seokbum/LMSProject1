@@ -15,7 +15,7 @@
         <c:if test="${not empty msg}">
             <div class="alert alert-danger"><c:out value="${msg}"/></div>
         </c:if>
-        <form action="/list" method="get" class="mb-4">
+        <form action="/notice/getNotices" method="get" class="mb-4">
             <div class="row">
                 <div class="col-md-3">
                     <select name="searchType" class="form-select">
@@ -58,7 +58,6 @@
                                 </td>
                                 <td><c:out value="${notice.userName}"/></td>
                                 <td>
-                                    <%-- 오늘 날짜와 공지사항 작성일을 비교하여 포맷을 다르게 표시 --%>
                                     <c:set var="todayDate" value="<%= new java.util.Date() %>" />
                                     <fmt:formatDate var="todayFormatted" value="${todayDate}" pattern="yyyy-MM-dd" />
                                     <fmt:formatDate var="noticeDateFormatted" value="${notice.noticeCreatedAt}" pattern="yyyy-MM-dd" />
@@ -85,7 +84,7 @@
             </tbody>
         </table>
         <div class="text-end">
-            <a href="<c:url value='/notice/add'/>" class="btn btn-primary">글쓰기</a>
+            <a href="<c:url value='/notice/createNotice'/>" class="btn btn-primary">글쓰기</a>
         </div>
         <nav>
             <ul class="pagination justify-content-center">

@@ -6,9 +6,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.ldb.lms.dto.board.notice.NoticeDto;
 import com.ldb.lms.dto.board.notice.NoticePaginationDto;
 import com.ldb.lms.dto.board.notice.NoticeSearchDto;
 
@@ -24,7 +26,7 @@ public class NoticeController {
 		this.noticeService = noticeService; 
 	}
 	
-	@GetMapping("list")
+	@GetMapping("getNotices")
 	public String listNotice(
 			@ModelAttribute NoticeSearchDto searchDto,
 			@ModelAttribute NoticePaginationDto pageDto,
@@ -36,6 +38,17 @@ public class NoticeController {
 		model.addAttribute("pagination",response.get("pagination"));
 		model.addAttribute("searchDto",searchDto);
 		model.addAttribute("today", new java.util.Date());
-		return "/notice/getNotices";
+		return "board/notice/getNotices";
+	}
+	
+	@GetMapping("createNotice")
+	public String createNotice() {
+		return "board/notice/createNotice";
+	}
+	
+	@PostMapping("write")
+	public String wrtieNotice(
+			@ModelAttribute NoticeDto noticeDto) {
+		return null;
 	}
 }

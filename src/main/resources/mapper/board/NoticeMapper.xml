@@ -4,13 +4,13 @@
     <select id="countNotices" parameterType="com.ldb.lms.dto.board.notice.NoticeSearchDto" resultType="int">
         SELECT COUNT(*)
         FROM notice n
-        LEFT JOIN student s ON n.writer_id = s.student_id
-        LEFT JOIN professor p ON n.writer_id = p.professor_id
+        JOIN professor p 
+        ON n.writer_id = p.professor_id
         <where>
             <if test="searchType != null and searchKeyword != null and searchKeyword != ''">
                 <choose>
                     <when test="searchType == 'userName'">
-                        COALESCE(s.student_name, p.professor_name) LIKE CONCAT('%', #{searchKeyword}, '%')
+                        p.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
                     </when>
                     <when test="searchType == 'noticeTitle'">
                         n.notice_title LIKE CONCAT('%', #{searchKeyword}, '%')
@@ -20,19 +20,19 @@
                     </when>
                     <when test="searchType == 'noticeTitle,userName'">
                         (n.notice_title LIKE CONCAT('%', #{searchKeyword}, '%') OR
-                         COALESCE(s.student_name, p.professor_name) LIKE CONCAT('%', #{searchKeyword}, '%'))
+                         p.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                     <when test="searchType == 'noticeTitle,noticeContent'">
                         (n.notice_title LIKE CONCAT('%', #{searchKeyword}, '%') OR
                          n.notice_content LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                     <when test="searchType == 'userName,noticeContent'">
-                        (COALESCE(s.student_name, p.professor_name) LIKE CONCAT('%', #{searchKeyword}, '%') OR
+                        (p.professor_name LIKE CONCAT('%', #{searchKeyword}, '%') OR
                          n.notice_content LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                     <when test="searchType == 'noticeTitle,userName,noticeContent'">
                         (n.notice_title LIKE CONCAT('%', #{searchKeyword}, '%') OR
-                         COALESCE(s.student_name, p.professor_name) LIKE CONCAT('%', #{searchKeyword}, '%') OR
+                         p.professor_name LIKE CONCAT('%', #{searchKeyword}, '%') OR
                          n.notice_content LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                 </choose>
@@ -43,23 +43,17 @@
     <!-- 공지사항 목록 조회 -->
     <select id="listNotice" parameterType="map" resultType="com.ldb.lms.dto.board.notice.NoticeDto">
         SELECT 
-            n.notice_id,
-            COALESCE(s.student_name, p.professor_name) AS userName,
-            n.notice_title,
-            n.notice_content,
-            n.notice_created_at,
-            n.notice_updated_at,
-            n.notice_file,
-            n.notice_read_count,
+            n.notice_id,p.professor_name AS userName,n.notice_title,n.notice_content,
+            n.notice_created_at,n.notice_updated_at,n.notice_file,n.notice_read_count,
             n.notice_password
         FROM notice n
-        LEFT JOIN student s ON n.writer_id = s.student_id
-        LEFT JOIN professor p ON n.writer_id = p.professor_id
+        JOIN professor p 
+        ON n.writer_id = p.professor_id
         <where>
             <if test="searchDto.searchType != null and searchDto.searchKeyword != null and searchDto.searchKeyword != ''">
                 <choose>
                     <when test="searchDto.searchType == 'userName'">
-                        COALESCE(s.student_name, p.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                        p.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
                     </when>
                     <when test="searchDto.searchType == 'noticeTitle'">
                         n.notice_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
@@ -69,19 +63,19 @@
                     </when>
                     <when test="searchDto.searchType == 'noticeTitle,userName'">
                         (n.notice_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
-                         COALESCE(s.student_name, p.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
+                         p.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
                     </when>
                     <when test="searchDto.searchType == 'noticeTitle,noticeContent'">
                         (n.notice_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
                          n.notice_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
                     </when>
                     <when test="searchDto.searchType == 'userName,noticeContent'">
-                        (COALESCE(s.student_name, p.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
+                        p.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
                          n.notice_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
                     </when>
                     <when test="searchDto.searchType == 'noticeTitle,userName,noticeContent'">
                         (n.notice_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
-                         COALESCE(s.student_name, p.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
+                         p.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
                          n.notice_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
                     </when>
                 </choose>
@@ -91,4 +85,15 @@
         LIMIT #{pageDto.itemsPerPage}
         OFFSET #{pageDto.offset}
     </select>
+    
+    <!-- notice 테이블 추가-->
+    <insert id="insert" parameterType="com.ldb.lms.dto.board.notice.NoticeDto">
+        INSERT INTO notice (
+            notice_id, notice_password, notice_title, notice_content,
+            notice_file, notice_created_at, notice_updated_at, notice_read_count
+        ) VALUES (
+            #{noticeId}, #{noticePassword}, #{noticeTitle},
+            #{noticeContent}, #{noticeFile}, #{noticeCreatedAt}, #{noticeUpdatedAt}, #{noticeReadCount}
+        )
+    </insert>
 </mapper>
