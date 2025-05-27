@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ldb.lms.dto.ApiResponseDto;
+import com.ldb.lms.dto.learning_support.AttendanceDto;
 import com.ldb.lms.dto.learning_support.DeptDto;
 import com.ldb.lms.dto.learning_support.RegistrationDto;
 import com.ldb.lms.dto.learning_support.SearchDto;

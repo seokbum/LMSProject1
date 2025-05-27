@@ -280,7 +280,7 @@ $(document).ready(function() {
         
         if (confirm("정말 수강을 취소하시겠습니까?")) {
             $.ajax({
-                url: "${path}/learning_support/viewCourse/deleteCourse",
+                url: "/api/learning_support/deleteCourse",
                 type: "post",
                 data: { 
                     registrationId: registrationId,
@@ -289,13 +289,14 @@ $(document).ready(function() {
                 dataType: "json",
                 success: function(response) {
                     if (response.success) {
-                        // 수강신청 취소한 행(tr) 삭제
+                        /* // 수강신청 취소한 행(tr) 삭제
                         $('button[data-registration-id="' + registrationId + '"]').closest("tr").remove();
                         $("p:contains('총 신청 학점')").text("총 신청 학점:" +  response.totalScore +  "학점");
                         // 시간표가 표시 중이면 시간표도 갱신
                        	if ($("#timetable-container").is(":visible")) {                		
-                		$(".view-courseTime").trigger("click");
-                    }
+                		$(".view-courseTime").trigger("click"); }*/
+                		location.reload(true);
+                    
                     } else {
                         alert("취소 실패: " + response.message);
                     }
@@ -316,7 +317,7 @@ $(document).ready(function() {
         $("#timetable-container").show();
         console.log('Triggering view-courseTime');
         $.ajax({
-            url: "${path}/learning_support/viewCourse/viewCourseTime",
+            url: "/api/learning_support/viewCourseTime",
             type: "get",
             dataType: "json",
             beforeSend: function() {
@@ -333,7 +334,7 @@ $(document).ready(function() {
                 // 로딩 메시지 제거
                 $("#timetable-body tr:last").remove();
                 if (response.success) {
-                    var timetable = response.timetable;
+                    var timetable = response.data;
                     var tbody = $("#timetable-body");
 
                     // 모든 셀 초기화

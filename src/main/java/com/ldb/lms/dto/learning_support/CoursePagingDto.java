@@ -4,7 +4,6 @@ import com.ldb.lms.dto.professor_support.PaginationDto;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 
 @Getter

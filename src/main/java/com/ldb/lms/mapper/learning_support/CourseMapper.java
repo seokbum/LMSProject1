@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.ldb.lms.dto.learning_support.AttendanceDto;
 import com.ldb.lms.dto.learning_support.CourseDto;
 import com.ldb.lms.dto.learning_support.CoursePagingDto;
 import com.ldb.lms.dto.learning_support.DeptDto;
@@ -48,7 +49,9 @@ public interface CourseMapper {
 
 	void deleteAttendance(Map<String, Object> map);
 
-	void deleteScore(Map<String, Object> map); 
+	void deleteScore(Map<String, Object> map);
+
+	List<AttendanceDto> viewCourseTime(String studentId); 
 
 	
 
