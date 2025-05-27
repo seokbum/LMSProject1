@@ -70,7 +70,7 @@ public class LearningService {
 	    String studentId = (String) map.get("studentId");
 	    String professorId = (String) map.get("professorId");
 
-	    // 1. 필수 매개변수 유효성 검사
+	    // 필수 매개변수 유효성 검사
 	    if (!StringUtils.hasText(courseId)) {
 	        log.error("registerCourse: courseId가 유효하지 않습니다.");
 	        throw new IllegalArgumentException("과목 ID는 필수입니다.");
@@ -86,7 +86,7 @@ public class LearningService {
 	        throw new IllegalArgumentException("교수ID 정보를 확인할 수 없습니다.");
 	    }
 	    
-	    // 수강 인원 증가 및 정원 체크 (단일 DB 쿼리로 동시성 안전하게 처리)
+	    // 수강 인원 증가 및 정원 체크 
         int updatedRows = courseMapper.increaseEnrollment(courseId);
         if (updatedRows == 0) {
         	log.warn("registerCourse: 과목 {}이(가) 정원 초과로 수강 신청 실패.", courseId);
@@ -199,25 +199,3 @@ public class LearningService {
 	
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
