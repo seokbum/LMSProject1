@@ -1,99 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ldb.lms.mapper.board.NoticeMapper">
-    <!-- 공지사항 레코드 수 조회 -->
+
+    <select id="listNotice" parameterType="map" resultType="com.ldb.lms.dto.board.notice.NoticeDto">
+        SELECT
+            n.notice_id,
+            n.writer_id,
+            p.professor_name AS userName,
+            n.notice_title,
+            n.notice_content,
+            n.notice_created_at,
+            n.notice_read_count,
+            n.notice_password,
+            n.notice_file
+        FROM notice n
+        LEFT JOIN professor p ON n.writer_id = p.professor_id
+        <where>
+            <if test="searchDto.searchType != null and searchDto.searchType != ''">
+                <choose>
+                    <when test="searchDto.searchType == 'userName'">
+                        AND p.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                    </when>
+                    <when test="searchDto.searchType == 'noticeTitle'">
+                        AND n.notice_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                    </when>
+                    <when test="searchDto.searchType == 'noticeContent'">
+                        AND n.notice_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                    </when>
+                    <when test="searchDto.searchType == 'noticeTitle,userName'">
+                        AND (n.notice_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                            OR p.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
+                    </when>
+                    <when test="searchDto.searchType == 'noticeTitle,noticeContent'">
+                        AND (n.notice_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                            OR n.notice_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
+                    </when>
+                    <when test="searchDto.searchType == 'userName,noticeContent'">
+                        AND (p.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                            OR n.notice_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
+                    </when>
+                    <when test="searchDto.searchType == 'noticeTitle,userName,noticeContent'">
+                        AND (n.notice_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                            OR p.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                            OR n.notice_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
+                    </when>
+                </choose>
+            </if>
+        </where>
+        ORDER BY n.notice_created_at DESC
+        LIMIT #{pageDto.itemsPerPage} OFFSET #{pageDto.offset}
+    </select>
+
     <select id="countNotices" parameterType="com.ldb.lms.dto.board.notice.NoticeSearchDto" resultType="int">
         SELECT COUNT(*)
         FROM notice n
-        JOIN professor p 
-        ON n.writer_id = p.professor_id
+        LEFT JOIN professor p ON n.writer_id = p.professor_id
         <where>
-            <if test="searchType != null and searchKeyword != null and searchKeyword != ''">
+            <if test="searchType != null and searchType != ''">
                 <choose>
                     <when test="searchType == 'userName'">
-                        p.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                        AND p.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
                     </when>
                     <when test="searchType == 'noticeTitle'">
-                        n.notice_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                        AND n.notice_title LIKE CONCAT('%', #{searchKeyword}, '%')
                     </when>
                     <when test="searchType == 'noticeContent'">
-                        n.notice_content LIKE CONCAT('%', #{searchKeyword}, '%')
+                        AND n.notice_content LIKE CONCAT('%', #{searchKeyword}, '%')
                     </when>
                     <when test="searchType == 'noticeTitle,userName'">
-                        (n.notice_title LIKE CONCAT('%', #{searchKeyword}, '%') OR
-                         p.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
+                        AND (n.notice_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                            OR p.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                     <when test="searchType == 'noticeTitle,noticeContent'">
-                        (n.notice_title LIKE CONCAT('%', #{searchKeyword}, '%') OR
-                         n.notice_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                        AND (n.notice_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                            OR n.notice_content LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                     <when test="searchType == 'userName,noticeContent'">
-                        (p.professor_name LIKE CONCAT('%', #{searchKeyword}, '%') OR
-                         n.notice_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                        AND (p.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                            OR n.notice_content LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                     <when test="searchType == 'noticeTitle,userName,noticeContent'">
-                        (n.notice_title LIKE CONCAT('%', #{searchKeyword}, '%') OR
-                         p.professor_name LIKE CONCAT('%', #{searchKeyword}, '%') OR
-                         n.notice_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                        AND (n.notice_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                            OR p.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                            OR n.notice_content LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                 </choose>
             </if>
         </where>
     </select>
 
-    <!-- 공지사항 목록 조회 -->
-    <select id="listNotice" parameterType="map" resultType="com.ldb.lms.dto.board.notice.NoticeDto">
-        SELECT 
-            n.notice_id,p.professor_name AS userName,n.notice_title,n.notice_content,
-            n.notice_created_at,n.notice_updated_at,n.notice_file,n.notice_read_count,
-            n.notice_password
-        FROM notice n
-        JOIN professor p 
-        ON n.writer_id = p.professor_id
-        <where>
-            <if test="searchDto.searchType != null and searchDto.searchKeyword != null and searchDto.searchKeyword != ''">
-                <choose>
-                    <when test="searchDto.searchType == 'userName'">
-                        p.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                    </when>
-                    <when test="searchDto.searchType == 'noticeTitle'">
-                        n.notice_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                    </when>
-                    <when test="searchDto.searchType == 'noticeContent'">
-                        n.notice_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                    </when>
-                    <when test="searchDto.searchType == 'noticeTitle,userName'">
-                        (n.notice_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
-                         p.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
-                    </when>
-                    <when test="searchDto.searchType == 'noticeTitle,noticeContent'">
-                        (n.notice_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
-                         n.notice_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
-                    </when>
-                    <when test="searchDto.searchType == 'userName,noticeContent'">
-                        p.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
-                         n.notice_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
-                    </when>
-                    <when test="searchDto.searchType == 'noticeTitle,userName,noticeContent'">
-                        (n.notice_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
-                         p.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%') OR
-                         n.notice_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
-                    </when>
-                </choose>
-            </if>
-        </where>
-        ORDER BY n.notice_created_at DESC
-        LIMIT #{pageDto.itemsPerPage}
-        OFFSET #{pageDto.offset}
-    </select>
-    
-    <!-- notice 테이블 추가-->
-    <insert id="insert" parameterType="com.ldb.lms.dto.board.notice.NoticeDto">
+    <insert id="insertNotice" parameterType="com.ldb.lms.dto.board.notice.NoticeDto">
         INSERT INTO notice (
-            notice_id, notice_password, notice_title, notice_content,
-            notice_file, notice_created_at, notice_updated_at, notice_read_count
+            notice_id,
+            writer_id,
+            notice_title,
+            notice_content,
+            notice_created_at,
+            notice_read_count,
+            notice_password,
+            notice_file
         ) VALUES (
-            #{noticeId}, #{noticePassword}, #{noticeTitle},
-            #{noticeContent}, #{noticeFile}, #{noticeCreatedAt}, #{noticeUpdatedAt}, #{noticeReadCount}
+            #{noticeId},
+            #{writerId},
+            #{noticeTitle},
+            #{noticeContent},
+            NOW(),
+            0,
+            #{noticePassword},
+            #{noticeFile}
         )
     </insert>
+    
+    <select id="getLastNoticeId" resultType="String">
+    	Select notice_id
+    	From notice
+    	ORDER BY notice_id DESC
+    	LIMIT 1
+    </select>
 </mapper>

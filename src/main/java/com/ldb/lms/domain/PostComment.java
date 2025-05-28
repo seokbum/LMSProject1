@@ -17,6 +17,4 @@ public class PostComment {
     private String parentCommentId;
     private Date createdAt;
     private Date updatedAt;
-    private String commentPassword;
-    private String commentAuthorName; 
 }

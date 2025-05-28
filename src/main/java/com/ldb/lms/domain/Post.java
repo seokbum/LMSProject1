@@ -23,6 +23,5 @@ public class Post {
     private Integer postReadCount;
     private String postPassword;
     private Integer postNotice;
-    private String authorName;
 
 }
