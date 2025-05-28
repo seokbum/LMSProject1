@@ -155,17 +155,16 @@ body {
 					<!--begin::User Menu Dropdown-->
 					<li class="nav-item dropdown user-menu"><a href="#"
 						class="nav-link dropdown-toggle d-flex align-items-center"
-						data-bs-toggle="dropdown"> <%-- 
+						data-bs-toggle="dropdown">  
 						<c:set var="img" value="${fn:contains(sessionScope.login, 'S') ? m.studentImg : m.professorImg}" />
-						--%> <img src="/dist/assets/picture/${m.img}"
+						 <img src="/dist/assets/picture/${img}"
 							class="user-image rounded-circle shadow" alt="User Image"
 							style="width: 60px; height: 60px; margin-top: 3px" /> <span
 							class="d-none d-md-inline">${sessionScope.login}님 반갑습니다</span>
 					</a>
 						<ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
 							<!--begin::User Image-->
-							<c:set var="img"
-								value="${fn:contains(sessionScope.login, 'S') ? m.studentImg : m.professorImg}" />
+							<c:set var="img" value="${fn:contains(sessionScope.login, 'S') ? m.studentImg : m.professorImg}" />
 							<li class="user-header text-bg-primary"><img
 								src="/dist/assets/picture/${img}" class="rounded-circle shadow"
 								alt="User Image" style="width: 100px; height: 100px;" /> <c:if

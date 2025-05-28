@@ -10,7 +10,7 @@
 	</select>
 	
 	<!--Professor객체를 받아 테이블에 insert하는 문장-->
-	<select id="insert" parameterType="Professor">
+	<insert id="insert" parameterType="Professor">
 	insert  into professor 
 	(
 	professor_id , professor_name , professor_email,
@@ -23,7 +23,7 @@
 	#{professorBirthday},#{professorPhone},#{deptId},
 	#{professorImg},#{professorPassword}
 	)
-	</select>
+	</insert>
 	
 	<!--professor_id를 가지는   컬럼조회-->
 	<select id="selectOne" resultType="Professor" parameterType="String">

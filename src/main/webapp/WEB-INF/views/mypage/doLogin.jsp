@@ -163,7 +163,7 @@ h4 {
 			</div>
 			<c:if test="${out != null }">
 			<div class="mb-3">
-				<div id="errorMessage" style="color: red; font-size:20px" >${out}</div>
+				<div id="errorMessage" style="color: red; font-size:20px" >${error}</div>
 			</div>
 			</c:if>
 			<button class="btn btn-primary">

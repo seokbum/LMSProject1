@@ -1,25 +1,16 @@
 package com.ldb.lms.controller.mypage;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.http.HttpRequest;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.Map;
-import java.util.logging.SimpleFormatter;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.ldb.lms.dto.mypage.RegisterUserDto;
 import com.ldb.lms.service.mypage.MypageService;
-
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -47,7 +38,7 @@ public class MypageController {
 	//너무간단한데 이 1문장도 서비스에서 처리??
 	@GetMapping("logout")
 	public String callLogout(HttpServletRequest request) {
-		request.getSession().invalidate();
+		mypageService.logout(request);
 		return "mypage/doLogin";
 	}
 	
@@ -55,8 +46,10 @@ public class MypageController {
 	@PostMapping("login")
 	public String login(@RequestParam String id , @RequestParam String password ,HttpServletRequest request) {
 		Map<String,String> login = mypageService.login(id,password,request);
-		return login==null?"mypage/doLogin":"index";
+		System.out.println("login"+login);
+		return login==null?"redirect:mypage/doLogin":"redirect:/";
 	}
+	
 	
 	@GetMapping("registerUser")
 	public String callRegisterUser(HttpServletRequest request) {
@@ -76,11 +69,17 @@ public class MypageController {
 	
 	@PostMapping("registerNumChk")
 	public String registerNumChk(HttpServletRequest request,@ModelAttribute RegisterUserDto dto){
-		System.out.println(dto);
+		System.out.println("registerNumChk(DTO) : "+dto);
 		mypageService.registerNumChk(dto,request);
-		
 		return "mypage/registerNumChk";
-		
+	}
+	
+	@PostMapping("registerSuccess")
+	public String registerSuccess(HttpServletRequest request){
+		if(mypageService.registerSuccess(request)) {
+			return "mypage/doLogin";
+		}
+		return "mypage/registerUser";
 	}
 	
 	

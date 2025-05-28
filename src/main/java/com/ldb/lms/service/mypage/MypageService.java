@@ -1,17 +1,11 @@
 package com.ldb.lms.service.mypage;
 
 import java.io.File;
-
-
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,11 +13,10 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
-import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
-import com.ldb.lms.dto.learning_support.DeptDto;
 import com.ldb.lms.dto.mypage.Dept;
 import com.ldb.lms.dto.mypage.LoginDto;
+import com.ldb.lms.dto.mypage.Professor;
 import com.ldb.lms.dto.mypage.RegisterUserDto;
 import com.ldb.lms.dto.mypage.Student;
 import com.ldb.lms.mapper.mypage.DeptMapper;
@@ -31,8 +24,8 @@ import com.ldb.lms.mapper.mypage.ProStuMapper;
 import com.ldb.lms.mapper.mypage.ProfessorMapper;
 import com.ldb.lms.mapper.mypage.StudentMapper;
 
-
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 ;
 
@@ -59,8 +52,6 @@ public class MypageService {
 		else {
 			return true;
 		}
-
-
 	}
 
 
@@ -68,11 +59,10 @@ public class MypageService {
 		LoginDto dto = new LoginDto();
 		dto.setProfessorId(id);
 		dto.setStudentId(id);
-
 		Map<String, String> map = proStuMapper.loginChk(dto);
 
 		if(map == null) {
-			request.setAttribute("out", "존재하지않는 정보");
+			request.setAttribute("error", "존재하지않는 정보");
 			return null;
 		}
 		else {
@@ -98,7 +88,7 @@ public class MypageService {
 
 				if(dbId.contains("S")) { //학생 중 퇴학상태인 학생을 검증하는 단계
 					if(studentMapper.selectStatus(dbId).equals("퇴학")) { 
-						request.setAttribute("out", "퇴학한사람은 로그인 할 수 없어요");
+						request.setAttribute("error", "퇴학한사람은 로그인 할 수 없어요");
 						return null;
 					}
 				}
@@ -109,7 +99,7 @@ public class MypageService {
 
 			}
 			else{
-				request.setAttribute("out", "아이디혹은비밀번호를 확인해주세요");
+				request.setAttribute("error", "아이디혹은비밀번호를 확인해주세요");
 				return null;
 			}
 		}
@@ -241,7 +231,7 @@ public class MypageService {
 		//LocalDate birth = dto.getBirth();
 		//Date date = Date.from(birth.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		
-		//IdChk
+		//position에 따른 id를 만들어줌(중복방지 로직추가)
 		String id = IdChk(dto.getPosition());
 		System.out.println("id : "+id);
 		
@@ -261,12 +251,98 @@ public class MypageService {
 			st.setStudentPhone(dto.getPhone());
 			st.setStudentStatus("재학");
 			System.out.println(st);
-			request.getSession().setAttribute("mem", st);
+			request.setAttribute("id", st.getStudentId());
+			request.getSession().setAttribute("m", st);
 			String num = EmailUtil.sendNum(st.getStudentEmail(), st.getStudentName(), st.getStudentId());
+			request.setAttribute("num", num);
+			System.out.println("num : "+num);
+		}
+		else {
+			Professor pro = new Professor();
+			pro.setProfessorId(id);
+			pro.setDeptId(dto.getDeptId());
+			pro.setProfessorBirthday(dto.getBirth());
+			pro.setProfessorEmail(dto.getEmail());
+			pro.setProfessorImg(dto.getPicture());
+			pro.setProfessorName(dto.getName());
+			pro.setProfessorPassword(hashpw);
+			pro.setProfessorPhone(dto.getPhone());
+			request.setAttribute("id", pro.getProfessorId());
+			request.getSession().setAttribute("m", pro);
+			String num = EmailUtil.sendNum(pro.getProfessorEmail(), pro.getProfessorName(), pro.getProfessorId());
 			request.setAttribute("num", num);
 			System.out.println("num : "+num);
 		}
 		
 		
+	}
+
+
+	public boolean registerSuccess(HttpServletRequest request) {
+		String id = request.getParameter("id");
+		if(id.contains("S")) {
+			Student stu = (Student)request.getSession().getAttribute("mem");
+			
+			if(studentMapper.insert(stu)<1) { //DB에오류발생시
+				System.out.println("실패");
+				request.getSession().invalidate();
+				return false;
+			}
+			else {
+				//회원가입성공 시 해당email로 발급된 id를 보내줄거임
+				String email = stu.getStudentEmail();
+				String name = stu.getStudentName();
+				EmailUtil.sendIdEmail(email, name, id);
+				request.getSession().invalidate();
+				return true;
+			}
+		}
+		else {
+			Professor pro = (Professor)request.getSession().getAttribute("mem");
+			
+			if(professroMapper.insert(pro)<1) {
+				System.out.println("실패");
+				request.getSession().invalidate();
+				return false;
+			}
+			else {
+				String email = pro.getProfessorEmail();
+				String name = pro.getProfessorName();
+				EmailUtil.sendIdEmail(email, name, id);
+				request.getSession().invalidate();
+				return true;
+			}
+		}
+		
+	}
+
+
+	public boolean index(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		String dbId = (String)session.getAttribute("login");
+		if(dbId==null) {
+			return false;
+		}
+		if(dbId.contains("S")) {
+			Student student = studentMapper.selectOne(dbId);
+			String deptName = deptMapper.selectName(student.getDeptId());
+			session.setAttribute("deptName", deptName);
+			session.setAttribute("m", student);
+			return true;
+		}
+		else if(dbId.contains("P")){
+			Professor professor = professroMapper.selectone(dbId);
+			String deptName = deptMapper.selectName(professor.getDeptId());
+			session.setAttribute("deptName", deptName);
+			session.setAttribute("m", professor);	
+			return true;
+		}
+		return false;
+		
+	}
+
+
+	public void logout(HttpServletRequest request) {
+		request.getSession().invalidate();
 	}
 }
