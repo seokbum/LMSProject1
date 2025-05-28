@@ -110,4 +110,11 @@
             #{noticeFile}
         )
     </insert>
+    
+    <select id="getLastNoticeId" resultType="String">
+    	Select notice_id
+    	From notice
+    	ORDER BY notice_id DESC
+    	LIMIT 1
+    </select>
 </mapper>

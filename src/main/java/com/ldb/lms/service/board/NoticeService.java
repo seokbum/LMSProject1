@@ -55,7 +55,7 @@ public class NoticeService {
 
     @Transactional
     public void saveNotice(NoticeDto noticeDto, MultipartFile file, String professorId) throws Exception {
-        log.info("saveNotice: noticeDto: {}, professorId: {}", noticeDto, professorId);
+        log.info("saveNotice called with noticeDto: {}, professorId: {}", noticeDto, professorId);
         if (!StringUtils.hasText(noticeDto.getNoticeTitle())) {
             throw new IllegalArgumentException("제목은 필수입니다.");
         }
@@ -65,25 +65,36 @@ public class NoticeService {
         if (!StringUtils.hasText(noticeDto.getNoticePassword())) {
             throw new IllegalArgumentException("비밀번호는 필수입니다.");
         }
-        if (file != null && !file.isEmpty()) {
-            String uploadDir = "src/main/resources/static/uploads/";
-            File dir = new File(uploadDir);
-            if (!dir.exists()) dir.mkdirs();
-            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            File dest = new File(uploadDir + fileName);
-            file.transferTo(dest);
-            noticeDto.setNoticeFile(fileName);
-        }
+        // notice_id 생성 로직
         if (noticeDto.getNoticeId() == null || noticeDto.getNoticeId().isEmpty()) {
-            noticeDto.setNoticeId(UUID.randomUUID().toString());
+            String lastId = noticeMapper.getLastNoticeId(); 
+            String newId = generateNextNoticeId(lastId);
+            noticeDto.setNoticeId(newId);
+            log.info("Generated new noticeId: {}", newId);
         }
         noticeDto.setWriterId(professorId);
+        log.info("Setting writerId to: {}", professorId);
         try {
             noticeMapper.insertNotice(noticeDto);
-            log.info("saveNotice: 공지사항 저장 성공, noticeId: {}", noticeDto.getNoticeId());
+            log.info("Notice inserted successfully, noticeId: {}", noticeDto.getNoticeId());
         } catch (Exception e) {
-            log.error("saveNotice: 공지사항 저장 실패, noticeId: {}", noticeDto.getNoticeId(), e);
+            log.error("saveNotice: 공지사항 저장 실패, noticeId: {}, error: {}", noticeDto.getNoticeId(), e.getMessage());
             throw new RuntimeException("공지사항 저장 중 오류 발생", e);
+        }
+    }
+
+    // 새 notice_id 생성 메서드
+    private String generateNextNoticeId(String lastId) {
+        if (lastId == null || !lastId.startsWith("N") || lastId.length() != 5) {
+            return "N0001"; 
+        }
+        try {
+            int num = Integer.parseInt(lastId.substring(1)); 
+            num++; 
+            return String.format("N%04d", num); 
+        } catch (NumberFormatException e) {
+            log.warn("Invalid lastId format: {}, returning N0001", lastId);
+            return "N0001";
         }
     }
 }

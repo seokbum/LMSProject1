@@ -14,4 +14,6 @@ public interface NoticeMapper {
     Integer countNotices(NoticeSearchDto searchDto);
 
     void insertNotice(NoticeDto noticeDto);
+    
+    String getLastNoticeId();
 }
