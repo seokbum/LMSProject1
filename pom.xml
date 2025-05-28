@@ -108,6 +108,22 @@
 			<artifactId>sitemesh</artifactId>
 			<version>3.2.1</version>
 		</dependency>
+		
+		<!-- MapStruct -->
+	    <dependency>
+	        <groupId>org.mapstruct</groupId>
+	        <artifactId>mapstruct</artifactId>
+	        <version>1.5.5.Final</version> 
+	    </dependency>
+	
+	    <!-- MapStruct annotation processor -->
+	    <dependency>
+	        <groupId>org.mapstruct</groupId>
+	        <artifactId>mapstruct-processor</artifactId>
+	        <version>1.5.5.Final</version>
+	        <scope>provided</scope>
+	    </dependency>
+		
 		<!-- 테스트 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -152,6 +168,34 @@
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
 			</plugin>
+			
+			<!-- MapStruct -->
+			<plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.11.0</version> 
+            <configuration>
+                <source>${java.version}</source>  
+                <target>${java.version}</target>
+                <annotationProcessorPaths>
+                    <path>
+                        <groupId>org.mapstruct</groupId>
+                        <artifactId>mapstruct-processor</artifactId>
+                        <version>1.5.5.Final</version>
+                    </path>
+                </annotationProcessorPaths>
+            </configuration>
+        </plugin>
+			
+			<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-compiler-plugin</artifactId>
+			  <configuration>
+			    <compilerArgs>
+			      <arg>-parameters</arg>
+			    </compilerArgs>
+			  </configuration>
+		    </plugin>
 		</plugins>
 	</build>
 </project>
