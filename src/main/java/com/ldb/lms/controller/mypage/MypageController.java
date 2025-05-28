@@ -3,17 +3,21 @@ package com.ldb.lms.controller.mypage;
 import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpRequest;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.Map;
+import java.util.logging.SimpleFormatter;
 
-
-
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ldb.lms.dto.mypage.RegisterUserDto;
 import com.ldb.lms.service.mypage.MypageService;
 
 
@@ -68,6 +72,15 @@ public class MypageController {
 	public String picture(HttpServletRequest request){
 		mypageService.picture(request);
 		return "mypage/picture";
+	}
+	
+	@PostMapping("registerNumChk")
+	public String registerNumChk(HttpServletRequest request,@ModelAttribute RegisterUserDto dto){
+		System.out.println(dto);
+		mypageService.registerNumChk(dto,request);
+		
+		return "mypage/registerNumChk";
+		
 	}
 	
 	

@@ -1,9 +1,16 @@
 package com.ldb.lms.service.mypage;
 
 import java.io.File;
+
+
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
@@ -17,6 +24,8 @@ import org.springframework.web.multipart.support.StandardServletMultipartResolve
 import com.ldb.lms.dto.learning_support.DeptDto;
 import com.ldb.lms.dto.mypage.Dept;
 import com.ldb.lms.dto.mypage.LoginDto;
+import com.ldb.lms.dto.mypage.RegisterUserDto;
+import com.ldb.lms.dto.mypage.Student;
 import com.ldb.lms.mapper.mypage.DeptMapper;
 import com.ldb.lms.mapper.mypage.ProStuMapper;
 import com.ldb.lms.mapper.mypage.ProfessorMapper;
@@ -25,6 +34,7 @@ import com.ldb.lms.mapper.mypage.StudentMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+;
 
 
 
@@ -116,7 +126,6 @@ public class MypageService {
 		// 파일 저장 경로 설정
 		String path = request.getServletContext().getRealPath("") + "/dist/assets/picture/";
 		System.out.println("Service: Save path: " + path); // 디버깅용 경로 출력
-
 		// 기준 디렉토리 실제 경로
 		File directory = new File(path);
 		if (!directory.exists()) {
@@ -125,7 +134,6 @@ public class MypageService {
 				throw new RuntimeException("디렉토리 생성에 실패했습니다: " + path);
 			}
 		}
-
 		// MultipartFile 가져오기
 		MultipartFile file = null;
 		try {
@@ -134,7 +142,6 @@ public class MypageService {
 		} catch (Exception e) {
 			throw new IllegalStateException("멀티파트 요청 처리에 실패했습니다: " + e.getMessage());
 		}
-
 		// 파일 null 또는 비어 있는지 체크
 		if (file == null || file.isEmpty()) {
 			System.out.println("Service: File is null or empty");
@@ -160,8 +167,106 @@ public class MypageService {
 			e.printStackTrace();
 			throw new RuntimeException("파일 업로드에 실패했습니다: " + e.getMessage());
 		}
-
 		// 파일명 저장
 		request.setAttribute("fname", fname);
+	}
+
+	public  String IdChk(String a) { 
+		String num = null;
+		if(a.equals("pro")) {
+			num = createProfessorId();	
+		}
+		else if(a.equals("stu")) {
+			num = createStudentId();
+		}
+		return num;
+	}
+	
+	//교수의아이디를 자동생성하는 메서드(p000)
+		private  String createProfessorId() {
+			int[] num = {0,1,2,3,4,5,6,7,8,9}; 
+
+			String sNum="";
+			for(int i=0;i<3;i++) {
+				//0 ~ (num.length-1)의 랜덤한숫자반환
+				int ranNum = new Random().nextInt(num.length);
+				sNum+=num[ranNum]; //랜덤한 3개의숫자
+			}
+		
+
+			while(true) { 
+				if(professroMapper.idchk("P"+sNum)<1) { //true(id가존재하지않을 시 )면 루프탈출
+					break;
+				}
+				else {
+					int iNum = Integer.parseInt(sNum);//sNum을 Integer로형변환 
+					iNum +=1; // 1 증가
+					sNum = String.valueOf(iNum); // sNum으로 다시넣기
+				}
+			}
+			//p0000 형식
+			return "P"+sNum;
+
+		}
+		//학생의아이디를 자동생성하는 메서드(s00000)
+		private   String createStudentId() {
+			int[] num = {0,1,2,3,4,5,6,7,8,9};
+			String sNum="";
+
+			for(int i=0;i<5;i++) {
+				//0 ~ (num.length-1)의 랜덤한숫자반환
+				int ranNum = new Random().nextInt(num.length);
+				sNum+=num[ranNum]; //랜덤한 5개의숫자
+			}
+			
+
+			while(true) { 
+				if(studentMapper.idchk("S"+sNum)<1) { //true(id가존재하지않을 시 )면 루프탈출
+					break;
+				}
+				else {
+					int iNum = Integer.parseInt(sNum);//sNum을 Integer로형변환 
+					iNum +=1; // 1 증가
+					sNum = String.valueOf(iNum); // sNum으로 다시넣기
+				}
+			}
+
+			return "S"+sNum;
+		}
+
+	
+
+	public void registerNumChk(RegisterUserDto dto, HttpServletRequest request) {
+		//LocalDate -> Date
+		//LocalDate birth = dto.getBirth();
+		//Date date = Date.from(birth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		
+		//IdChk
+		String id = IdChk(dto.getPosition());
+		System.out.println("id : "+id);
+		
+		//pass -> hashPass
+		String hashpw = BCrypt.hashpw(dto.getPassword(), BCrypt.gensalt());
+		System.out.println("hashPass : "+hashpw );
+		if(id.contains("S")) {
+			Student st = new Student();
+			st.setStudentId(id);
+			st.setStudentNum(id.substring(1));
+			st.setDeptId(dto.getDeptId());
+			st.setStudentBirthday(dto.getBirth());
+			st.setStudentEmail(dto.getEmail());
+			st.setStudentImg(dto.getPicture());
+			st.setStudentName(dto.getName());
+			st.setStudentPassword(hashpw);
+			st.setStudentPhone(dto.getPhone());
+			st.setStudentStatus("재학");
+			System.out.println(st);
+			request.getSession().setAttribute("mem", st);
+			String num = EmailUtil.sendNum(st.getStudentEmail(), st.getStudentName(), st.getStudentId());
+			request.setAttribute("num", num);
+			System.out.println("num : "+num);
+		}
+		
+		
 	}
 }

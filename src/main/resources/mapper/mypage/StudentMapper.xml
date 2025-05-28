@@ -4,7 +4,7 @@
 
 
 <mapper namespace="com.ldb.lms.mapper.mypage.StudentMapper">
-<select id="cnt" resultType="int" parameterType="String"> 
+<select id="idchk" resultType="int" parameterType="String"> 
 		select count(*) from student where student_id=#{id}
 	</select>
 	

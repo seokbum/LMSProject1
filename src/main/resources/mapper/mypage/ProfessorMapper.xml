@@ -5,7 +5,7 @@
 <mapper namespace="com.ldb.lms.mapper.mypage.ProfessorMapper">
 
 	<!-- 아이디중복체크 쿼리(존재한다면 1이 반환될것) -->
-	<select id="cnt" resultType="int" parameterType="String">
+	<select id="idchk" resultType="int" parameterType="String">
 	select count(*) from professor where professor_id=#{value}
 	</select>
 	

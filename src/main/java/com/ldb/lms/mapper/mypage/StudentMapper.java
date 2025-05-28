@@ -9,7 +9,7 @@ import com.ldb.lms.dto.mypage.UpdateStuPwDto;
 @Mapper
 public interface StudentMapper {
 	
-	int cnt();
+	int idchk(String id);
 	
 	Student list();
 	

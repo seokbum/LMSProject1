@@ -1,5 +1,6 @@
 package com.ldb.lms.dto.mypage;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class Student {
     private String studentEmail;
     private String studentPassword;
     private String studentStatus;
-    private Date studentBirthday;
+    private LocalDate studentBirthday;
     private String studentPhone;
     private String studentImg;
 
