@@ -56,10 +56,6 @@ public class NoticeService {
     @Transactional
     public void saveNotice(NoticeDto noticeDto, MultipartFile file, String professorId) throws Exception {
         log.info("saveNotice: noticeDto: {}, professorId: {}", noticeDto, professorId);
-        if (!StringUtils.hasText(professorId)) {
-            professorId = "P001"; // 하드코딩
-            log.warn("saveNotice: professorId가 없음, P001로 설정");
-        }
         if (!StringUtils.hasText(noticeDto.getNoticeTitle())) {
             throw new IllegalArgumentException("제목은 필수입니다.");
         }

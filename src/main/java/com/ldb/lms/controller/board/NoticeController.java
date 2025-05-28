@@ -41,7 +41,7 @@ public class NoticeController {
         log.info("createNotice: professorId: {}", professorId);
         if (professorId == null) {
             professorId = "P001"; // 하드코딩
-            log.warn("createNotice: professorId가 null입니다. 임시로 P001로 설정합니다. 실제 운영 환경에서는 인증된 사용자 ID를 사용해야 합니다.");
+            
         }
         return "board/notice/createNotice"; 
     }
