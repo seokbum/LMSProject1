@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="path" value="${pageContext.request.contextPath}"/>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -59,21 +60,13 @@
     <form id="noticeForm" action="update" method="post" enctype="multipart/form-data">
         <input type="hidden" name="noticeId" value="${notice.noticeId}">
         <div class="mb-3">
-            <label for="writerId" class="form-label">글쓴이</label>
-            <input type="text" class="form-control" id="writerId" name="writerId" value="${notice.writerId}" readonly>
-        </div>
-        <div class="mb-3">
-            <label for="writerName" class="form-label">작성자 이름</label>
-            <input type="text" class="form-control" id="writerName" value="${writerName}" readonly>
-        </div>
-        <div class="mb-3">
             <label for="noticeTitle" class="form-label">제목</label>
             <input type="text" class="form-control" id="noticeTitle" name="noticeTitle" value="${notice.noticeTitle}" required>
         </div>
         <div class="mb-3">
             <label for="content" class="form-label">내용</label>
-            <textarea id="content" name="noticeContent" style="display: none;">${notice.noticeContent}</textarea>
-            <div id="editor" class="toast-editor"></div>
+            <textarea id="content" name="noticeContent" style="display: none;"></textarea>
+            <div id="editor" class="toast-editor">${fn:escapeXml(notice.noticeContent)}</div>
         </div>
         <div class="mb-3">
             <label for="noticePassword" class="form-label">비밀번호</label>
@@ -83,13 +76,12 @@
             <label for="noticeFile" class="form-label">첨부파일</label>
             <input type="file" class="form-control" id="noticeFile" name="noticeFile">
             <c:if test="${not empty notice.noticeFile}">
-                <p>현재 파일: ${notice.noticeFile}</p>
-                <input type="hidden" name="noticeFile" value="${notice.noticeFile}">
+                <p>현재 첨부파일: <a href="${notice.noticeFile}" target="_blank">${fn:substringAfter(notice.noticeFile, '/dist/assets/upload/')}</a></p>
             </c:if>
         </div>
         <div class="text-end">
-            <button type="submit" class="notice-btn-primary">수정 완료</button>
-            <a href="<c:url value='/notice/getNotices'/>" class="btn btn-secondary">목록</a>
+            <button type="submit" class="notice-btn-primary">수정</button>
+            <a href="getNoticeDetail?noticeId=${notice.noticeId}" class="btn btn-secondary">취소</a>
         </div>
     </form>
 </div>
@@ -101,14 +93,14 @@
             el: document.querySelector('#editor'),
             height: '400px',
             initialEditType: 'wysiwyg',
+            initialValue: $('#editor').html(), // 기존 내용을 초기값으로 설정
             previewStyle: 'vertical',
-            initialValue: `${'${notice.noticeContent}'}`,
             hooks: {
                 addImageBlobHook: (blob, callback) => {
                     const formData = new FormData();
                     formData.append('file', blob);
                     $.ajax({
-                        url: '/notice/uploadImage',
+                        url: '/api/notice/uploadImage',
                         type: 'POST',
                         data: formData,
                         processData: false,

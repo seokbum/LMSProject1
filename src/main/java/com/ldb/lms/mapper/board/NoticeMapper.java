@@ -1,10 +1,11 @@
 package com.ldb.lms.mapper.board;
 
-import java.util.List;
-import java.util.Map;
-import org.apache.ibatis.annotations.Mapper;
 import com.ldb.lms.dto.board.notice.NoticeDto;
 import com.ldb.lms.dto.board.notice.NoticeSearchDto;
+import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface NoticeMapper {
@@ -14,6 +15,14 @@ public interface NoticeMapper {
     Integer countNotices(NoticeSearchDto searchDto);
 
     void insertNotice(NoticeDto noticeDto);
-    
+
     String getLastNoticeId();
+
+    NoticeDto getNotice(String noticeId);
+
+    void incrementReadCount(String noticeId);
+
+    void deleteNotice(String noticeId);
+    
+    void updateNotice(NoticeDto noticeDto);
 }
