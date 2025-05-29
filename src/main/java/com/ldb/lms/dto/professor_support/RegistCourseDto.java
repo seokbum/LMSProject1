@@ -25,6 +25,5 @@ public class RegistCourseDto {
     private String courseTimeYoil;   			// 요일
     private String courseTimeStart;  			// 시작 시간 (HH:00 형식)
     private String courseTimeEnd;    			// 종료 시간 (HH:50 형식)
-    
-    
+
 }
