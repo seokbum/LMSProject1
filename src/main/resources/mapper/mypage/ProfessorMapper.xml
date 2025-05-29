@@ -30,9 +30,5 @@
 		select * from professor where professor_id=#{professorId}
 	</select>
 
-<!-- id가 일치 시 비밀번호를 업데이트하는 문장 -->	
-<update id="tempPw" parameterType="UpdateProPwDto">
-	update professor set professor_password=#{professorNewPassword}
-	where professor_id = #{professorId} 
-</update>
+
 </mapper>

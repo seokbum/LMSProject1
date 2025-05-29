@@ -115,7 +115,7 @@ public class EmailUtil {
     }
 	
 	//임시비밀번호를 보내는메서드
-	public static String sendTempPw(String toEmail, String userName, String tempPw) {
+	public static String sendTempPw(String toEmail, String id, String tempPw) {
         String host = "smtp.gmail.com";
         String from = "ddkk8525@gmail.com"; // 실제 Gmail 주소
         String password = "muef nfld rbql bfez"; // Gmail 앱 비밀번호
@@ -146,7 +146,7 @@ public class EmailUtil {
             message.setFrom(new InternetAddress(from));
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
             message.setSubject("임시비밀번호 안내(LDB학사관리부)");
-            message.setText(userName+"님의 임시비밀번호 : "+tempPw+"\n\n -LDB학사관리부-");
+            message.setText(id+"님의 임시비밀번호 : "+tempPw+"\n\n -LDB학사관리부-");
             
 
             Transport.send(message);

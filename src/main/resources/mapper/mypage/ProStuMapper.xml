@@ -32,23 +32,23 @@
 	<select id="findPw" resultType="String" parameterType="FindPwDto">
 	SELECT student_password 
 	FROM student
-	WHERE student_id = #{studentId} AND student_email=#{studentEmail}
+	WHERE student_id = #{id} AND student_email=#{email}
 	UNION
 	SELECT professor_password
 	FROM professor
-	WHERE professor_id = #{professorId} AND professor_email=#{professorEmail};
+	WHERE professor_id = #{id} AND professor_email=#{email};
 	</select>
 	
 	<!-- 넘겨받은 학생아이디가 일치한다면 넘겨받은 비밀번호로 업데이트 -->
-	<update id="updateStuPw" parameterType="UpdateStuPwDto" >
-		update student set student_password=#{studentNewPassword}
-		where student_id=#{studentId}
+	<update id="updateStuPw" parameterType="UpdatePwDto" >
+		update student set student_password=#{newPw}
+		where student_id=#{id}
 	</update>
 	
 		<!-- 넘겨받은 교수아이디가 일치한다면 넘겨받은 비밀번호로 업데이트 -->
-	<update id="updateProPw" parameterType="UpdateProPwDto">
-		update professor set professor_password=#{professorNewPassword}
-		where  professor_id=#{professorId}
+	<update id="updateProPw" parameterType="UpdatePwDto">
+		update professor set professor_password=#{newPw}
+		where  professor_id=#{id}
 	</update>
 	
 	<!-- 학생or교수의 아이디를 넘겨받아 학과명 추출 -->
@@ -79,6 +79,8 @@
 	student_phone=#{studentPhone}
 	where student_id = #{studentId}
 	</update>
+	
+	
 	
 	
 

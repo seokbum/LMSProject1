@@ -1,6 +1,11 @@
 package com.ldb.lms.controller.mypage;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.ldb.lms.dto.mypage.FindIdDto;
+import com.ldb.lms.dto.mypage.FindPwDto;
 import com.ldb.lms.dto.mypage.RegisterUserDto;
+import com.ldb.lms.dto.mypage.UpdatePwDto;
 import com.ldb.lms.service.mypage.MypageService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,8 +35,11 @@ public class MypageController {
 		this.mypageService = mypageService;
 	}
 	
+		
+	
 	@GetMapping("doLogin")
 	public String callDoLogin (HttpServletRequest request) {
+		//로그인 상태로 doLogin에 접근 불가능
 		if(mypageService.loginChk(request)) {
 			return "error";
 		}
@@ -50,22 +61,63 @@ public class MypageController {
 		return login==null?"redirect:mypage/doLogin":"redirect:/";
 	}
 	
+	@GetMapping("findId")
+	public String callFindId() {
+		return "mypage/findId";
+	}
+	
+	@PostMapping("findIdProcess")
+	public String findIdProcess(@ModelAttribute FindIdDto dto,HttpServletRequest request) {
+		mypageService.findId(dto,request);
+		return "mypage/findId";
+	}
+	
+	@GetMapping("findPw")
+	public String callFindPw() {
+		return "mypage/findPw";
+	}
+	
+	@PostMapping("findPwProcess")
+	public String findPwProcess(@ModelAttribute FindPwDto dto,HttpServletRequest request) {
+		if(mypageService.findPwProcess(dto,request)) {
+			return "mypage/updatePw";
+		}
+		return "mypage/findPw";
+	}
+	
+	@GetMapping("updatePw")
+	public String callUpdatePw() {
+		return "mypage/updatePw";
+	}
+	
+	@PostMapping("changePw")
+	public String callChangePw(@ModelAttribute UpdatePwDto dto,HttpServletRequest request) {
+		mypageService.changePw(dto,request);
+		return "mypage/updatePw";
+	}
+	
+	
 	
 	@GetMapping("registerUser")
 	public String callRegisterUser(HttpServletRequest request) {
 		mypageService.getDeptAll(request);
 		return "mypage/registerUser";
 	}
+	
+	
 	@GetMapping("registerImg")
 	public String callRegisterImg(HttpServletRequest request) {
 		return "mypage/registerImg";
 	}
+	
 	
 	@PostMapping("picture")
 	public String picture(HttpServletRequest request){
 		mypageService.picture(request);
 		return "mypage/picture";
 	}
+	
+	
 	
 	@PostMapping("registerNumChk")
 	public String registerNumChk(HttpServletRequest request,@ModelAttribute RegisterUserDto dto){

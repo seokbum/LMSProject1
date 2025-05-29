@@ -2,6 +2,9 @@ package com.ldb.lms.service.mypage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,10 +18,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
 import com.ldb.lms.dto.mypage.Dept;
+import com.ldb.lms.dto.mypage.FindIdDto;
+import com.ldb.lms.dto.mypage.FindPwDto;
 import com.ldb.lms.dto.mypage.LoginDto;
 import com.ldb.lms.dto.mypage.Professor;
 import com.ldb.lms.dto.mypage.RegisterUserDto;
 import com.ldb.lms.dto.mypage.Student;
+import com.ldb.lms.dto.mypage.UpdatePwDto;
 import com.ldb.lms.mapper.mypage.DeptMapper;
 import com.ldb.lms.mapper.mypage.ProStuMapper;
 import com.ldb.lms.mapper.mypage.ProfessorMapper;
@@ -171,70 +177,100 @@ public class MypageService {
 		}
 		return num;
 	}
-	
+
 	//교수의아이디를 자동생성하는 메서드(p000)
-		private  String createProfessorId() {
-			int[] num = {0,1,2,3,4,5,6,7,8,9}; 
+	private  String createProfessorId() {
+		int[] num = {0,1,2,3,4,5,6,7,8,9}; 
 
-			String sNum="";
-			for(int i=0;i<3;i++) {
-				//0 ~ (num.length-1)의 랜덤한숫자반환
-				int ranNum = new Random().nextInt(num.length);
-				sNum+=num[ranNum]; //랜덤한 3개의숫자
-			}
-		
-
-			while(true) { 
-				if(professroMapper.idchk("P"+sNum)<1) { //true(id가존재하지않을 시 )면 루프탈출
-					break;
-				}
-				else {
-					int iNum = Integer.parseInt(sNum);//sNum을 Integer로형변환 
-					iNum +=1; // 1 증가
-					sNum = String.valueOf(iNum); // sNum으로 다시넣기
-				}
-			}
-			//p0000 형식
-			return "P"+sNum;
-
-		}
-		//학생의아이디를 자동생성하는 메서드(s00000)
-		private   String createStudentId() {
-			int[] num = {0,1,2,3,4,5,6,7,8,9};
-			String sNum="";
-
-			for(int i=0;i<5;i++) {
-				//0 ~ (num.length-1)의 랜덤한숫자반환
-				int ranNum = new Random().nextInt(num.length);
-				sNum+=num[ranNum]; //랜덤한 5개의숫자
-			}
-			
-
-			while(true) { 
-				if(studentMapper.idchk("S"+sNum)<1) { //true(id가존재하지않을 시 )면 루프탈출
-					break;
-				}
-				else {
-					int iNum = Integer.parseInt(sNum);//sNum을 Integer로형변환 
-					iNum +=1; // 1 증가
-					sNum = String.valueOf(iNum); // sNum으로 다시넣기
-				}
-			}
-
-			return "S"+sNum;
+		String sNum="";
+		for(int i=0;i<3;i++) {
+			//0 ~ (num.length-1)의 랜덤한숫자반환
+			int ranNum = new Random().nextInt(num.length);
+			sNum+=num[ranNum]; //랜덤한 3개의숫자
 		}
 
-	
+
+		while(true) { 
+			if(professroMapper.idchk("P"+sNum)<1) { //true(id가존재하지않을 시 )면 루프탈출
+				break;
+			}
+			else {
+				int iNum = Integer.parseInt(sNum);//sNum을 Integer로형변환 
+				iNum +=1; // 1 증가
+				sNum = String.valueOf(iNum); // sNum으로 다시넣기
+			}
+		}
+		//p0000 형식
+		return "P"+sNum;
+
+	}
+	//학생의아이디를 자동생성하는 메서드(s00000)
+	private   String createStudentId() {
+		int[] num = {0,1,2,3,4,5,6,7,8,9};
+		String sNum="";
+
+		for(int i=0;i<5;i++) {
+			//0 ~ (num.length-1)의 랜덤한숫자반환
+			int ranNum = new Random().nextInt(num.length);
+			sNum+=num[ranNum]; //랜덤한 5개의숫자
+		}
+
+
+		while(true) { 
+			if(studentMapper.idchk("S"+sNum)<1) { //true(id가존재하지않을 시 )면 루프탈출
+				break;
+			}
+			else {
+				int iNum = Integer.parseInt(sNum);//sNum을 Integer로형변환 
+				iNum +=1; // 1 증가
+				sNum = String.valueOf(iNum); // sNum으로 다시넣기
+			}
+		}
+
+		return "S"+sNum;
+	}
+
+
+	//임시비밀번호를 만드는 알고리즘(비밀번호찾기 시에만 발급이 될것임)
+	public  String getTempPw() {
+		List<String> lowerList = Arrays.asList
+				("a" ,"b" ,"c" ,"d" ,"e" ,"f" ,"g" ,"h" ,"i" ,"j" ,"k" 
+						,"l" ,"m" ,"n" ,"o" ,"p","q","r","s","t","z");
+
+		List<String> upperList = new ArrayList<>();
+		for (String string : lowerList) {
+			upperList.add(string.toUpperCase());
+		}	
+		List<String> specialList = Arrays.asList("%","@","#","^","&","*","!");
+
+		List<Object> combineList = new ArrayList<>();
+		combineList.addAll(specialList);
+		combineList.addAll(lowerList);
+		combineList.addAll(upperList);
+		for (int i = 0; i < 15; i++) { //랜덤한0~9 숫자 10개집어넣기
+			combineList.add(new Random().nextInt(10)); 
+		}
+		//무작위 섞기
+		Collections.shuffle(combineList);
+		String tempNum = "";
+		for (int i = 0; i < 6; i++) {
+			int num = new Random().nextInt(combineList.size());
+			tempNum += combineList.get(num);
+		}
+		return tempNum;
+	}
+
+
 
 	public void registerNumChk(RegisterUserDto dto, HttpServletRequest request) {
 		//LocalDate -> Date
 		//LocalDate birth = dto.getBirth();
 		//Date date = Date.from(birth.atStartOfDay(ZoneId.systemDefault()).toInstant());
-		
+
 		//position에 따른 id를 만들어줌(중복방지 로직추가)
 		String id = IdChk(dto.getPosition());
 		System.out.println("id : "+id);
-		
+
 		//pass -> hashPass
 		String hashpw = BCrypt.hashpw(dto.getPassword(), BCrypt.gensalt());
 		System.out.println("hashPass : "+hashpw );
@@ -273,8 +309,8 @@ public class MypageService {
 			request.setAttribute("num", num);
 			System.out.println("num : "+num);
 		}
-		
-		
+
+
 	}
 
 
@@ -282,7 +318,7 @@ public class MypageService {
 		String id = request.getParameter("id");
 		if(id.contains("S")) {
 			Student stu = (Student)request.getSession().getAttribute("mem");
-			
+
 			if(studentMapper.insert(stu)<1) { //DB에오류발생시
 				System.out.println("실패");
 				request.getSession().invalidate();
@@ -299,7 +335,7 @@ public class MypageService {
 		}
 		else {
 			Professor pro = (Professor)request.getSession().getAttribute("mem");
-			
+
 			if(professroMapper.insert(pro)<1) {
 				System.out.println("실패");
 				request.getSession().invalidate();
@@ -313,7 +349,7 @@ public class MypageService {
 				return true;
 			}
 		}
-		
+
 	}
 
 
@@ -338,11 +374,84 @@ public class MypageService {
 			return true;
 		}
 		return false;
-		
+
 	}
 
 
 	public void logout(HttpServletRequest request) {
 		request.getSession().invalidate();
+	}
+
+
+	public void findId(FindIdDto dto,HttpServletRequest request) {
+		String id = proStuMapper.findId(dto);
+		if(id==null) {
+			request.setAttribute("msg", "아이디를 찾을 수 없어요");
+		}
+		else {
+			request.setAttribute("msg", dto.getName()+"님의 id : "+id);
+		}
+	}
+
+
+	public boolean findPwProcess(FindPwDto dto, HttpServletRequest request) {
+		String pass = proStuMapper.findPw(dto);
+		String id = dto.getId();
+		String email = dto.getEmail();
+		if(pass==null) {
+			request.setAttribute("msg", "입력하신정보가 맞지않아요");
+			return false;
+		}
+		else {
+			//임시비번
+			String tempPw = getTempPw(); 
+			//암호화 된 임시비번
+			String hashPw = BCrypt.hashpw(tempPw, BCrypt.gensalt());
+			System.out.println("임시비번 : "+tempPw);
+			
+			if(id.contains("S")) {
+				UpdatePwDto sDto = new UpdatePwDto();
+				sDto.setId(id);
+				sDto.setNewPw(hashPw);
+				if(proStuMapper.updateStuPw(sDto)<1) {
+					request.setAttribute("msg", "임시비밀번호 업데이트실패");
+					return false;
+				}
+				else {
+					//업데이트성공시 (해쉬처리 전의 임시비밀번호를 이메일로 보내준다)
+					EmailUtil.sendTempPw(email, id, tempPw);
+					request.setAttribute("id", id);
+					request.setAttribute("email", email);//updatePw에서사용
+					return true;
+				}
+			}
+			else if(id.contains("P")) {
+				UpdatePwDto pDto = new UpdatePwDto();
+				pDto.setId(id);
+				pDto.setNewPw(hashPw);
+				if(proStuMapper.updateProPw(pDto)<1) {
+					request.setAttribute("msg", "임시비밀번호 업데이트실패");
+					return false;
+				}
+				else {
+					//업데이트성공시 (해쉬처리 전의 임시비밀번호를 이메일로 보내준다)
+					EmailUtil.sendTempPw(email, id, tempPw);
+					request.setAttribute("id", id);
+					request.setAttribute("email", email);
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
+
+	public void changePw(UpdatePwDto dto,HttpServletRequest request) {
+		String id = dto.getId();
+		String email = dto.getEmail();
+		String newPw = dto.getNewPw();
+		String pw = dto.getPw();
+		
+		
 	}
 }

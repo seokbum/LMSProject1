@@ -43,10 +43,6 @@ select * from student where student_id=#{val}
 	select student_status from student where student_id=#{val}
 </select>
 
-<!-- 넘겨받은 학생id 존재 시 비밀번호 업데이트-->
-<update id="tempPw" parameterType="UpdateStuPwDto">
-	update student set student_password=#{studentNewPassword}
-	where student_id = #{studentId} 
-</update>
+
 
 </mapper>
