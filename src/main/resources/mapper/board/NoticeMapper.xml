@@ -3,7 +3,7 @@
 <mapper namespace="com.ldb.lms.mapper.board.NoticeMapper">
 
     <!-- 공지사항 목록을 조회하는 쿼리. 검색 조건과 페이징을 적용하여 결과를 반환 -->
-    <select id="listNotice" parameterType="map" resultType="com.ldb.lms.dto.board.notice.NoticeDto">
+    <select id="listNotice" parameterType="map" resultType="NoticeDto">
         SELECT
             n.notice_id,
             n.writer_id,
@@ -13,7 +13,7 @@
             n.notice_created_at,
             n.notice_read_count,
             n.notice_password,
-            n.notice_file
+            n.notice_file AS existingFilePath
         FROM notice n
         LEFT JOIN professor p ON n.writer_id = p.professor_id
         <where>
@@ -54,7 +54,7 @@
     </select>
 
     <!-- 공지사항 총 개수를 조회하는 쿼리. 검색 조건을 적용하여 필터링된 결과의 개수를 반환 -->
-    <select id="countNotices" parameterType="com.ldb.lms.dto.board.notice.NoticeSearchDto" resultType="int">
+    <select id="countNotices" parameterType="NoticeSearchDto" resultType="int">
         SELECT COUNT(*)
         FROM notice n
         LEFT JOIN professor p ON n.writer_id = p.professor_id
@@ -93,7 +93,7 @@
     </select>
 
     <!-- 새로운 공지사항을 삽입하는 쿼리. 작성된 공지사항 데이터를 데이터베이스에 저장 -->
-    <insert id="insertNotice" parameterType="com.ldb.lms.dto.board.notice.NoticeDto">
+    <insert id="insertNotice" parameterType="NoticeDto">
         INSERT INTO notice (
             notice_id,
             writer_id,
@@ -111,7 +111,7 @@
             NOW(),
             0,
             #{noticePassword},
-            #{noticeFile}
+            #{existingFilePath}
         )
     </insert>
     
@@ -124,7 +124,7 @@
     </select>
 
     <!-- 공지사항 상세 정보를 조회하는 쿼리. 특정 notice_id로 공지사항 데이터를 반환 -->
-    <select id="getNotice" parameterType="string" resultType="com.ldb.lms.dto.board.notice.NoticeDto">
+    <select id="getNotice" parameterType="string" resultType="NoticeDto">
         SELECT
             n.notice_id,
             n.writer_id,
@@ -134,7 +134,7 @@
             n.notice_created_at,
             n.notice_read_count,
             n.notice_password,
-            n.notice_file
+            n.notice_file as existingFilePath
         FROM notice n
         LEFT JOIN professor p ON n.writer_id = p.professor_id
         WHERE n.notice_id = #{noticeId}
@@ -153,12 +153,12 @@
         WHERE notice_id = #{noticeId}
     </delete>
     
-    <update id="updateNotice" parameterType="com.ldb.lms.dto.board.notice.NoticeDto">
+    <update id="updateNotice" parameterType="NoticeDto">
     UPDATE notice
     SET
         notice_title = #{noticeTitle},
         notice_content = #{noticeContent},
-        notice_file = #{noticeFile},
+        notice_file = #{existingFilePath},
         notice_password = #{noticePassword}
     WHERE notice_id = #{noticeId}
 	</update>

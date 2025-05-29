@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c"%>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt"%>           
+<%@ taglib uri="jakarta.tags.functions" prefix="fn"%> 
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,10 +35,10 @@
                 <tr>
                     <th>첨부파일</th>
                     <td>
-                        <c:if test="${not empty notice.noticeFile}">
-                            <a href="/dist/assets/upload/${notice.noticeFile}" download="${notice.noticeFile}" class="btn btn-sm btn-outline-secondary">다운로드</a>
+                        <c:if test="${not empty notice.existingFilePath}">
+                            <a href="${pageContext.request.contextPath}${notice.existingFilePath}" download="${notice.existingFilePath}" class="btn btn-sm btn-outline-secondary">다운로드</a>
                         </c:if>
-                        <c:if test="${empty notice.noticeFile}">
+                        <c:if test="${empty notice.existingFilePath}">
                             없음
                         </c:if>
                     </td>

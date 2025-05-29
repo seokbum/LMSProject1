@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c"%>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt"%>           
+<%@ taglib uri="jakarta.tags.functions" prefix="fn"%> 
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -75,8 +75,8 @@
         <div class="mb-3">
             <label for="noticeFile" class="form-label">첨부파일</label>
             <input type="file" class="form-control" id="noticeFile" name="noticeFile">
-            <c:if test="${not empty notice.noticeFile}">
-                <p>현재 첨부파일: <a href="${notice.noticeFile}" target="_blank">${fn:substringAfter(notice.noticeFile, '/dist/assets/upload/')}</a></p>
+            <c:if test="${not empty notice.existingFilePath}">
+                <p>현재 첨부파일: <a href="${notice.existingFilePath}" target="_blank">${fn:substringAfter(notice.existingFilePath, '/dist/assets/upload/')}</a></p>
             </c:if>
         </div>
         <div class="text-end">
@@ -93,7 +93,7 @@
             el: document.querySelector('#editor'),
             height: '400px',
             initialEditType: 'wysiwyg',
-            initialValue: $('#editor').html(), // 기존 내용을 초기값으로 설정
+            initialValue: $('#editor').html(), 
             previewStyle: 'vertical',
             hooks: {
                 addImageBlobHook: (blob, callback) => {
@@ -106,7 +106,12 @@
                         processData: false,
                         contentType: false,
                         success: (response) => {
-                            callback(response.url, 'image');
+                        	if (response.url) {
+                                callback(response.url, 'image');
+                            } else {
+                                console.error('Upload failed:', response.error);
+                                alert('이미지 업로드 실패: ' + response.error);
+                            }
                         },
                         error: (err) => {
                             console.error('Image upload failed:', err);
@@ -117,8 +122,42 @@
             }
         });
 
-        $('#noticeForm').on('submit', function () {
-            $('#content').val(editor.getHTML());
+        $('#noticeForm').on('submit', function (e) {
+        	e.preventDefault();
+        	const formData = new FormData();
+            const noticeData = {
+                noticeId: $('#noticeId').val(),
+                noticeTitle: $('#noticeTitle').val(),
+                noticeContent: editor.getHTML(),
+                noticePassword: $('#noticePassword').val(),
+                existingFilePath: '${notice.existingFilePath}'
+            };
+            formData.append('notice', new Blob([JSON.stringify(noticeData)], { type: 'application/json' }));
+            
+            const fileInput = $('#noticeFile')[0];
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
+
+            $.ajax({
+                url: '${pageContext.request.contextPath}/api/notice/update',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: (response) => {
+                    if (response.message) {
+                        alert(response.message);
+                        window.location.href = response.redirectUrl;
+                    } else {
+                        alert('공지사항 수정 실패: ' + response.error);
+                    }
+                },
+                error: (err) => {
+                    console.error('Update notice failed:', err);
+                    alert('공지사항 수정 중 오류 발생');
+                }
+            });
         });
     });
 </script>

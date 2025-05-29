@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c"%>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt"%>           
+<%@ taglib uri="jakarta.tags.functions" prefix="fn"%> 
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -101,7 +101,12 @@
                         processData: false,
                         contentType: false,
                         success: (response) => {
+							if(response.url){
                             callback(response.url, 'image');
+							} else {
+								console.error('Upload failed:', response.error);
+                                alert('이미지 업로드 실패: ' + response.error);
+							}
                         },
                         error: (err) => {
                             console.error('Image upload failed:', err);
@@ -112,8 +117,40 @@
             }
         });
 
-        $('#noticeForm').on('submit', function () {
-            $('#content').val(editor.getHTML());
+        $('#noticeForm').on('submit', function (e) {
+        	e.preventDefault();
+            const formData = new FormData();
+            const noticeData = {
+                noticeTitle: $('#noticeTitle').val(),
+                noticeContent: editor.getHTML(),
+                noticePassword: $('#noticePassword').val()
+            };
+            formData.append('notice', new Blob([JSON.stringify(noticeData)], { type: 'application/json' }));
+            
+            const fileInput = $('#noticeFile')[0];
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
+
+            $.ajax({
+                url: '${pageContext.request.contextPath}/api/notice/write',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: (response) => {
+                    if (response.message) {
+                        alert(response.message);
+                        window.location.href = response.redirectUrl;
+                    } else {
+                        alert('공지사항 저장 실패: ' + response.error);
+                    }
+                },
+                error: (err) => {
+                    console.error('Write notice failed:', err);
+                    alert('공지사항 저장 중 오류 발생');
+                }
+            });
         });
     });
 </script>

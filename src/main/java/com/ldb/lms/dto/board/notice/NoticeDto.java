@@ -1,6 +1,9 @@
 package com.ldb.lms.dto.board.notice;
 
 import java.util.Date;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,7 +19,8 @@ public class NoticeDto {
     private String noticeContent;
     private Date noticeCreatedAt;
     private Date noticeUpdatedAt;
-    private String noticeFile;
+    private MultipartFile noticeFile;
     private Integer noticeReadCount;
     private String noticePassword;
+    private String existingFilePath;
 }

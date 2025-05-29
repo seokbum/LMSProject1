@@ -1,19 +1,18 @@
 package com.ldb.lms.controller.board;
 
-import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ldb.lms.dto.board.notice.NoticeDto;
 import com.ldb.lms.dto.board.notice.NoticePaginationDto;
 import com.ldb.lms.dto.board.notice.NoticeSearchDto;
 import com.ldb.lms.service.board.NoticeService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,16 +32,27 @@ public class NoticeApiController {
     }
     
     @PostMapping("uploadImage")
-    @ResponseBody
-    public Map<String, String> uploadImage(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
-        Map<String, String> response = new HashMap<>();
-        try {
-            String filePath = noticeService.uploadImage(file, request);
-            response.put("url", filePath);
-        } catch (Exception e) {
-            log.error("uploadImage: 이미지 업로드 실패", e);
-            response.put("error", "이미지 업로드 실패");
-        }
-        return response;
+    public ResponseEntity<Map<String, String>> uploadImage(
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest request) {
+        return noticeService.handleImageUpload(file, request);
+    }
+
+    @PostMapping("write")
+    public ResponseEntity<Map<String, String>> writeNotice(
+            @RequestPart("notice") NoticeDto noticeDto,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            HttpServletRequest request,
+            HttpSession session) {
+        return noticeService.handleWriteNotice(noticeDto, file, request, session);
+    }
+    
+    @PostMapping("update")
+    public ResponseEntity<Map<String, String>> updateNotice(
+            @RequestPart("notice") NoticeDto noticeDto,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            HttpServletRequest request,
+            HttpSession session) {
+        return noticeService.handleUpdateNotice(noticeDto, file, request, session);
     }
 }
