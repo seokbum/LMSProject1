@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
-import com.ldb.lms.domain.Course;
 import com.ldb.lms.dto.learning_support.DeptDto;
 import com.ldb.lms.dto.professor_support.RegistCourseDto;
 import com.ldb.lms.service.learning_support.LearningService;
@@ -48,10 +47,9 @@ public class ProfessorController {
 		if (!StringUtils.hasText(professorId)) {
 			professorId = "P001";
         }
+		
 		rDto.setProfessorId(professorId);
-		professorService.test(rDto);
-		
-		
+		professorService.insertCourseAndCourseTime(rDto);
 		
 		return "redirect:professor_support/registCourseByPro";
 	}

@@ -18,7 +18,7 @@
         for update
     </select>
     
-    <insert id="insertCourseInfo" parameterType="RegistCourseDto">
+    <insert id="insertCourseInfo" parameterType="com.ldb.lms.domain.Course">
         INSERT INTO course (
             course_id,
             dept_id,
@@ -46,7 +46,7 @@
         )
     </insert>
 
-    <insert id="insertCourseTime" parameterType="RegistCourseDto">
+    <insert id="insertCourseTime" parameterType="com.ldb.lms.domain.CourseTime">
         INSERT INTO course_time (
             course_time_id,
             professor_id,
