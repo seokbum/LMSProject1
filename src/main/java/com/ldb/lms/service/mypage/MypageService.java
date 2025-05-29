@@ -331,7 +331,7 @@ public class MypageService {
 			return true;
 		}
 		else if(dbId.contains("P")){
-			Professor professor = professroMapper.selectone(dbId);
+			Professor professor = professroMapper.selectOne(dbId);
 			String deptName = deptMapper.selectName(professor.getDeptId());
 			session.setAttribute("deptName", deptName);
 			session.setAttribute("m", professor);	

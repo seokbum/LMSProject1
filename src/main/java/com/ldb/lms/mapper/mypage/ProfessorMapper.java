@@ -2,6 +2,7 @@ package com.ldb.lms.mapper.mypage;
 
 import org.apache.ibatis.annotations.Mapper;
 
+
 import com.ldb.lms.dto.mypage.Professor;
 import com.ldb.lms.dto.mypage.UpdateProPwDto;
 
@@ -10,7 +11,7 @@ public interface ProfessorMapper {
 	
 	int idchk(String professorId);
 	int insert(Professor p);
-	Professor selectone(String professorId);
+	Professor selectOne(String professorId);
 	void tempPw(UpdateProPwDto pwDto);
 	
 }

@@ -76,6 +76,7 @@ public class MypageController {
 	
 	@PostMapping("registerSuccess")
 	public String registerSuccess(HttpServletRequest request){
+		//어차피 회원가입성공 시 모든세션정보를 서비스 내에서 날림
 		if(mypageService.registerSuccess(request)) {
 			return "mypage/doLogin";
 		}
