@@ -2,8 +2,8 @@ package com.ldb.lms.mapper.mypage;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.ldb.lms.domain.Student;
 import com.ldb.lms.dto.mypage.DeleteUserDto;
+import com.ldb.lms.dto.mypage.Student;
 import com.ldb.lms.dto.mypage.UpdateStuPwDto;
 
 @Mapper
@@ -13,14 +13,14 @@ public interface StudentMapper {
 	
 	Student list();
 	
-	void insert(Student st);
+	int insert(Student st);
 	
 	Student selectOne(String student_id);
 	
-	void deleteUser(DeleteUserDto dto);
+	int deleteUser(DeleteUserDto dto);
 	
 	String selectStatus(String student_id);
 	
-	void tempPw(UpdateStuPwDto dto);
+	int tempPw(UpdateStuPwDto dto);
 
 }

@@ -1,6 +1,7 @@
 package com.ldb.lms.dto.mypage;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 import lombok.Getter;
@@ -19,5 +20,11 @@ public class Professor {
     private String professorImg;
     private String professorPassword;
     private String deptId;
+    
+    public Date getProfessorBirthday() {
+    	return Date.from(this.professorBirthday.atStartOfDay(ZoneId.systemDefault()).toInstant());
+ 
+    	
+    }
     
 }

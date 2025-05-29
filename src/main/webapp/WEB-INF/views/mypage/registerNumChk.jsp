@@ -44,7 +44,7 @@
 <body>
     <div class="card">
         <h4 class="text-center mb-4">인증번호 입력</h4>
-        <form action="registerSuccess" onsubmit="return numChk(this)">      
+        <form action="registerSuccess" onsubmit="return numChk(this)" method="post">      
         <div class="mb-3">
             <label for="name" class="form-label">인증번호</label>
             <input type="text" class="form-control" id="num" name="num"

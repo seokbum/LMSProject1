@@ -9,7 +9,7 @@ import com.ldb.lms.dto.mypage.UpdateProPwDto;
 public interface ProfessorMapper {
 	
 	int idchk(String professorId);
-	void insert(Professor p);
+	int insert(Professor p);
 	Professor selectone(String professorId);
 	void tempPw(UpdateProPwDto pwDto);
 	
