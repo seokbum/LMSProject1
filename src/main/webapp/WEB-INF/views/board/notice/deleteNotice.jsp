@@ -1,11 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="path" value="${pageContext.request.contextPath}"/>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>공지 게시물 삭제</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f8f9fa;
@@ -32,7 +32,7 @@
             border-radius: 0.25rem;
             padding: 0.75rem 1rem;
             font-size: 1rem;
-            width: 100%; /* 입력 필드 너비 100% */
+            width: 100%;
         }
         .btn {
             border-radius: 0.25rem;
@@ -96,7 +96,7 @@
             <input type="hidden" name="noticeId" value="${notice.noticeId}">
             <div class="form-group">
                 <label class="font-weight-bold">작성자:</label>
-                <span class="ml-2">${notice.writerName}</span>
+                <span class="ml-2">${notice.userName}</span>
             </div>
             <div class="form-group">
                 <label class="font-weight-bold">제목:</label>
@@ -108,7 +108,7 @@
             </div>
             <div class="btn-group mt-1">
                 <button type="submit" class="btn btn-danger">삭제</button>
-                <a href="${path}/notice/getNotices" class="btn btn-secondary">취소</a>
+                <a href="getNotices" class="btn btn-secondary">취소</a>
             </div>
         </form>
     </div>

@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="jakarta.tags.core" prefix="c" %>
-<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
-<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -57,7 +57,7 @@
 <body>
 <div class="notice-container mt-5">
     <h2 class="text-center h2">공지사항 등록</h2>
-    <form id="noticeForm" action="<c:url value='/notice/write'/>" method="post" enctype="multipart/form-data">
+    <form id="noticeForm" action="write" method="post" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="noticeTitle" class="form-label">제목</label>
             <input type="text" class="form-control" id="noticeTitle" name="noticeTitle" required>
@@ -77,7 +77,7 @@
         </div>
         <div class="text-end">
             <button type="submit" class="notice-btn-primary">등록</button>
-            <a href="<c:url value='/notice/getNotices'/>" class="btn btn-secondary">취소</a>
+            <a href="getNotices" class="btn btn-secondary">취소</a>
         </div>
     </form>
 </div>
@@ -95,7 +95,7 @@
                     const formData = new FormData();
                     formData.append('file', blob);
                     $.ajax({
-                        url: '/notice/uploadImage',
+                        url: '/api/notice/uploadImage',
                         type: 'POST',
                         data: formData,
                         processData: false,

@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ldb.lms.mapper.board.NoticeMapper">
 
+    <!-- 공지사항 목록을 조회하는 쿼리. 검색 조건과 페이징을 적용하여 결과를 반환 -->
     <select id="listNotice" parameterType="map" resultType="com.ldb.lms.dto.board.notice.NoticeDto">
         SELECT
             n.notice_id,
@@ -16,6 +17,7 @@
         FROM notice n
         LEFT JOIN professor p ON n.writer_id = p.professor_id
         <where>
+            <!-- 검색 조건이 있을 경우, 검색 유형에 따라 동적으로 WHERE 절 생성 -->
             <if test="searchDto.searchType != null and searchDto.searchType != ''">
                 <choose>
                     <when test="searchDto.searchType == 'userName'">
@@ -51,6 +53,7 @@
         LIMIT #{pageDto.itemsPerPage} OFFSET #{pageDto.offset}
     </select>
 
+    <!-- 공지사항 총 개수를 조회하는 쿼리. 검색 조건을 적용하여 필터링된 결과의 개수를 반환 -->
     <select id="countNotices" parameterType="com.ldb.lms.dto.board.notice.NoticeSearchDto" resultType="int">
         SELECT COUNT(*)
         FROM notice n
@@ -89,6 +92,7 @@
         </where>
     </select>
 
+    <!-- 새로운 공지사항을 삽입하는 쿼리. 작성된 공지사항 데이터를 데이터베이스에 저장 -->
     <insert id="insertNotice" parameterType="com.ldb.lms.dto.board.notice.NoticeDto">
         INSERT INTO notice (
             notice_id,
@@ -111,10 +115,51 @@
         )
     </insert>
     
+    <!-- 가장 최근 공지사항 ID를 조회하는 쿼리. 새 공지사항 ID 생성 시 사용 -->
     <select id="getLastNoticeId" resultType="String">
-    	Select notice_id
-    	From notice
-    	ORDER BY notice_id DESC
-    	LIMIT 1
+        SELECT notice_id
+        FROM notice
+        ORDER BY notice_id DESC
+        LIMIT 1
     </select>
+
+    <!-- 공지사항 상세 정보를 조회하는 쿼리. 특정 notice_id로 공지사항 데이터를 반환 -->
+    <select id="getNotice" parameterType="string" resultType="com.ldb.lms.dto.board.notice.NoticeDto">
+        SELECT
+            n.notice_id,
+            n.writer_id,
+            p.professor_name AS userName,
+            n.notice_title,
+            n.notice_content,
+            n.notice_created_at,
+            n.notice_read_count,
+            n.notice_password,
+            n.notice_file
+        FROM notice n
+        LEFT JOIN professor p ON n.writer_id = p.professor_id
+        WHERE n.notice_id = #{noticeId}
+    </select>
+
+    <!-- 공지사항 조회수를 증가시키는 쿼리. 상세 페이지 조회 시 호출 -->
+    <update id="incrementReadCount" parameterType="string">
+        UPDATE notice
+        SET notice_read_count = notice_read_count + 1
+        WHERE notice_id = #{noticeId}
+    </update>
+
+    <!-- 공지사항을 삭제하는 쿼리. 특정 notice_id에 해당하는 공지사항 삭제 -->
+    <delete id="deleteNotice" parameterType="string">
+        DELETE FROM notice
+        WHERE notice_id = #{noticeId}
+    </delete>
+    
+    <update id="updateNotice" parameterType="com.ldb.lms.dto.board.notice.NoticeDto">
+    UPDATE notice
+    SET
+        notice_title = #{noticeTitle},
+        notice_content = #{noticeContent},
+        notice_file = #{noticeFile},
+        notice_password = #{noticePassword}
+    WHERE notice_id = #{noticeId}
+	</update>
 </mapper>
