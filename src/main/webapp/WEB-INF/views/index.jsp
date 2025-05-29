@@ -14,92 +14,94 @@ pageContext.setAttribute("randomImageNumber", randomImageNumber);
 <head>
     <title>메인화면</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        /* 기본 배경 스타일 */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('/dist/assets/picture/backWon${randomImageNumber}.jpg');
-            background-size: 510px 900px;
-            background-position: 100% 25%;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            filter: brightness(0.7);
-            z-index: -1;
-        }
+<style>
+    /* 기본 배경 스타일 */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('/dist/assets/picture/backWon${randomImageNumber}.jpg');
+        background-size: 510px 900px;
+        background-position: 100% 25%;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        filter: brightness(0.7);
+        z-index: -1;
+    }
 
-        /* 컨테이너 위치 */
-        .container-custom {
-            margin-top: 50px;
-            margin-left: 55px;
-        }
+    /* 컨테이너 위치 */
+    .container-custom {
+        margin-top: 50px;
+        margin-left: 55px;
+    }
 
-        /* 카드 스타일 */
-        .card-custom {
-            padding: 20px; /* 여백 줄임 */
-            min-height: 350px; /* 높이 유지 */
-            margin-bottom: 50px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* 수직 중앙 */
-        }
+    /* 카드 스타일 */
+    .card-custom {
+        padding: 15px; /* 여백 줄임 */
+        min-height: 250px; /* 높이 낮춤 */
+        margin-bottom: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* 수직 중앙 */
+        max-width: 400px; /* 너비 제한 */
+        margin-left: 20px; /* 왼쪽으로 더 붙임 */
+    }
 
-        /* 카드 바디 중앙 정렬 */
-        .card-body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* 수직 중앙 */
-            align-items: stretch; /* 수평은 채우기 */
-            flex-grow: 1; /* 바디가 카드 높이 채우도록 */
-        }
+    /* 카드 바디 중앙 정렬 */
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* 수직 중앙 */
+        align-items: stretch; /* 수평은 채우기 */
+        flex-grow: 1; /* 바디가 카드 높이 채우도록 */
+    }
 
-        /* 환영 메시지 텍스트 스타일 */
-        .welcome-text {
-            margin-bottom: 15px; /* 텍스트 간 간격 */
-            font-size: 1.1rem; /* 살짝 큰 폰트 */
-        }
+    /* 환영 메시지 텍스트 스타일 */
+    .welcome-text {
+        margin-bottom: 15px; /* 텍스트 간 간격 */
+        font-size: 1.1rem; /* 살짝 큰 폰트 */
+    }
 
-        /* 빠른 액세스 버튼 */
-        .quick-access .btn {
-            font-size: 1rem; /* 버튼 텍스트 크기 */
-            padding: 10px 20px; /* 버튼 패딩 */
-            margin: 5px; /* 버튼 간 간격 */
-        }
+    /* 빠른 액세스 버튼 */
+    .quick-access .btn {
+        font-size: 1rem; /* 버튼 텍스트 크기 */
+        padding: 10px 20px; /* 버튼 패딩 */
+        margin: 5px; /* 버튼 간 간격 */
+    }
 
-        /* 공지사항 리스트 */
-        .list-group-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center; /* 수직 중앙 */
-            padding: 10px 15px; /* 패딩 조정 */
-            margin-bottom: 5px; /* 항목 간 간격 */
-        }
+    /* 공지사항 리스트 */
+    .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center; /* 수직 중앙 */
+        padding: 10px 15px; /* 패딩 조정 */
+        margin-bottom: 5px; /* 항목 간 간격 */
+    }
 
-        /* 타임라인 스타일 */
-        .timeline-item {
-            padding: 10px 15px; /* 패딩 조정 */
-            margin-bottom: 15px; /* 항목 간 간격 */
-        }
-        .timeline-item .time {
-            margin-bottom: 5px; /* 날짜와 제목 간격 */
-        }
-        .timeline-item h3 {
-            font-size: 1.1rem; /* 제목 크기 */
-        }
-        .timeline-body {
-            font-size: 0.95rem; /* 본문 크기 */
-        }
-        /* 타임라인 빈 경우 */
-        .timeline-empty {
-            text-align: center;
-            color: #6c757d; /* 회색 텍스트 */
-            margin-top: 20px;
-        }
-    </style>
+    /* 타임라인 스타일 */
+    .timeline-item {
+        padding: 10px 15px; /* 패딩 조정 */
+        margin-bottom: 15px; /* 항목 간 간격 */
+    }
+    .timeline-item .time {
+        margin-bottom: 5px; /* 날짜와 제목 간격 */
+    }
+    .timeline-item h3 {
+        font-size: 1.1rem; /* 제목 크기 */
+    }
+    .timeline-body {
+        font-size: 0.95rem; /* 본문 크기 */
+    }
+    /* 타임라인 빈 경우 */
+    .timeline-empty {
+        text-align: center;
+        color: #6c757d; /* 회색 텍스트 */
+        margin-top: 20px;
+    }
+</style>
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
     <div class="app-wrapper">
