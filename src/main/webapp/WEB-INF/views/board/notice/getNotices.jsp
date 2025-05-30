@@ -174,20 +174,20 @@
             </div>
 
             <nav>
-                <ul class="pagination justify-content-center">
-                    <li class="page-item <c:if test="${pagination.currentPage <= 1}">disabled</c:if>">
-                        <a class="page-link" href="${pageContext.request.contextPath}/notice/getNotices?pageNum=${pagination.currentPage - 1}&searchType=${searchDto.searchType}&searchKeyword=${searchDto.searchKeyword}">이전</a>
-                    </li>
-                    <c:forEach var="i" begin="${pagination.startPage}" end="${pagination.endPage}">
-                        <li class="page-item <c:if test="${i == pagination.currentPage}">active</c:if>">
-                            <a class="page-link" href="${pageContext.request.contextPath}/notice/getNotices?pageNum=${i}&searchType=${searchDto.searchType}&searchKeyword=${searchDto.searchKeyword}">${i}</a>
-                        </li>
-                    </c:forEach>
-                    <li class="page-item <c:if test="${pagination.currentPage >= pagination.totalPages}">disabled</c:if>">
-                        <a class="page-link" href="${pageContext.request.contextPath}/notice/getNotices?pageNum=${pagination.currentPage + 1}&searchType=${searchDto.searchType}&searchKeyword=${searchDto.searchKeyword}">다음</a>
-                    </li>
-                </ul>
-            </nav>
+			    <ul class="pagination justify-content-center">
+			        <li class="page-item <c:if test="${pagination.currentPage <= 1}">disabled</c:if>">
+			            <a class="page-link" href="<c:url value='/notice/getNotices?pageNum=${pagination.currentPage - 1}&searchType=${fn:escapeXml(searchDto.searchType)}&searchKeyword=${fn:escapeXml(searchDto.searchKeyword)}'/>">이전</a>
+			        </li>
+			        <c:forEach var="i" begin="${pagination.startPage}" end="${pagination.endPage}">
+			            <li class="page-item <c:if test="${i == pagination.currentPage}">active</c:if>">
+			                <a class="page-link" href="<c:url value='/notice/getNotices?pageNum=${i}&searchType=${fn:escapeXml(searchDto.searchType)}&searchKeyword=${fn:escapeXml(searchDto.searchKeyword)}'/>">${i}</a>
+			            </li>
+			        </c:forEach>
+			        <li class="page-item <c:if test="${pagination.currentPage >= pagination.totalPages}">disabled</c:if>">
+			            <a class="page-link" href="<c:url value='/notice/getNotices?pageNum=${pagination.currentPage + 1}&searchType=${fn:escapeXml(searchDto.searchType)}&searchKeyword=${fn:escapeXml(searchDto.searchKeyword)}'/>">다음</a>
+			        </li>
+			    </ul>
+			</nav>	
         </div>
     </div>
 

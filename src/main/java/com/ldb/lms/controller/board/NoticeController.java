@@ -37,8 +37,10 @@ public class NoticeController {
     @GetMapping("getNotices")
     public String getNotices(
             @ModelAttribute NoticeSearchDto searchDto,
+            @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
             @ModelAttribute NoticePaginationDto pageDto,
             Model model) {
+    	pageDto.setCurrentPage(pageNum);
         noticeService.populateNoticesModel(searchDto, pageDto, model);
         return "board/notice/getNotices";
     }

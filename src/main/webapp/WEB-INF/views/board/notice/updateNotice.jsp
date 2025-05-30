@@ -8,8 +8,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>공지사항 수정</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <style>
@@ -58,7 +56,7 @@
 <div class="notice-container mt-5">
     <h2 class="text-center h2">공지사항 수정</h2>
     <form id="noticeForm" action="update" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="noticeId" value="${notice.noticeId}">
+        <input type="hidden" id="noticeId" name="noticeId"  value="${notice.noticeId}">
         <div class="mb-3">
             <label for="noticeTitle" class="form-label">제목</label>
             <input type="text" class="form-control" id="noticeTitle" name="noticeTitle" value="${notice.noticeTitle}" required>
@@ -66,7 +64,7 @@
         <div class="mb-3">
             <label for="content" class="form-label">내용</label>
             <textarea id="content" name="noticeContent" style="display: none;"></textarea>
-            <div id="editor" class="toast-editor">${fn:escapeXml(notice.noticeContent)}</div>
+            <div id="editor" class="toast-editor">${notice.noticeContent}</div>
         </div>
         <div class="mb-3">
             <label for="noticePassword" class="form-label">비밀번호</label>
@@ -140,8 +138,8 @@
             }
 
             $.ajax({
-                url: '${pageContext.request.contextPath}/api/notice/update',
-                type: 'POST',
+                url: "/api/notice/update",
+                type: "POST",
                 data: formData,
                 processData: false,
                 contentType: false,

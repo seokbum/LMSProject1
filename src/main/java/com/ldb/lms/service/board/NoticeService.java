@@ -182,8 +182,6 @@ public class NoticeService {
             String professorId = getProfessorIdFromSession(session);
             noticeDto.setNoticeFile(file);
             updateNotice(noticeDto, professorId, request);
-
-            response.put("message", "공지사항이 성공적으로 수정되었습니다.");
             response.put("redirectUrl", request.getContextPath() + "/notice/getNoticeDetail?noticeId=" + noticeDto.getNoticeId());
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
@@ -263,6 +261,7 @@ public class NoticeService {
         if (notice != null) {
             notice.setNoticeFile(null);
         }
+        log.info("prepareUpdateNotice: noticeId={}, notice={}", noticeId, notice);
         model.addAttribute("notice", notice);
     }
 
@@ -313,6 +312,7 @@ public class NoticeService {
     public Map<String, Object> listNotice(NoticeSearchDto searchDto, NoticePaginationDto pageDto) {
         Integer pageSize = pageDto.getItemsPerPage() != null ? pageDto.getItemsPerPage() : 10;
         Integer currentPage = pageDto.getCurrentPage() != null && pageDto.getCurrentPage() > 0 ? pageDto.getCurrentPage() : 1;
+        log.info("listNotice: pageSize={}, currentPage={}", pageSize, currentPage);
         Integer totalRows = noticeMapper.countNotices(searchDto);
         Integer totalPages = (int) Math.ceil((double) totalRows / pageSize);
         Integer offset = (currentPage - 1) * pageSize;
@@ -388,8 +388,6 @@ public class NoticeService {
             }
 
             if (StringUtils.hasText(notice.getExistingFilePath())) {
-                // deleteNotice는 request가 없으므로 파일 삭제는 호출자가 처리해야 함
-                // 또는 별도의 환경 설정으로 경로를 주입받아 처리
                 log.warn("deleteNotice: 파일 삭제는 호출자가 처리해야 합니다. filePath: {}", notice.getExistingFilePath());
             }
 
