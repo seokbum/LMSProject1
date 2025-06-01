@@ -11,6 +11,10 @@ public interface ProfessorCourseMapper {
 	void insertCourseInfo(Course course);
 
 	void insertCourseTime(CourseTime courseTime);
+
+	long getMaxcourseIdNumber();
+
+	long getMaxcourseTimeIdNumber();
 	
 	
 }

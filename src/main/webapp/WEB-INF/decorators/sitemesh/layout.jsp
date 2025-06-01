@@ -273,22 +273,22 @@ body {
 						</a>
 							<ul class="nav nav-treeview">
 								<li class="nav-item">
-								<a href="/professors/courses" class="nav-link">
+								<a href="/professors/courses/register" class="nav-link">
 										<i class="nav-icon bi bi-circle"></i>
 										<p>강의등록</p>
 								</a></li>
 								<li class="nav-item"><a
-									href="${path}/professor_support/manage/manageCourse"
+									href="/professors/courses/management"
 									class="nav-link"> <i class="nav-icon bi bi-circle"></i>
 										<p>강의관리</p>
 								</a></li>
 								<li class="nav-item"><a
-									href="${path}/professor_support/score/scoreMng"
+									href="/professors/courses/score"
 									class="nav-link"> <i class="nav-icon bi bi-circle"></i>
 										<p>성적관리</p>
 								</a></li>
 								<li class="nav-item"><a
-									href="${path}/professor_support/attendance/attendance"
+									href="/professors/attendance/attendance"
 									class="nav-link"> <i class="nav-icon bi bi-circle"></i>
 										<p>출석관리</p>
 								</a></li>

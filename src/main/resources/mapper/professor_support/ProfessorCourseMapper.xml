@@ -36,7 +36,7 @@
             #{deptId},
             #{professorId},
             #{courseName},
-            #{courseStatus},
+            'OPEN',
             0,
             #{courseMaxCnt},
             #{courseScore},

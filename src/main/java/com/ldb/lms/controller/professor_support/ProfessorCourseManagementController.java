@@ -8,36 +8,39 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.ldb.lms.dto.learning_support.DeptDto;
 import com.ldb.lms.dto.professor_support.RegistCourseDto;
 import com.ldb.lms.service.learning_support.LearningService;
-import com.ldb.lms.service.professor_support.ProfessorService;
+import com.ldb.lms.service.professor_support.ProfessorCourseManagementService;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-public class ProfessorController {
+@RequestMapping("/professors/courses/management")
+public class ProfessorCourseManagementController {
 
     private final LearningService learningService;
 	
-	private final ProfessorService professorService;
+	private final ProfessorCourseManagementService professorCourseManagementService;
 	
-	public ProfessorController(ProfessorService professorService, LearningService learningService) {
-		this.professorService = professorService;
+	public ProfessorCourseManagementController(ProfessorCourseManagementService professorCourseManagementService, LearningService learningService) {
+		this.professorCourseManagementService = professorCourseManagementService;
 		this.learningService = learningService;
 	}
 
-	@GetMapping("/professors/courses")
+	@GetMapping
 	public String getCourses (Model model) {
 		List<DeptDto> departments = learningService.getDepartments("");
 		model.addAttribute("departments", departments);
-		return "professor_support/registCourseByPro";
+		return "professor_support/manageCourse";
 	}
 	
-	@PostMapping("/professors/courses")
+	@PutMapping("/{courseId}")
 	public String insertCourse (
 			@SessionAttribute(name="login", required=false) String professorId,
 			@ModelAttribute(name = "RegistCourseDto") RegistCourseDto rDto,
@@ -49,11 +52,10 @@ public class ProfessorController {
         }
 		
 		rDto.setProfessorId(professorId);
-		professorService.insertCourseAndCourseTime(rDto);
+		professorCourseManagementService.insertCourseAndCourseTime(rDto);
 		
-		return "redirect:professor_support/registCourseByPro";
+		return "redirect:courses";
 	}
-	
 	
 }
 

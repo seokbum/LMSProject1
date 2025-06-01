@@ -127,7 +127,7 @@
 </head>
 <body>
 	<input type="hidden" id="paramError" value="${errorMsg}">
-    <form action="/professors/courses" method="post" id="registCourseForm">
+    <form action="/professors/courses/register" method="post" id="registCourseForm">
         <div class="content">
             <div class="d-flex justify-content-between align-items-center mb-4 position-relative">
 		        <h2><i class="bi bi-pencil-square me-2"></i> 강의 등록</h2>
@@ -137,7 +137,7 @@
                 <div class="mb-3 row">
                     <label for="majorName" class="col-sm-2 col-form-label-custom">전공명</label>
                     <div class="col-sm-10">
-                        <select class="form-select form-select-sm" id="majorName" name="majorName">
+                        <select class="form-select form-select-sm" id="majorName" name=deptId>
                             <option value="" selected>전공을 선택하세요</option>
                             <c:forEach var="department" items="${departments}" varStatus="status">
                                 <option value="${department.deptId}">${department.deptName}</option>
@@ -241,7 +241,7 @@
                 <div class="mb-3 row">
                     <label for="score" class="col-sm-2 col-form-label-custom">학점</label>
                     <div class="col-sm-10">
-                        <input type="number" class="form-control form-control-sm" id="score" name="score" min="1" max="6" value="">
+                        <input type="number" class="form-control form-control-sm" id="score" name="courseScore" min="1" max="6" value="">
                         <small class="form-text text-muted">1점에서 6점 사이의 학점을 입력하세요.</small>
                     </div>
                 </div>
