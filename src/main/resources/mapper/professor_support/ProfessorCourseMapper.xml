@@ -133,10 +133,10 @@
 	    <set>
 	        <choose>
 	            <when test="courseStatus == 'CLOSED'">
-	                course_status = 'OPEN',
+	                course_status = 'OPEN'
 	            </when>
 	            <when test="courseStatus == 'OPEN'">
-	                course_status = 'CLOSED',
+	                course_status = 'CLOSED'
 	            </when>
 	        </choose>
 	        </set>
@@ -176,14 +176,14 @@
     <delete id="deleteCourseTimeInfo">
         DELETE 
         FROM  course_time
-        WHERE course_id = #{course_Id}
+        WHERE course_id = #{courseId}
     </delete>
     
     <!-- score 테이블 삭제 -->
     <delete id="deleteScore">
         DELETE 
         FROM  score
-        WHERE course_id = #{course_Id}
+        WHERE course_id = #{courseId}
     </delete>
 	
 </mapper>
