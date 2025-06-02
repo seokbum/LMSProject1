@@ -57,8 +57,7 @@ public class MypageController {
 	@PostMapping("login")
 	public String login(@RequestParam String id , @RequestParam String password ,HttpServletRequest request) {
 		Map<String,String> login = mypageService.login(id,password,request);
-		System.out.println("login"+login);
-		return login==null?"redirect:mypage/doLogin":"redirect:/";
+		return login==null?"mypage/doLogin":"redirect:/";
 	}
 	
 	@GetMapping("findId")

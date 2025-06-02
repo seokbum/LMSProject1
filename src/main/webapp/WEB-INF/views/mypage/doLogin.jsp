@@ -161,7 +161,7 @@ h4 {
 					type="password" class="form-control" id="password" name="password"
 					placeholder="비밀번호 입력">
 			</div>
-			<c:if test="${out != null }">
+			<c:if test="${error != null }">
 			<div class="mb-3">
 				<div id="errorMessage" style="color: red; font-size:20px" >${error}</div>
 			</div>

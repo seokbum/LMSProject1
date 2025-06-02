@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -23,7 +24,8 @@ body {
 .card {
 	border: none;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	width: 100%; max-width : 400px;
+	width: 100%;
+	max-width: 400px;
 	padding: 20px;
 	background-color: #ffffff;
 	border-radius: 10px;
@@ -89,13 +91,15 @@ h4 {
 </style>
 </head>
 <body>
-	<div class="card">
+<c:if test="${chg==null}">
+<div class="card">
 		<h4 class="text-center mb-4">비밀번호 변경</h4>
-		<form action="changePw" method="post" onsubmit="return input_check(this)">
+		<form action="changePw" method="post"
+			onsubmit="return input_check(this)">
 
 			<input type="hidden" value="${param.id}" name="id"> <input
 				type="hidden" value="${param.email}" name="email">
-			
+
 			<div class="mb-3">
 				<label for="pw" class="form-label">현재 비밀번호</label> <input
 					type="password" class="form-control" id="pw" name="pw">
@@ -117,85 +121,84 @@ h4 {
 
 			<button class="btn btn-custom w-100 mb-3">비밀번호 변경</button>
 			<div class="text-center">
-				<a href="close" class="btn btn-link-custom">비밀번호를 나중에 바꾸고 싶으면
-					클릭!</a>
+				<a href="javascript:c()" class="btn btn-link-custom">비밀번호를 나중에
+					바꾸고 싶으면 클릭!</a>
 			</div>
 		</form>
 	</div>
+</c:if>	
+	
+<c:if test="${chg!=null}">
+<div class="card">
+        <h4 class="text-center mb-4">${chg}</h4>
+         <a href="javascript:c()" class="btn-link-custom">로그인 화면으로 돌아가기</a>
+</div>
+</c:if>	
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script type="text/javascript">
+		function c() {
+			window.close();
 
-      
-        
-        function passwordChk(p){
-        	const passVal = document.querySelector("#passValid");
-        	if(!valid(p.value.trim(),'pass')){
-        		passVal.innerHTML= '특수문자,영어,숫자포함 8~16자리';
-        		passVal.style.color='red';
-        	}
-        	else{
-        		passVal.innerHTML= '유효한비밀번호';
-        		passVal.style.color='green';
-        	}
-        }
-        
-        function re_passwordChk(cp){ //비밀번호와 재입력한비밀번호가 같은지?
-    		let  p = document.querySelector("#newPw").value;
-    		let  pEqulasCp = document.querySelector("#pEqulasCp");
-    		if(!(p===cp.value)){
-    			pEqulasCp.innerHTML = '비밀번호가 일치하지않아요';
-    		}
-    		else{
-    			pEqulasCp.innerHTML = '';
-    		}
+		}
 
-        }
-        
-        function valid(text,type){    
-        if(type==='pass'){ //비밀번호유효성검사
-        		const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,16}$/;
-        		//(?=.*[A-Za-z]) → 문자열 어딘가에 영문자가 있어야 해 (확인만)
-        		//\W : 특수문자 , [A-Za-z\d\W_]{8,16} : 해당문자들이 8개~16개존재해야함
-        		return regex.test(text);
-        	}
-        
-        }
-        
-        function input_check(t) {
-            if (t.newPw.value.trim() != t.newPw2.value.trim()) {
-                alert("변경할 비밀번호와 재입력한 비밀번호가 일치하지 않습니다.");
-                t.cPw2.focus();
-                return false;
-            }
-            else if (t.pw.value.trim()==""){
+		function passwordChk(p) {
+			const passVal = document.querySelector("#passValid");
+			if (!valid(p.value.trim(), 'pass')) {
+				passVal.innerHTML = '특수문자,영어,숫자포함 8~16자리';
+				passVal.style.color = 'red';
+			} else {
+				passVal.innerHTML = '유효한비밀번호';
+				passVal.style.color = 'green';
+			}
+		}
+
+		function re_passwordChk(cp) { //비밀번호와 재입력한비밀번호가 같은지?
+			let p = document.querySelector("#newPw").value;
+			let pEqulasCp = document.querySelector("#pEqulasCp");
+			if (!(p === cp.value)) {
+				pEqulasCp.innerHTML = '비밀번호가 일치하지않아요';
+			} else {
+				pEqulasCp.innerHTML = '';
+			}
+
+		}
+
+		function valid(text, type) {
+			if (type === 'pass') { //비밀번호유효성검사
+				const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,16}$/;
+				//(?=.*[A-Za-z]) → 문자열 어딘가에 영문자가 있어야 해 (확인만)
+				//\W : 특수문자 , [A-Za-z\d\W_]{8,16} : 해당문자들이 8개~16개존재해야함
+				return regex.test(text);
+			}
+		}
+
+		function input_check(t) {
+			if (t.newPw.value.trim() != t.newPw2.value.trim()) {
+				alert("변경할 비밀번호와 재입력한 비밀번호가 일치하지 않습니다.");
+				t.cPw2.focus();
+				return false;
+			} else if (t.pw.value.trim() == "") {
 				alert("현재비번입력");
 				t.pw.focus();
 				return false;
-            }
-            else if(t.newPw.value.trim() == ""){ 
-        		alert("비밀번호입력")
-        		t.newPw.focus();
-        		return false; 
-        	}
-            else if(t.newPw2.value.trim() == ""){ 
-        		alert("비밀번호재입력")
-        		t.newPw2.focus();
-        		return false; 
-        	}
-            //valid(t.pw.value.trim(),'pass')
-            else if(!(
-            		 valid(t.newPw.value.trim(),'pass')
-            		&& valid(t.newPw2.value.trim(),'pass')
-            		)){ 
-        	alert("형식을준수해주세요")
-        	return false;
-        	}
-            return true;
-        }
-        
-      
-
-    </script>
+			} else if (t.newPw.value.trim() == "") {
+				alert("비밀번호입력")
+				t.newPw.focus();
+				return false;
+			} else if (t.newPw2.value.trim() == "") {
+				alert("비밀번호재입력")
+				t.newPw2.focus();
+				return false;
+			}
+			//valid(t.pw.value.trim(),'pass')
+			else if (!(valid(t.newPw.value.trim(), 'pass') && valid(
+					t.newPw2.value.trim(), 'pass'))) {
+				alert("형식을준수해주세요")
+				return false;
+			}
+			return true;
+		}
+	</script>
 </body>
 </html>
