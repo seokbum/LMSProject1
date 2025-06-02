@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ldb.lms.mapper.board.PostMapper">
+
+    <!-- 공지사항 목록 조회 -->
+    <select id="listNotices" parameterType="map" resultType="com.ldb.lms.dto.board.post.PostDto">
+        SELECT
+            po.post_id,
+            po.author_id,
+            COALESCE(s.student_name, pr.professor_name) AS userName,
+            po.post_title,
+            po.post_content,
+            po.post_created_at,
+            po.post_read_count,
+            po.post_password,
+            po.post_file AS existingFilePath,
+            po.post_notice
+        FROM post po
+        INNER JOIN student s ON po.author_id = s.student_id
+        LEFT JOIN professor pr ON po.author_id = pr.professor_id
+        WHERE po.post_notice = 1
+        <if test="searchType != null and searchKeyword != null and searchKeyword != ''">
+            AND (
+                <choose>
+                    <when test="searchType == 'userName'">
+                        (s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'postTitle'">
+                        po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </when>
+                    <when test="searchType == 'postContent'">
+                        po.post_content LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </when>
+                    <when test="searchType == 'postTitle,userName'">
+                        (po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'postTitle,postContent'">
+                        (po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR po.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'userName,postContent'">
+                        (s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR po.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'postTitle,userName,postContent'">
+                        (po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR po.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                </choose>
+            )
+        </if>
+        UNION
+        SELECT
+            po.post_id,
+            po.author_id,
+            COALESCE(pr.professor_name, s.student_name) AS userName,
+            po.post_title,
+            po.post_content,
+            po.post_created_at,
+            po.post_read_count,
+            po.post_password,
+            po.post_file AS existingFilePath,
+            po.post_notice
+        FROM post po
+        INNER JOIN professor pr ON po.author_id = pr.professor_id
+        LEFT JOIN student s ON po.author_id = s.student_id
+        WHERE po.post_notice = 1
+        <if test="searchType != null and searchKeyword != null and searchKeyword != ''">
+            AND (
+                <choose>
+                    <when test="searchType == 'userName'">
+                        (s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'postTitle'">
+                        po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </when>
+                    <when test="searchType == 'postContent'">
+                        po.post_content LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </when>
+                    <when test="searchType == 'postTitle,userName'">
+                        (po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'postTitle,postContent'">
+                        (po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR po.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'userName,postContent'">
+                        (s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR po.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'postTitle,userName,postContent'">
+                        (po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR po.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                </choose>
+            )
+        </if>
+        ORDER BY post_created_at DESC
+    </select>
+
+    <!-- 일반 게시물 목록 조회 (페이징 및 답글 정렬 포함) -->
+    <select id="listPost" parameterType="map" resultType="com.ldb.lms.dto.board.post.PostDto">
+        SELECT
+            po.post_id,
+            po.author_id,
+            COALESCE(s.student_name, pr.professor_name) AS userName,
+            po.post_title,
+            po.post_content,
+            po.post_created_at,
+            po.post_read_count,
+            po.post_password,
+            po.post_file AS existingFilePath,
+            po.post_group,
+            po.post_group_level,
+            po.post_group_step,
+            po.post_notice
+        FROM post po
+        LEFT JOIN student s ON po.author_id = s.student_id
+        LEFT JOIN professor pr ON po.author_id = pr.professor_id
+        WHERE po.post_notice = 0
+        AND (s.student_id IS NOT NULL OR pr.professor_id IS NOT NULL)
+        <if test="searchType != null and searchKeyword != null and searchKeyword != ''">
+            AND (
+                <choose>
+                    <when test="searchType == 'userName'">
+                        (s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'postTitle'">
+                        po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </when>
+                    <when test="searchType == 'postContent'">
+                        po.post_content LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </when>
+                    <when test="searchType == 'postTitle,userName'">
+                        (po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'postTitle,postContent'">
+                        (po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR po.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'userName,postContent'">
+                        (s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR po.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'postTitle,userName,postContent'">
+                        (po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR po.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                </choose>
+            )
+        </if>
+        ORDER BY post_group DESC, post_group_step ASC, post_created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 일반 게시물 수 조회 -->
+    <select id="countPosts" parameterType="com.ldb.lms.dto.board.post.PostSearchDto" resultType="int">
+        SELECT COUNT(DISTINCT po.post_id)
+        FROM post po
+        LEFT JOIN student s ON po.author_id = s.student_id
+        LEFT JOIN professor pr ON po.author_id = pr.professor_id
+        WHERE po.post_notice = 0
+        AND (s.student_id IS NOT NULL OR pr.professor_id IS NOT NULL)
+        <if test="searchType != null and searchKeyword != null and searchKeyword != ''">
+            AND (
+                <choose>
+                    <when test="searchType == 'userName'">
+                        (s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'postTitle'">
+                        po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </when>
+                    <when test="searchType == 'postContent'">
+                        po.post_content LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </when>
+                    <when test="searchType == 'postTitle,userName'">
+                        (po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'postTitle,postContent'">
+                        (po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR po.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'userName,postContent'">
+                        (s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR po.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                    <when test="searchType == 'postTitle,userName,postContent'">
+                        (po.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR po.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                    </when>
+                </choose>
+            )
+        </if>
+    </select>
+</mapper>

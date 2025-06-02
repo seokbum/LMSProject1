@@ -97,7 +97,7 @@
         <div class="notice-container mt-5">
             <h2 class="text-center fs-1">공지사항</h2>
 
-            <form id="searchForm" class="mb-4" action="${pageContext.request.contextPath}/notice/getNotices" method="get">
+            <form id="searchForm" class="mb-4" action="/notice/getNotices" method="get">
                 <div class="row">
                     <div class="col-md-3">
                         <label for="searchType" class="form-label">검색 조건</label>
@@ -140,7 +140,7 @@
                                 <tr>
                                     <td><c:out value="${pagination.totalRows - (pagination.offset + status.index)}"/></td>
                                     <td>
-                                        <a href="${pageContext.request.contextPath}/notice/getNoticeDetail?noticeId=${notice.noticeId}"><c:out value="${notice.noticeTitle}"/></a>
+                                        <a href="/notice/getNoticeDetail?noticeId=${notice.noticeId}"><c:out value="${notice.noticeTitle}"/></a>
                                     </td>
                                     <td><c:out value="${notice.userName}"/></td>
                                     <td>
@@ -170,7 +170,7 @@
             </table>
 
             <div class="text-end">
-                <a href="${pageContext.request.contextPath}/notice/createNotice" class="notice-btn-primary">글쓰기</a>
+                <a href="/notice/createNotice" class="notice-btn-primary">글쓰기</a>
             </div>
 
             <nav>
