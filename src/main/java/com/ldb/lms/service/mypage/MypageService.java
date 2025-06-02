@@ -56,6 +56,7 @@ public class MypageService {
 			return false;
 		}
 		else {
+			request.setAttribute("error", "로그아웃을 하세요");
 			return true;
 		}
 	}
@@ -188,8 +189,6 @@ public class MypageService {
 			int ranNum = new Random().nextInt(num.length);
 			sNum+=num[ranNum]; //랜덤한 3개의숫자
 		}
-
-
 		while(true) { 
 			if(professroMapper.idchk("P"+sNum)<1) { //true(id가존재하지않을 시 )면 루프탈출
 				break;
@@ -317,7 +316,7 @@ public class MypageService {
 	public boolean registerSuccess(HttpServletRequest request) {
 		String id = request.getParameter("id");
 		if(id.contains("S")) {
-			Student stu = (Student)request.getSession().getAttribute("mem");
+			Student stu = (Student)request.getSession().getAttribute("m");
 
 			if(studentMapper.insert(stu)<1) { //DB에오류발생시
 				System.out.println("실패");
@@ -334,7 +333,7 @@ public class MypageService {
 			}
 		}
 		else {
-			Professor pro = (Professor)request.getSession().getAttribute("mem");
+			Professor pro = (Professor)request.getSession().getAttribute("m");
 
 			if(professroMapper.insert(pro)<1) {
 				System.out.println("실패");
@@ -448,10 +447,24 @@ public class MypageService {
 
 	public void changePw(UpdatePwDto dto,HttpServletRequest request) {
 		String id = dto.getId();
-		String email = dto.getEmail();
 		String newPw = dto.getNewPw();
-		String pw = dto.getPw();
-		
-		
+		String hashpw = BCrypt.hashpw(newPw, BCrypt.gensalt());
+		dto.setNewPw(hashpw); //암호화된 비밀번호로 업데이트
+		if(id.contains("S")) {
+			if(proStuMapper.updateStuPw(dto)<1) {
+				request.setAttribute("chg", "비밀번호변경 실패");
+			}
+			else {
+				request.setAttribute("chg", "비밀번호변경 완료");
+			}
+		}
+		else {
+			if(proStuMapper.updateProPw(dto)<1) {
+				request.setAttribute("chg", "비밀번호변경 실패");
+			}
+			else {
+				request.setAttribute("chg", "비밀번호변경 완료");
+			}
+		}
 	}
 }
