@@ -35,7 +35,6 @@ public class ProfessorCourseRegisterService {
 	public void insertCourseAndCourseTime(RegistCourseDto rDto) {
 		
 		try {
-			
 			long maxCourseId = professorCourseMapper.getMaxcourseIdNumber();
 			long maxCtId = professorCourseMapper.getMaxcourseTimeIdNumber();
 			String courseId = "C" + (++maxCourseId);
