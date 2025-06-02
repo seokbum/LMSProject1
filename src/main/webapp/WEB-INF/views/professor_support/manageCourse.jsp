@@ -237,19 +237,19 @@
 				<ul class="pagination">
 					<c:if test="${pagination.currentPage > 1}">
 						<li class="page-item"><a class="page-link"
-							href="${path}/professor_support/manage/manageCourse?page=${pagination.currentPage - 1}&search=${param.search}">이전</a>
+							href="/professors/courses/management?page=${pagination.currentPage - 1}&search=${param.search}">이전</a>
 						</li>
 					</c:if>
 					<c:forEach begin="1" end="${pagination.totalPages}" var="page">
 						<li
 							class="page-item ${pagination.currentPage == page ? 'active' : ''}">
 							<a class="page-link"
-							href="${path}/professor_support/manage/manageCourse?page=${page}&search=${param.search}">${page}</a>
+							href="/professors/courses/management?page=${page}&search=${param.search}">${page}</a>
 						</li>
 					</c:forEach>
 					<c:if test="${pagination.currentPage < pagination.totalPages}">
 						<li class="page-item"><a class="page-link"
-							href="${path}/professor_support/manage/manageCourse?page=${pagination.currentPage + 1}&search=${param.search}">다음</a>
+							href="/professors/courses/management?page=${pagination.currentPage + 1}&search=${param.search}">다음</a>
 						</li>
 					</c:if>
 				</ul>
@@ -369,7 +369,7 @@
 		function handleSearch() {
 			var keyword = $("#searchInput").val();
 			var page = "${pagination.currentPage}";
-			var baseUrl = "${path}/professor_support/manage/manageCourse";
+			var baseUrl = "/professors/courses/management";
 			var searchUrl = keyword ? baseUrl + "?page=" + page + "&search="
 					+ encodeURIComponent(keyword) : baseUrl + "?page=" + page;
 			window.location.href = searchUrl;
