@@ -41,10 +41,8 @@ public class ProfessorCourseRegisterService {
 			String courseTimeId = "CT" + (++maxCtId);
 			rDto.setCourseId(courseId);
 			rDto.setCourseTimeId(courseTimeId);
-			
 			Course course =  convertMapper.toCourse(rDto);
 			CourseTime courseTime =  convertMapper.toCourseTime(rDto);
-			
 			professorCourseMapper.insertCourseInfo(course);
 			professorCourseMapper.insertCourseTime(courseTime);
 		} catch(Exception e) {

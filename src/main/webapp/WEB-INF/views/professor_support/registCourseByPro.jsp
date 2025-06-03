@@ -250,7 +250,7 @@
             <div class="card p-4">
                 <h5 class="mb-3">강의 설명</h5>
                 <div class="mb-3">
-                    <textarea class="form-control form-control-sm" name="description" rows="5"></textarea>
+                    <textarea class="form-control form-control-sm" name="coursePlan" rows="5"></textarea>
                     <small class="form-text text-muted">강의 내용을 설명해주세요.</small>
                 </div>
                 <div class="d-flex justify-content-end">
