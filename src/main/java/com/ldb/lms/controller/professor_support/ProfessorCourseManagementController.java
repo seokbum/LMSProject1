@@ -1,5 +1,7 @@
 package com.ldb.lms.controller.professor_support;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -41,7 +43,9 @@ public class ProfessorCourseManagementController {
 		if (StringUtils.hasText(professorId)) {
 			paginationDto.setProfessorId(professorId);
 			professorCourseManagementService.calcPage(paginationDto);
-			professorCourseManagementService.getCourses(paginationDto);
+			List<RegistCourseDto> courses = 
+					professorCourseManagementService.getCourses(paginationDto);
+			model.addAttribute("courses", courses);
 		} else {
 			throw new RuntimeException("로그인정보가 확인되지 않습니다.");
 		}

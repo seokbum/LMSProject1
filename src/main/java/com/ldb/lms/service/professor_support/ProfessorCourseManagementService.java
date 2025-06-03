@@ -52,10 +52,10 @@ public class ProfessorCourseManagementService {
 		log.info("paginationDto: {}", paginationDto.toString());
 	}
 	
-	public void getCourses(PaginationDto paginationDto) {
-		List<RegistCourseDto> list = professorCourseMapper.searchCourseInfo(paginationDto);
-		
-		log.info("list: {}", list);
+	public List<RegistCourseDto> getCourses(PaginationDto paginationDto) {
+		List<RegistCourseDto> courses = professorCourseMapper.searchCourseInfo(paginationDto);
+		log.info("list: {}", courses);
+		return courses;
 	}
 	
 
