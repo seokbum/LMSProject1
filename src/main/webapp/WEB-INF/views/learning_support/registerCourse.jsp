@@ -376,7 +376,7 @@
                 deptId: $("#deptSelect").val(),
                 courseId: $("#courseId").val(),
                 courseName: $("#courseName").val(),
-                currentPage: currentPage,
+                page: currentPage,
                 itemsPerPage: pageSize,
             };
             $.ajax({
@@ -386,7 +386,7 @@
                 dataType: "json",
                 success: function(data) {
                     var courses = data.courses || [];
-                    var pagination = data.pagination || { currentPage: 1, totalPages: 1 };
+                    var pagination = data.pagination;
                     var $body = $("#courseBody");
                     $body.empty();
                     
@@ -424,7 +424,7 @@
                         $body.append(row);
                     });
                     $("#courseCount").text(pagination.totalRows);
-                    renderPagination(pagination.currentPage, pagination.totalPages);
+                    renderPagination(pagination.page, pagination.totalPages);
                     
                 },
                 error: function(xhr) {

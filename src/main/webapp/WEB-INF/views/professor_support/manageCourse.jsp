@@ -129,7 +129,7 @@
 
 		<div class="card">
 			<div class="mb-3 text-end">
-				<a href="${path}/professor_support/registCourse"
+				<a href="/professors/courses/management"
 					class="btn btn-primary">새 강의 등록</a>
 			</div>
 			<table class="table table-hover">
@@ -201,8 +201,8 @@
 								</button>
 							</td>
 							<td>
-								<a href="${path}/professor_support/manage/deleteCourseInfo
-								?page=${pagination.currentPage}&search=${param.search}&courseId=${course.courseId}"
+								<a href="/professors/manage/deleteCourseInfo
+								?page=${paginationDto.page}&search=${param.search}&courseId=${course.courseId}"
 								class="btn btn-secondary btn-sm" onclick="return confirm('정말 삭제하시겠습니까?');"> 
 								<i class="bi bi-trash"></i> 삭제
 								</a> 
@@ -235,21 +235,21 @@
 			<!-- Pagination -->
 			<nav aria-label="Page navigation">
 				<ul class="pagination">
-					<c:if test="${pagination.currentPage > 1}">
+					<c:if test="${paginationDto.page > 1}">
 						<li class="page-item"><a class="page-link"
-							href="/professors/courses/management?page=${pagination.currentPage - 1}&search=${param.search}">이전</a>
+							href="/professors/courses/management?page=${paginationDto.page - 1}&search=${param.search}&sortDirection=${param.sortDirection}">이전</a>
 						</li>
 					</c:if>
-					<c:forEach begin="1" end="${pagination.totalPages}" var="page">
+					<c:forEach begin="${paginationDto.startPage}" end="${paginationDto.endPage}" var="page">
 						<li
-							class="page-item ${pagination.currentPage == page ? 'active' : ''}">
+							class="page-item ${paginationDto.page == page ? 'active' : ''}">
 							<a class="page-link"
-							href="/professors/courses/management?page=${page}&search=${param.search}">${page}</a>
+							href="/professors/courses/management?page=${page}&search=${param.search}&sortDirection=${param.sortDirection}">${page}</a>
 						</li>
 					</c:forEach>
-					<c:if test="${pagination.currentPage < pagination.totalPages}">
+					<c:if test="${paginationDto.page < paginationDto.totalPages}">
 						<li class="page-item"><a class="page-link"
-							href="/professors/courses/management?page=${pagination.currentPage + 1}&search=${param.search}">다음</a>
+							href="/professors/courses/management?page=${paginationDto.page + 1}&search=${param.search}&sortDirection=${param.sortDirection}">다음</a>
 						</li>
 					</c:if>
 				</ul>
@@ -268,7 +268,7 @@
 						aria-label="Close"></button>
 				</div>
 				<form id="updateCourseForm"
-					action="${path}/professor_support/manage/updateCourseInfo" method="post">
+					action="/professors/courses/updateCourseInfo" method="post">
 					<div class="modal-body">
 						<div class="form-group">
 							<label for="modalCourseId">강의ID:</label> 
@@ -385,7 +385,7 @@
 					: sortField;
 
 			currentUrl.searchParams.set("sortDirection", newSort);
-			currentUrl.searchParams.set("page", "${pagination.currentPage}");
+			currentUrl.searchParams.set("page", "${paginationDto.page}");
 			currentUrl.searchParams.set("search", "${param.search}");
 			window.location.href = currentUrl.toString();
 		}

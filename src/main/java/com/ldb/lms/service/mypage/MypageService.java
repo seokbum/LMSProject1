@@ -31,7 +31,6 @@ import com.ldb.lms.mapper.mypage.ProfessorMapper;
 import com.ldb.lms.mapper.mypage.StudentMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 ;
 
@@ -352,7 +351,7 @@ public class MypageService {
 	}
 
 
-	public boolean index(HttpServletRequest request) {
+	/*public boolean index(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String dbId = (String)session.getAttribute("login");
 		if(dbId==null) {
@@ -374,7 +373,7 @@ public class MypageService {
 		}
 		return false;
 
-	}
+	}*/
 
 
 	public void logout(HttpServletRequest request) {

@@ -53,7 +53,7 @@ public class ProfessorCourseRegisterController {
 		rDto.setProfessorId(professorId);
 		professorCourseRegisterService.insertCourseAndCourseTime(rDto);
 		
-		return "redirect:courses";
+		return "redirect:register";
 	}
 	
 }

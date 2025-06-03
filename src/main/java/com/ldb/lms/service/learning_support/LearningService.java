@@ -37,13 +37,13 @@ public class LearningService {
     }
 
     public Map<String, Object> searchCourse(SearchDto searchDto, PaginationDto pageDto) {
-        Integer pageSize = pageDto.getItemsPerPage() != null ? pageDto.getItemsPerPage() : 10;
-        Integer currentPage = pageDto.getCurrentPage() != null ? pageDto.getCurrentPage() : 1;
-        Integer offset = (currentPage - 1) * pageSize;
+        Integer pageSize = pageDto.getItemsPerPage();
+        Integer page = pageDto.getPage();
+        Integer offset = (page - 1) * pageSize;
         Integer totalRows = courseMapper.countCourses(searchDto);
         Integer totalPages = (int) Math.ceil((double) totalRows / pageSize);
 
-        pageDto.setCurrentPage(currentPage);
+        pageDto.setPage(page);
         pageDto.setTotalRows(totalRows);
         pageDto.setTotalPages(totalPages);
         pageDto.setOffset(offset);

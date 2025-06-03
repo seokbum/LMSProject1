@@ -1,6 +1,7 @@
 package com.ldb.lms.service.professor_support;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import com.ldb.lms.dto.professor_support.PaginationDto;
+import com.ldb.lms.dto.professor_support.RegistCourseDto;
 import com.ldb.lms.mapper.professor_support.ConvertDtoMapper;
 import com.ldb.lms.mapper.professor_support.ProfessorCourseMapper;
 
@@ -28,33 +30,33 @@ public class ProfessorCourseManagementService {
 		this.professorCourseMapper = professorCourseMapper;
 	}
 
-	public void getCourses(Model model) {
-		
-		
-	}
-
 	public void calcPage(PaginationDto paginationDto) {
 		
 		Map<String, String> map = new HashMap<>();
 		map.put("professorId", paginationDto.getProfessorId());
 		map.put("search", paginationDto.getSearch());
 		
-		String pageParam = paginationDto.getPage();
-		Integer currentPage = 
-				(pageParam != null && !pageParam.isEmpty()) ? Integer.parseInt(pageParam) : 1;
-		Integer offset = (currentPage - 1) * paginationDto.getItemsPerPage();
+		Integer itemPerPage = paginationDto.getItemsPerPage();
+		Integer page = paginationDto.getPage();
 		Integer totalRows = professorCourseMapper.getCourseCountRows(map);
-		Integer totalPages = (int) Math.ceil((double) totalRows / paginationDto.getItemsPerPage());
+		Integer totalPages = (int) Math.ceil((double) totalRows / itemPerPage);
+		Integer startPage = ((page - 1) / itemPerPage) * itemPerPage + 1;
+		Integer endPage = Math.min((startPage + itemPerPage -1), totalPages);
+		Integer offset = (page - 1) * itemPerPage;
 		
-		paginationDto.setCurrentPage(currentPage);
 		paginationDto.setTotalRows(totalRows);
 		paginationDto.setTotalPages(totalPages);
+		paginationDto.setStartPage(startPage);
+		paginationDto.setEndPage(endPage);
 		paginationDto.setOffset(offset);
-		
-		professorCourseMapper.searchCourseInfo(paginationDto);// 
+		log.info("paginationDto: {}", paginationDto.toString());
 	}
 	
-	
+	public List<RegistCourseDto> getCourses(PaginationDto paginationDto) {
+		List<RegistCourseDto> courses = professorCourseMapper.searchCourseInfo(paginationDto);
+		log.info("list: {}", courses);
+		return courses;
+	}
 	
 
 
