@@ -35,36 +35,36 @@ public class ProfessorCourseManagementController {
 			@ModelAttribute PaginationDto paginationDto,
 			@SessionAttribute(name="login", required=false) String professorId,
 			Model model) {
+		// 임시 하드코딩
+		professorId = "P001";
 		
-		if (!StringUtils.hasText(professorId)) {
+		if (StringUtils.hasText(professorId)) {
 			paginationDto.setProfessorId(professorId);
 			professorCourseManagementService.calcPage(paginationDto);
-			professorCourseManagementService.getCourses(model);
+			professorCourseManagementService.getCourses(paginationDto);
 		} else {
 			throw new RuntimeException("로그인정보가 확인되지 않습니다.");
 		}
-		
-		
-		
+
 		return "professor_support/manageCourse";
 	}
 	
-	@PutMapping("/{courseId}")
-	public String insertCourse (
-			@SessionAttribute(name="login", required=false) String professorId,
-			@ModelAttribute(name = "RegistCourseDto") RegistCourseDto rDto,
-			Model model
-			) {
-		
-		if (!StringUtils.hasText(professorId)) {
-			professorId = "P001";
-        }
-		
-		rDto.setProfessorId(professorId);
-		professorCourseManagementService.insertCourseAndCourseTime(rDto);
-		
-		return "redirect:courses";
-	}
+//	@PutMapping("/{courseId}")
+//	public String insertCourse (
+//			@SessionAttribute(name="login", required=false) String professorId,
+//			@ModelAttribute(name = "RegistCourseDto") RegistCourseDto rDto,
+//			Model model
+//			) {
+//		
+//		if (!StringUtils.hasText(professorId)) {
+//			professorId = "P001";
+//        }
+//		
+//		rDto.setProfessorId(professorId);
+//		professorCourseManagementService.insertCourseAndCourseTime(rDto);
+//		
+//		return "redirect:courses";
+//	}
 	
 }
 

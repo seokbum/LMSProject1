@@ -235,21 +235,21 @@
 			<!-- Pagination -->
 			<nav aria-label="Page navigation">
 				<ul class="pagination">
-					<c:if test="${pagination.currentPage > 1}">
+					<c:if test="${paginationDto.page > 1}">
 						<li class="page-item"><a class="page-link"
-							href="/professors/courses/management?page=${pagination.currentPage - 1}&search=${param.search}">이전</a>
+							href="/professors/courses/management?page=${paginationDto.page - 1}&search=${param.search}">이전</a>
 						</li>
 					</c:if>
-					<c:forEach begin="1" end="${pagination.totalPages}" var="page">
+					<c:forEach begin="${paginationDto.startPage}" end="${paginationDto.endPage}" var="page">
 						<li
-							class="page-item ${pagination.currentPage == page ? 'active' : ''}">
+							class="page-item ${paginationDto.page == page ? 'active' : ''}">
 							<a class="page-link"
 							href="/professors/courses/management?page=${page}&search=${param.search}">${page}</a>
 						</li>
 					</c:forEach>
-					<c:if test="${pagination.currentPage < pagination.totalPages}">
+					<c:if test="${paginationDto.page < paginationDto.totalPages}">
 						<li class="page-item"><a class="page-link"
-							href="/professors/courses/management?page=${pagination.currentPage + 1}&search=${param.search}">다음</a>
+							href="/professors/courses/management?page=${paginationDto.page + 1}&search=${param.search}">다음</a>
 						</li>
 					</c:if>
 				</ul>

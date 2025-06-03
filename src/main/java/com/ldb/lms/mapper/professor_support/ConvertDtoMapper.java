@@ -1,6 +1,8 @@
 package com.ldb.lms.mapper.professor_support;
 
 import java.sql.Time;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import org.mapstruct.Mapper;
 
@@ -17,10 +19,10 @@ public interface ConvertDtoMapper {
 	
 	default Time map(String timeStr) {
 	    if (timeStr == null) return null;
-	    if (timeStr.length() == 5) timeStr += ":00"; // "10:00" → "10:00:00"
-	    return Time.valueOf(timeStr);
+    	// "10:00" → "10:00:00"
+    	LocalTime time = LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("H:mm[:ss]"));
+	    	 
+	    return Time.valueOf(time);
 	}
-	
-	
 	
 }
