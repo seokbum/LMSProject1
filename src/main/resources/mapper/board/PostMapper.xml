@@ -16,25 +16,26 @@
         LIMIT 1
     </select>
 
-    <insert id="insertPost" parameterType="com.ldb.lms.dto.board.post.PostDto">
+    <insert id="insertPost" parameterType="PostDto">
         INSERT INTO post (
             post_id, author_id, post_title, post_content, post_password,
-            post_notice, post_group, post_group_level, post_group_step,
-            file_path, post_created_at, post_updated_at, post_read_count
+            post_group, post_group_level, post_group_step,
+            post_file, post_created_at, post_updated_at, post_read_count, post_notice
         ) VALUES (
             #{postId}, #{authorId}, #{postTitle}, #{postContent}, #{postPassword},
-            COALESCE(#{postNotice}, 0), COALESCE(#{postGroup}, #{postId}), COALESCE(#{postGroupLevel}, 0), COALESCE(#{postGroupStep}, 0),
-            #{existingFilePath}, NOW(), NOW(), 0
+            COALESCE(#{postGroup}, #{postId}), COALESCE(#{postGroupLevel}, 0), COALESCE(#{postGroupStep}, 0),
+            #{existingFilePath}, NOW(), NOW(), 0, #{postNotice}
         )
     </insert>
 
-    <update id="updatePost" parameterType="com.ldb.lms.dto.board.post.PostDto">
+    <update id="updatePost" parameterType="PostDto">
         UPDATE post
         SET post_title = #{postTitle},
             post_content = #{postContent},
             post_password = #{postPassword},
-            file_path = #{existingFilePath},
-            post_updated_at = NOW()
+            post_file = #{existingFilePath},
+            post_updated_at = NOW(),
+            post_notice = #{postNotice}
         WHERE post_id = #{postId}
     </update>
 
@@ -43,90 +44,45 @@
     </delete>
 
     <delete id="deleteWithComments" parameterType="string">
-        DELETE FROM post_comment WHERE post_id = #{postId} </delete>
+        DELETE FROM post_comment WHERE post_id = #{postId}
+    </delete>
 
     <update id="incrementReadCount" parameterType="string">
         UPDATE post SET post_read_count = post_read_count + 1 WHERE post_id = #{postId}
     </update>
 
-    <select id="getPost" parameterType="string" resultType="com.ldb.lms.dto.board.post.PostDto">
+    <select id="getPost" parameterType="string" resultType="PostDto">
         SELECT p.post_id, p.author_id,
                COALESCE(s.student_name, pr.professor_name) AS userName,
                p.post_title, p.post_content, p.post_password,
-               p.post_notice, p.post_group, p.post_group_level, p.post_group_step,
-               p.file_path AS existingFilePath, p.post_read_count, p.post_created_at, p.post_updated_at
+               p.post_group, p.post_group_level, p.post_group_step,
+               p.post_file AS existingFilePath, p.post_read_count, p.post_created_at, p.post_updated_at, p.post_notice
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
         LEFT JOIN professor pr ON p.author_id = pr.professor_id
         WHERE p.post_id = #{postId}
     </select>
 
-    <select id="listNotices" parameterType="map" resultType="map">
+    <select id="listPosts" parameterType="map" resultType="PostDto">
         SELECT p.post_id,
                p.author_id,
-               COALESCE(s.student_name, pr.professor_name) AS user_name,
+               COALESCE(s.student_name, pr.professor_name) AS userName,
                p.post_title,
-               p.post_notice,
-               p.post_read_count,
-               p.post_created_at,
-               p.post_updated_at
-        FROM post p
-        LEFT JOIN student s ON p.author_id = s.student_id
-        LEFT JOIN professor pr ON p.author_id = pr.professor_id
-        WHERE p.post_notice = 1
-        <where>
-            <if test="searchDto.searchType != null and searchDto.searchType != ''">
-                <choose>
-                    <when test="searchDto.searchType == 'userName'">
-                        AND COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                    </when>
-                    <when test="searchDto.searchType == 'postTitle'">
-                        AND p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                    </when>
-                    <when test="searchDto.searchType == 'postContent'">
-                        AND p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                    </when>
-                    <when test="searchDto.searchType == 'postTitle,userName'">
-                        AND (p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                            OR COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
-                    </when>
-                    <when test="searchDto.searchType == 'postTitle,postContent'">
-                        AND (p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                            OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
-                    </when>
-                    <when test="searchDto.searchType == 'userName,postContent'">
-                        AND (COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                            OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
-                    </when>
-                    <when test="searchDto.searchType == 'postTitle,userName,postContent'">
-                        AND (p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                            OR COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                            OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
-                    </when>
-                </choose>
-            </if>
-        </where>
-        ORDER BY p.post_created_at DESC
-        LIMIT #{pageDto.itemsPerPage} OFFSET #{pageDto.offset}
-    </select>
-
-    <select id="listPosts" parameterType="map" resultType="map">
-        SELECT p.post_id,
-               p.author_id,
-               COALESCE(s.student_name, pr.professor_name) AS user_name,
-               p.post_title,
-               p.post_notice,
+               p.post_content,
                p.post_read_count,
                p.post_created_at,
                p.post_updated_at,
                p.post_group,
                p.post_group_level,
-               p.post_group_step
+               p.post_group_step,
+               p.post_notice
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
         LEFT JOIN professor pr ON p.author_id = pr.professor_id
-        WHERE p.post_notice = 0
         <where>
+            <if test="searchDto.postNotice != null">
+                AND p.post_notice = #{searchDto.postNotice}
+            </if>
             <if test="searchDto.searchType != null and searchDto.searchType != ''">
                 <choose>
                     <when test="searchDto.searchType == 'userName'">
@@ -162,13 +118,35 @@
         LIMIT #{pageDto.itemsPerPage} OFFSET #{pageDto.offset}
     </select>
 
-    <select id="countPosts" parameterType="com.ldb.lms.dto.board.post.PostSearchDto" resultType="int">
+    <select id="listNotices" parameterType="PostSearchDto" resultType="PostDto">
+        SELECT p.post_id,
+               p.author_id,
+               COALESCE(s.student_name, pr.professor_name) AS userName,
+               p.post_title,
+               p.post_content,
+               p.post_read_count,
+               p.post_created_at,
+               p.post_updated_at,
+               p.post_group,
+               p.post_group_level,
+               p.post_group_step,
+               p.post_notice
+        FROM post p
+        LEFT JOIN student s ON p.author_id = s.student_id
+        LEFT JOIN professor pr ON p.author_id = pr.professor_id
+        WHERE p.post_notice = 1
+        ORDER BY p.post_created_at DESC
+    </select>
+
+    <select id="countPosts" parameterType="PostSearchDto" resultType="int">
         SELECT COUNT(*)
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
         LEFT JOIN professor pr ON p.author_id = pr.professor_id
-        WHERE p.post_notice = 0
         <where>
+            <if test="postNotice != null">
+                AND p.post_notice = #{postNotice}
+            </if>
             <if test="searchType != null and searchType != ''">
                 <choose>
                     <when test="searchType == 'userName'">
@@ -209,7 +187,7 @@
         AND post_group_step >= #{postGroupStep}
     </update>
 
-    <insert id="insertComment" parameterType="com.ldb.lms.dto.board.post.CommentDto">
+    <insert id="insertComment" parameterType="CommentDto">
         INSERT INTO post_comment (
             comment_id, post_id, writer_id, comment_content, parent_comment_id, created_at
         ) VALUES (
@@ -217,29 +195,32 @@
         )
     </insert>
 
-    <update id="updateComment" parameterType="com.ldb.lms.dto.board.post.CommentDto">
+    <update id="updateComment" parameterType="CommentDto">
         UPDATE post_comment
         SET comment_content = #{commentContent},
-            updated_at = NOW() WHERE comment_id = #{commentId}
+            updated_at = NOW()
+        WHERE comment_id = #{commentId}
     </update>
 
     <delete id="deleteComment" parameterType="string">
         DELETE FROM post_comment WHERE comment_id = #{commentId}
     </delete>
 
-    <select id="selectComment" parameterType="string" resultType="com.ldb.lms.dto.board.post.CommentDto">
+    <select id="selectComment" parameterType="string" resultType="CommentDto">
         SELECT comment_id, post_id, writer_id, comment_content,
-               parent_comment_id, created_at, updated_at FROM post_comment
+               parent_comment_id, created_at, updated_at
+        FROM post_comment
         WHERE comment_id = #{commentId}
     </select>
 
-    <select id="selectCommentList" parameterType="string" resultType="com.ldb.lms.dto.board.post.CommentDto">
+    <select id="selectCommentList" parameterType="string" resultType="CommentDto">
         SELECT c.comment_id, c.post_id, c.writer_id,
                COALESCE(s.student_name, pr.professor_name) AS writer_name,
-               c.comment_content, c.parent_comment_id, c.created_at, c.updated_at FROM post_comment c
+               c.comment_content, c.parent_comment_id, c.created_at, c.updated_at
+        FROM post_comment c
         LEFT JOIN student s ON c.writer_id = s.student_id
         LEFT JOIN professor pr ON c.writer_id = pr.professor_id
         WHERE c.post_id = #{postId}
         ORDER BY c.created_at ASC
-     </select>
+    </select>
 </mapper>

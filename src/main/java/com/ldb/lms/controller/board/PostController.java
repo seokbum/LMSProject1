@@ -8,10 +8,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @Slf4j
 @Controller
@@ -21,54 +22,96 @@ public class PostController {
 
     private final PostService postService;
 
+    @GetMapping("/download")
+    public void downloadFile(
+            @RequestParam("filePath") String filePath,
+            HttpServletResponse response,
+            HttpServletRequest request) throws Exception {
+        postService.handleFileDownload(filePath, response, request);
+    }
+
     @GetMapping("getPosts")
     public String getPosts(
             @ModelAttribute PostSearchDto searchDto,
             @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
             @ModelAttribute PostPaginationDto pageDto,
+            @RequestParam(value = "postType", defaultValue = "post") String postType,
             Model model) {
-        log.debug("getPosts - pageNum: {}, searchDto: {}", pageNum, searchDto);
+    	searchDto.setPostNotice("notice".equals(postType) ? 1 : 0);
         pageDto.setCurrentPage(pageNum);
         postService.populatePostsModel(searchDto, pageDto, model);
-        log.debug("getPosts - model attributes: {}", model.asMap());
+        model.addAttribute("postType", postType);
         return "board/post/getPosts";
+    }
+
+    @GetMapping("createPost")
+    public String showCreatePost(
+            @RequestParam(value = "postType", defaultValue = "post") String postType,
+            Model model,
+            HttpSession session) {
+        postService.prepareCreatePost(session, model, postType);
+        return "board/post/createPost";
     }
 
     @GetMapping("getPostDetail")
     public String getPostDetail(
             @RequestParam("postId") String postId,
+            @RequestParam(value = "postType", defaultValue = "post") String postType,
             Model model) {
         postService.populatePostDetail(postId, model);
         return "board/post/getPostDetail";
     }
 
-    @GetMapping("createPost")
-    public String showCreatePost(Model model) {
-        postService.prepareCreatePost(model);
-        return "board/post/writePost";
+    @GetMapping("deletePost")
+    public String showDeletePost(
+            @RequestParam("postId") String postId,
+            @RequestParam(value = "postType", defaultValue = "post") String postType,
+            HttpSession session,
+            Model model) {
+        postService.prepareDeletePost(postId, session, model);
+        model.addAttribute("postType", postType);
+        return "board/post/deletePost";
+    }
+
+    @PostMapping("delete")
+    public String deletePost(
+            @RequestParam("postId") String postId,
+            @RequestParam("pass") String password,
+            HttpSession session,
+            Model model,
+            HttpServletRequest request) {
+        return postService.handleDeletePost(postId, password, session, model, request);
     }
 
     @GetMapping("updatePost")
     public String showUpdatePost(
             @RequestParam("postId") String postId,
+            @RequestParam(value = "postType", defaultValue = "post") String postType,
+            HttpSession session,
             Model model) {
-        postService.prepareUpdatePost(postId, model);
+        postService.prepareUpdatePost(postId, session, model);
         return "board/post/updatePost";
     }
 
-    @GetMapping("deletePost")
-    public String showDeletePost(
-            @RequestParam("postId") String postId,
+    @PostMapping("update")
+    public String updatePost(
+            @ModelAttribute PostDto postDto,
+            @RequestPart(value = "postFile", required = false) MultipartFile file,
+            @RequestParam(value = "postType", defaultValue = "post") String postType,
+            HttpServletRequest request,
+            HttpSession session,
             Model model) {
-        postService.prepareDeletePost(postId, model);
-        return "board/post/deletePost";
+        postDto.setPostNotice("notice".equals(postType) ? 1 : 0);
+        postService.handleUpdatePost(postDto, file, request, session);
+        return "redirect:/post/getPostDetail?postId=" + postDto.getPostId() + "&postType=" + postType;
     }
 
     @GetMapping("replyPost")
     public String showReplyPost(
             @RequestParam("postId") String postId,
+            HttpSession session,
             Model model) {
-        postService.prepareReplyPost(postId, model);
-        return "board/post/writePost";
+        postService.prepareReplyPost(postId, session, model);
+        return "board/post/createPost";
     }
 }

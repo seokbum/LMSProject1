@@ -7,8 +7,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-
 public class PostSearchDto {
-	private String searchType; 
+    private String searchType;
     private String searchKeyword;
+    private Integer postNotice;
 }
