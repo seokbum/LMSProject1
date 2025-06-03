@@ -1,11 +1,6 @@
 package com.ldb.lms.controller.mypage;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -128,9 +123,11 @@ public class MypageController {
 	@PostMapping("registerSuccess")
 	public String registerSuccess(HttpServletRequest request){
 		//어차피 회원가입성공 시 모든세션정보를 서비스 내에서 날림
-		if(mypageService.registerSuccess(request)) {
+		/*if(mypageService.registerSuccess(request)) {
 			return "mypage/doLogin";
 		}
+		return "mypage/registerUser";*/
+		mypageService.registerSuccess(request);
 		return "mypage/registerUser";
 	}
 	

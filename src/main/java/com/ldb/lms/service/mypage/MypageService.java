@@ -52,6 +52,7 @@ public class MypageService {
 	public boolean loginChk(HttpServletRequest request) {
 		String login = (String)request.getSession().getAttribute("login");
 		if(login==null) {
+			request.getSession().invalidate(); //일단세션 다날려
 			return false;
 		}
 		else {
@@ -318,8 +319,8 @@ public class MypageService {
 			Student stu = (Student)request.getSession().getAttribute("m");
 
 			if(studentMapper.insert(stu)<1) { //DB에오류발생시
-				System.out.println("실패");
 				request.getSession().invalidate();
+				request.setAttribute("msg", "회원가입 오류발생!");
 				return false;
 			}
 			else {
@@ -328,6 +329,7 @@ public class MypageService {
 				String name = stu.getStudentName();
 				EmailUtil.sendIdEmail(email, name, id);
 				request.getSession().invalidate();
+				request.setAttribute("msg", email+"로 아이디 전송완료!");
 				return true;
 			}
 		}
@@ -335,8 +337,8 @@ public class MypageService {
 			Professor pro = (Professor)request.getSession().getAttribute("m");
 
 			if(professroMapper.insert(pro)<1) {
-				System.out.println("실패");
 				request.getSession().invalidate();
+				request.setAttribute("msg", "회원가입 오류발생!");
 				return false;
 			}
 			else {
@@ -344,6 +346,7 @@ public class MypageService {
 				String name = pro.getProfessorName();
 				EmailUtil.sendIdEmail(email, name, id);
 				request.getSession().invalidate();
+				request.setAttribute("msg", email+"로 아이디 전송완료!");
 				return true;
 			}
 		}

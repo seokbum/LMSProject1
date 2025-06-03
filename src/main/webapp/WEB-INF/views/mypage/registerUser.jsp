@@ -28,7 +28,7 @@ body {
 	border: none;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	width: 100%;
-	max-width: 400px;
+	max-width: 700px;
 	padding: 20px;
 	margin-top: 20px;
 	margin-bottom: 20px;
@@ -55,7 +55,8 @@ body {
 </style>
 </head>
 <body>
-	<div class="card">
+<c:if test="${msg==null}">
+<div class="card">
 		<h4 class="text-center mb-4">회원가입</h4>
 		<form action="registerNumChk" name="f" method="post"
 			onsubmit="return input_check(this)">
@@ -98,10 +99,6 @@ body {
 					<c:forEach items="${dept}" var="s">
 						<option value="${s.deptId}">${s.deptName}</option>
 					</c:forEach>
-					<!-- <option value="Computer Science">컴퓨터공학과</option>
-                <option value="Electrical Engineering">전자공학과</option>
-                <option value="Mechanical Engineering">기계공학과</option>
-                <option value="Business Administration">경영학과</option> -->
 
 				</select>
 			</div>
@@ -131,15 +128,23 @@ body {
 					placeholder="이메일 입력" onkeyup="emailChk(this)"> <font
 					id='emailValid'></font>
 			</div>
-
 			<button class="btn btn-custom w-100 mb-3">가입</button>
 		</form>
-
 		<div class="text-center">
 			<a href="doLogin" class="btn-link-custom">로그인 화면으로 돌아가기</a>
 		</div>
-
 	</div>
+</c:if>
+<c:if test="${msg!=null}">
+<div class="card">
+	<h2>${msg}</h2>
+	<br>
+	<a href="doLogin" class="btn btn-secondary">로그인 화면으로</a>
+</div>
+
+
+</c:if>
+	
 
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

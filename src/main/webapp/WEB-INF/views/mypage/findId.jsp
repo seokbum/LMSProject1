@@ -62,14 +62,14 @@
         </form>
     </div>
 </c:if>
-<c:if test="${msg!=null}">
+<c:if test="${msg != null}">
 <div class="card">
-	<h4 class="text-center mb-4" style="color: orange">${msg}</h4>
+    <div>
+        <h2 style="text-align: center">${msg}</h2>
+        <button class="btn btn-custom w-100 mb-3" onclick="c()">홈화면으로 돌아가기</button>
+    </div>
 </div>
-<br>
-<div class="text-center">
-      <a href="javascript:c()" class="btn-link-custom">창 닫기</a>
-</div>
+
 </c:if>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript">
