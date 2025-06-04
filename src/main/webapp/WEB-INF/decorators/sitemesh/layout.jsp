@@ -224,7 +224,7 @@ body {
 								</p>
 						</a>
 							<ul class="nav nav-treeview">
-								<li class="nav-item"><a href="${path}/mypage/userInfo"
+								<li class="nav-item"><a href="/mypage/userInfo"
 									class="nav-link active"> <i class="nav-icon bi bi-circle"></i>
 										<p>개인정보</p>
 								</a></li>

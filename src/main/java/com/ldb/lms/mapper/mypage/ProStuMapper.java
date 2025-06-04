@@ -8,9 +8,8 @@ import org.apache.ibatis.annotations.Mapper;
 import com.ldb.lms.dto.mypage.FindIdDto;
 import com.ldb.lms.dto.mypage.FindPwDto;
 import com.ldb.lms.dto.mypage.LoginDto;
-import com.ldb.lms.dto.mypage.UpdateProInfoDto;
 import com.ldb.lms.dto.mypage.UpdatePwDto;
-import com.ldb.lms.dto.mypage.UpdateStuInfoDto;
+import com.ldb.lms.dto.mypage.UpdateInfoDto;
 
 
 @Mapper 
@@ -33,10 +32,10 @@ public interface ProStuMapper {
 	//학생or교수의 아이디를 넘겨받아 학과명 추출 
 	String selectDeptName(String studentId);
 	
-	void updateProInfo(UpdateProInfoDto updateProInfoDto);
+	void updateProInfo(UpdateInfoDto dto);
 	
 	//넘겨받은 id에 해당하는 학생의 img , email , phone 업데이트
-	void updateStuInfo(UpdateStuInfoDto updateStuInfoDto);
+	void updateStuInfo(UpdateInfoDto dto);
 	
 	
 	

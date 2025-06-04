@@ -63,21 +63,21 @@
 	</select>
 	
 	<!-- 넘겨받은 id에 해당하는 교수의 img , email , phone 업데이트 -->
-	<update id="updateProInfo" parameterType="UpdateProInfoDto">
+	<update id="updateProInfo" parameterType="UpdateInfoDto">
 	update professor 
-	set professor_img=#{professorImg},
-	professor_email=#{professorEmail},
-	professor_phone=#{professorPhone}
-	where professor_id = #{professorId}
+	set professor_img=#{picture},
+	professor_email=#{email},
+	professor_phone=#{phone}
+	where professor_id = #{id}
 	</update>
 	
 	<!-- 넘겨받은 id에 해당하는 학생의 img , email , phone 업데이트 -->
-	<update id="updateStuInfo" parameterType="UpdateStuInfoDto">
+	<update id="updateStuInfo" parameterType="UpdateInfoDto">
 	update student 
-	set student_img=#{studentImg},
-	student_email=#{studentEmail},
-	student_phone=#{studentPhone}
-	where student_id = #{studentId}
+	set student_img=#{picture},
+	student_email=#{email},
+	student_phone=#{phone}
+	where student_id = #{id}
 	</update>
 	
 	

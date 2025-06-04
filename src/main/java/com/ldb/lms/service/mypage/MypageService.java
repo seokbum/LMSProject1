@@ -24,6 +24,7 @@ import com.ldb.lms.dto.mypage.LoginDto;
 import com.ldb.lms.dto.mypage.Professor;
 import com.ldb.lms.dto.mypage.RegisterUserDto;
 import com.ldb.lms.dto.mypage.Student;
+import com.ldb.lms.dto.mypage.UpdateInfoDto;
 import com.ldb.lms.dto.mypage.UpdatePwDto;
 import com.ldb.lms.mapper.mypage.DeptMapper;
 import com.ldb.lms.mapper.mypage.ProStuMapper;
@@ -31,6 +32,7 @@ import com.ldb.lms.mapper.mypage.ProfessorMapper;
 import com.ldb.lms.mapper.mypage.StudentMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 ;
 
@@ -354,7 +356,7 @@ public class MypageService {
 	}
 
 
-	/*public boolean index(HttpServletRequest request) {
+	public boolean index(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String dbId = (String)session.getAttribute("login");
 		if(dbId==null) {
@@ -376,7 +378,7 @@ public class MypageService {
 		}
 		return false;
 
-	}*/
+	}
 
 
 	public void logout(HttpServletRequest request) {
@@ -467,6 +469,17 @@ public class MypageService {
 			else {
 				request.setAttribute("chg", "비밀번호변경 완료");
 			}
+		}
+	}
+
+
+	public void userUpdate(UpdateInfoDto dto) {
+		System.out.println("dto :::: "+dto);
+		if(dto.getId().contains("S")) {
+			proStuMapper.updateStuInfo(dto);	
+		}
+		else {
+			proStuMapper.updateProInfo(dto);
 		}
 	}
 }

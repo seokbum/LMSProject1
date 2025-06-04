@@ -17,6 +17,9 @@ public class SiteMeshConfig {
             protected void applyCustomConfiguration(SiteMeshFilterBuilder builder) {
                 builder.addDecoratorPath("/*", "sitemesh/layout.jsp")
                 .addExcludedPath("/mypage/*");
+                
+                builder.addDecoratorPath("/mypage/userInfo", "sitemesh/layout.jsp");
+                
             }
         });
         return filter;
