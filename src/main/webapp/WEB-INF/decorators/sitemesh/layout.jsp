@@ -183,9 +183,10 @@ body {
 							<!--end::User Image-->
 
 							<!--begin::Menu Footer-->
-							<li class="user-footer"><a href="mypage/userInfo"
-								class="btn btn-default btn-flat">Profile</a> <a
-								href="mypage/logout"
+							<li class="user-footer"><a href="/mypage/userInfo"
+								class="btn btn-default btn-flat">Profile</a> 
+								<a
+								href="/mypage/logout"
 								class="btn btn-default btn-flat float-end">Sign out</a></li>
 							<!--end::Menu Footer-->
 						</ul></li>

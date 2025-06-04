@@ -382,7 +382,11 @@ public class MypageService {
 
 
 	public void logout(HttpServletRequest request) {
-		request.getSession().invalidate();
+		HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+            System.out.println("Session invalidated");
+        }
 	}
 
 
@@ -397,13 +401,13 @@ public class MypageService {
 	}
 
 
-	public boolean findPwProcess(FindPwDto dto, HttpServletRequest request) {
+	public void findPwProcess(FindPwDto dto, HttpServletRequest request) {
 		String pass = proStuMapper.findPw(dto);
 		String id = dto.getId();
 		String email = dto.getEmail();
 		if(pass==null) {
 			request.setAttribute("msg", "입력하신정보가 맞지않아요");
-			return false;
+			return;
 		}
 		else {
 			//임시비번
@@ -418,14 +422,15 @@ public class MypageService {
 				sDto.setNewPw(hashPw);
 				if(proStuMapper.updateStuPw(sDto)<1) {
 					request.setAttribute("msg", "임시비밀번호 업데이트실패");
-					return false;
+					return;
 				}
 				else {
 					//업데이트성공시 (해쉬처리 전의 임시비밀번호를 이메일로 보내준다)
 					EmailUtil.sendTempPw(email, id, tempPw);
 					request.setAttribute("id", id);
 					request.setAttribute("email", email);//updatePw에서사용
-					return true;
+					request.setAttribute("msg", "success");
+					return ;
 				}
 			}
 			else if(id.contains("P")) {
@@ -434,17 +439,18 @@ public class MypageService {
 				pDto.setNewPw(hashPw);
 				if(proStuMapper.updateProPw(pDto)<1) {
 					request.setAttribute("msg", "임시비밀번호 업데이트실패");
-					return false;
+					return;
 				}
 				else {
 					//업데이트성공시 (해쉬처리 전의 임시비밀번호를 이메일로 보내준다)
 					EmailUtil.sendTempPw(email, id, tempPw);
 					request.setAttribute("id", id);
 					request.setAttribute("email", email);
-					return true;
+					request.setAttribute("msg", "success");
+					return;
 				}
 			}
-			return false;
+			return;
 		}
 	}
 
@@ -473,13 +479,28 @@ public class MypageService {
 	}
 
 
-	public void userUpdate(UpdateInfoDto dto) {
+	public boolean userUpdate(UpdateInfoDto dto,HttpServletRequest request) {
 		System.out.println("dto :::: "+dto);
 		if(dto.getId().contains("S")) {
-			proStuMapper.updateStuInfo(dto);	
+			int updateStuInfo = proStuMapper.updateStuInfo(dto);
+			System.out.println("dtoUpdate L "+updateStuInfo);
+			if(updateStuInfo<1) {
+				return false;	
+			}
+			else {
+				return true;
+			}
+		}
+		else if(dto.getId().contains("P")) {
+			if(proStuMapper.updateProInfo(dto)<1) {
+				return false;
+			}
+			else {
+				return true;
+			}
 		}
 		else {
-			proStuMapper.updateProInfo(dto);
+			return false;
 		}
 	}
 }

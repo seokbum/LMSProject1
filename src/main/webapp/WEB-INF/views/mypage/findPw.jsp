@@ -52,11 +52,58 @@ body {
 .btn-link-custom:hover {
 	text-decoration: underline;
 }
+ /* Button container for alignment */
+    .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin: 20px 0;
+    }
+
+    /* General button styling */
+    .custom-btn {
+        padding: 12px 24px;
+        font-size: 20px;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+/* Info button (비밀번호변경하기) */
+    .custom-btn-info {
+        background-color: #17a2b8;
+        color: white;
+    }
+    /* Secondary button (로그인화면으로) */
+    .custom-btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+     /* Styling for the error/success message */
+    .message-text {
+        font-size: 24px;
+        font-weight: 600;
+        color: red; /* Blue for default message */
+        margin-bottom: 20px;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #e7f1ff;
+        transition: all 0.3s ease;
+    }
+    /* Success message specific style */
+    .message-text.success {
+        color: #28a745; /* Green for success */
+        background-color: #d4edda;
+    }
 </style>
 </head>
 <body>
 	<div class="card">
-		<h4 class="text-center mb-4">비밀번호 찾기</h4>
+	<c:if test="${msg==null}">
+	<h4 class="text-center mb-4">비밀번호 찾기</h4>
 		<form action="findPwProcess" name="f" method="post">
 			<div class="mb-3">
 				<label for="id" class="form-label">아이디</label> <input type="text"
@@ -67,16 +114,32 @@ body {
 					type="email" class="form-control" id="email" name="email"
 					placeholder="이메일 입력" onkeyup="delMsg()">
 			</div>
-			<c:if test="${msg!=null}">
-				<div class="mb-3">
-					<p class="text-center mb-4" id="errorMsg" style="color: red">${msg}</p>
-				</div>
-			</c:if>
 			<button class="btn btn-custom w-100 mb-3">비밀번호 찾기</button>
 			<div class="text-center">
+			
 				<a href="javascript:c()" class="btn-link-custom">로그인 화면으로 돌아가기</a>
 			</div>
 		</form>
+	</c:if>
+		
+<c:if test="${msg!=null}">
+    <div class="message-container">
+        <div class="mb-3">
+            <h2 class="message-text ${msg=='success' ? 'success' : ''}" id="errorMsg">${msg}</h2>
+        </div>
+        <div class="button-group">
+            <button class="custom-btn custom-btn-secondary" onclick="c()">로그인화면으로</button>
+            <c:if test="${msg=='success'}">
+                <form action="updatePw" method="post">
+                    <input type="hidden" name="id" value="${id}">
+                    <input type="hidden" name="email" value="${email}">
+                    <button type="submit" class="custom-btn custom-btn-info">비밀번호변경하기</button>
+                </form>
+            </c:if>
+        </div>
+    </div>
+    <br><br>
+</c:if>
 	</div>
 
 

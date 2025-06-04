@@ -42,14 +42,15 @@ public class MypageController {
 		return "mypage/doLogin";
 	}
 	
-	//너무간단한데 이 1문장도 서비스에서 처리??
+
 	@GetMapping("logout")
 	public String callLogout(HttpServletRequest request) {
 		mypageService.logout(request);
-		return "redirect:/mypage/doLogin";
+		//String path = request.getContextPath();
+		System.out.println("Redirecting to /mypage/doLogin");
+		return "redirect:/mypage/doLogin";		
 	}
-	
-	
+		
 	@PostMapping("login")
 	public String login(@RequestParam String id , @RequestParam String password ,HttpServletRequest request) {
 		Map<String,String> login = mypageService.login(id,password,request);
@@ -74,31 +75,31 @@ public class MypageController {
 	
 	@PostMapping("findPwProcess")
 	public String findPwProcess(@ModelAttribute FindPwDto dto,HttpServletRequest request) {
-		if(mypageService.findPwProcess(dto,request)) {
+		/*if(mypageService.findPwProcess(dto,request)) {
 			return "mypage/updatePw";
-		}
+		}*/
+		mypageService.findPwProcess(dto,request);
 		return "mypage/findPw";
 	}
 	
-	@GetMapping("updatePw")
+	@PostMapping("updatePw")
 	public String callUpdatePw() {
 		return "mypage/updatePw";
 	}
 	
 	@PostMapping("changePw")
 	public String callChangePw(@ModelAttribute UpdatePwDto dto,HttpServletRequest request) {
+		System.out.println("dto :::"+dto);
+		request.getSession().invalidate();//세션초기화
 		mypageService.changePw(dto,request);
 		return "mypage/updatePw";
 	}
-	
-	
-	
+		
 	@GetMapping("registerUser")
 	public String callRegisterUser(HttpServletRequest request) {
 		mypageService.getDeptAll(request);
 		return "mypage/registerUser";
 	}
-	
 	
 	@GetMapping("registerImg")
 	public String callRegisterImg(HttpServletRequest request) {
@@ -153,8 +154,13 @@ public class MypageController {
 			, @ModelAttribute UpdateInfoDto dto){
 		String id = (String)request.getSession().getAttribute("login");
 		dto.setId(id);
-		mypageService.userUpdate(dto);
-		return "redirect:/";
+		if(!mypageService.userUpdate(dto,request)) {
+			request.setAttribute("msg", "변경 실패");
+		}
+		else {
+			request.setAttribute("msg", "변경 성공");
+		}
+		return "mypage/userInfo";
 	}
 	
 	

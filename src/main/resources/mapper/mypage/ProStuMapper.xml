@@ -69,6 +69,9 @@
 	professor_email=#{email},
 	professor_phone=#{phone}
 	where professor_id = #{id}
+	AND (professor_img != #{picture}
+         OR professor_email != #{email}
+         OR professor_phone != #{phone})
 	</update>
 	
 	<!-- 넘겨받은 id에 해당하는 학생의 img , email , phone 업데이트 -->
@@ -78,6 +81,9 @@
 	student_email=#{email},
 	student_phone=#{phone}
 	where student_id = #{id}
+	AND (student_img != #{picture}
+         OR student_email != #{email}
+         OR student_phone != #{phone})
 	</update>
 	
 	

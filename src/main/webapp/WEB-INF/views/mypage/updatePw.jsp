@@ -121,7 +121,7 @@ h4 {
 
 			<button class="btn btn-custom w-100 mb-3">비밀번호 변경</button>
 			<div class="text-center">
-				<a href="javascript:c()" class="btn btn-link-custom">비밀번호를 나중에
+				<a  href="javascript:c()" class="btn btn-link-custom">비밀번호를 나중에
 					바꾸고 싶으면 클릭!</a>
 			</div>
 		</form>
@@ -138,8 +138,8 @@ h4 {
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script type="text/javascript">
 		function c() {
-			window.close();
-
+				opener.location.href="/mypage/doLogin";
+				window.close();	
 		}
 
 		function passwordChk(p) {

@@ -21,14 +21,14 @@ public class HomeController {
 	
     @GetMapping("/")
     public String home(HttpServletRequest request,  Model model) {
-    	mypageService.index(request);
-    	return "index";
-    	/*if(mypageService.index(request)) {
+    	/*mypageService.index(request);
+    	return "index";*/
+    	if(mypageService.index(request)) {
     		return "index";
     	}
     	else {
     		return "redirect:mypage/doLogin";
-    	}*/
+    	}
         
     }
 

@@ -216,10 +216,11 @@
 <body>
     <div class="container">
         <!-- Personal Information -->
-        <div class="card">
-            <h2>개인 정보</h2>
+    <div class="card">
+<c:if test="${msg==null}">
 
-            <form action="userUpdate" class="form-section" name="f" method="post">
+            <h2>개인 정보</h2>
+    <form action="userUpdate" class="form-section" name="f" method="post">
                 <div class="profile-section">
                     <c:set var="img" value="${fn:contains(sessionScope.login, 'S') ? m.studentImg : m.professorImg}" />
                     <input type="hidden" name="picture" value="${img}">
@@ -307,11 +308,16 @@
                     </c:if>                  
                 </div>
             </form>
-            <form id="pwForm" action="pwUpdate" method="post" target="pwUpdateWindow" name="c">
+            <form id="pwForm" action="updatePw" method="post" target="pwUpdateWindow" name="c">
                 <input type="hidden" name="id" value="${sessionScope.login}">
                 <input type="hidden" name="email" value="${fn:contains(sessionScope.login, 'S') ? m.studentEmail : m.professorEmail}">
             </form>
-        </div>
+            </c:if> 
+            <c:if test="${msg!=null}">
+            <h2>${msg}</h2>
+            <a href="/" class="btn btn-primary">개인정보 화면으로</a>
+            </c:if>   
+        </div>  
     </div>
 
     <script type="text/javascript">
