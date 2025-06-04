@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
 import com.ldb.lms.dto.professor_support.PaginationDto;
 import com.ldb.lms.dto.professor_support.RegistCourseDto;
@@ -31,7 +30,7 @@ public class ProfessorCourseManagementService {
 	}
 
 	public void calcPage(PaginationDto paginationDto) {
-		
+		log.info("paginationDto: {}", paginationDto.toString());
 		Map<String, String> map = new HashMap<>();
 		map.put("professorId", paginationDto.getProfessorId());
 		map.put("search", paginationDto.getSearch());

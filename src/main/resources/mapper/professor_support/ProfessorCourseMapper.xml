@@ -75,7 +75,7 @@
 		   and c.professor_id = ct.professor_id
 		   and c.course_id = ct.course_id
 	   	<if test="search != null and search != ''">
-           and courseName LIKE '%${search}%'
+           and c.course_name LIKE '%${search}%'
 	    </if>
     </select>
     

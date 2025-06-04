@@ -129,7 +129,7 @@
 
 		<div class="card">
 			<div class="mb-3 text-end">
-				<a href="/professors/courses/management"
+				<a href="/professors/courses/register"
 					class="btn btn-primary">새 강의 등록</a>
 			</div>
 			<table class="table table-hover">
@@ -267,8 +267,8 @@
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close"></button>
 				</div>
-				<form id="updateCourseForm"
-					action="/professors/courses/updateCourseInfo" method="post">
+				<form id="updateCourseForm" action="" method="post">
+					<input type="hidden" name="_method" value="put"/>
 					<div class="modal-body">
 						<div class="form-group">
 							<label for="modalCourseId">강의ID:</label> 
@@ -368,7 +368,7 @@
 		// 검색 관련 함수
 		function handleSearch() {
 			var keyword = $("#searchInput").val();
-			var page = "${pagination.currentPage}";
+			var page = "${paginationDto.page}";
 			var baseUrl = "/professors/courses/management";
 			var searchUrl = keyword ? baseUrl + "?page=" + page + "&search="
 					+ encodeURIComponent(keyword) : baseUrl + "?page=" + page;
@@ -439,6 +439,8 @@
 			$("#modalCourseScore").val(courseScore);
 			$("#modalCoursePlan").val(coursePlan);
 			$("#modalCourseTimeId").val(courseTimeId);
+
+			$("#updateCourseForm").attr("action", "/professors/courses/management/" + courseId);
 		}
 
 		// 강의 상태 변경 처리 함수
@@ -455,7 +457,7 @@
 	
 			if (confirm("강의를 개설or종료 하시겠습니까?")) {
 				$.ajax({
-					url : "${path}/professor_support/manage/changeCourse",
+					url : "/professor_support/courses/management",
 					type : "POST",
 					data : {
 						courseId : courseId,
@@ -502,7 +504,7 @@
 			$("<input>").attr({
 				type : "hidden",
 				name : "page",
-				value : "${pagination.currentPage}"
+				value : "${paginationDto.page}"
 			}).appendTo("#updateCourseForm");
 			
 			$("<input>").attr({
