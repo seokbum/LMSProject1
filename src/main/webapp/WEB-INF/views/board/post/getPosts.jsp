@@ -2,7 +2,6 @@
 <%@ taglib uri="jakarta.tags.core" prefix="c"%>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt"%>           
 <%@ taglib uri="jakarta.tags.functions" prefix="fn"%> 
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -96,20 +95,19 @@
     <div class="app-main"> 
         <div class="post-container mt-5">
             <h2 class="text-center fs-1">문의게시판</h2>
-
             <form id="searchForm" class="mb-4" action="/post/getPosts" method="get">
                 <div class="row">
                     <div class="col-md-3">
                         <label for="searchType" class="form-label">검색 조건</label>
                         <select name="searchType" id="searchType" class="form-select">
                             <option value="">전체</option>
-                            <option value="userName" <c:if test="${searchDto.searchType == 'userName'}">selected</c:if>>작성자</option>
+                            <option value="authorName" <c:if test="${searchDto.searchType == 'authorName'}">selected</c:if>>작성자</option>
                             <option value="postTitle" <c:if test="${searchDto.searchType == 'postTitle'}">selected</c:if>>제목</option>
                             <option value="postContent" <c:if test="${searchDto.searchType == 'postContent'}">selected</c:if>>내용</option>
-                            <option value="postTitle,userName" <c:if test="${searchDto.searchType == 'postTitle,userName'}">selected</c:if>>제목+작성자</option>
+                            <option value="postTitle,authorName" <c:if test="${searchDto.searchType == 'postTitle,authorName'}">selected</c:if>>제목+작성자</option>
                             <option value="postTitle,postContent" <c:if test="${searchDto.searchType == 'postTitle,postContent'}">selected</c:if>>제목+내용</option>
-                            <option value="userName,postContent" <c:if test="${searchDto.searchType == 'userName,postContent'}">selected</c:if>>작성자+내용</option>
-                            <option value="postTitle,userName,postContent" <c:if test="${searchDto.searchType == 'postTitle,userName,postContent'}">selected</c:if>>제목+작성자+내용</option>
+                            <option value="authorName,postContent" <c:if test="${searchDto.searchType == 'authorName,postContent'}">selected</c:if>>작성자+내용</option>
+                            <option value="postTitle,authorName,postContent" <c:if test="${searchDto.searchType == 'postTitle,authorName,postContent'}">selected</c:if>>제목+작성자+내용</option>
                         </select>
                     </div>
                     <div class="col-md-6">
@@ -122,8 +120,6 @@
                     </div>
                 </div>
             </form>
-
-            <!-- 공지사항 목록 -->
             <c:if test="${not empty notices}">
                 <table class="table table-bordered">
                     <thead>
@@ -140,7 +136,7 @@
                             <tr>
                                 <td>공지</td>
                                 <td>
-                                    <a href="getPostDetail?postId=${post.postId}">
+                                    <a href="getPostDetail?postId=${post.postId}&authorId=${param.authorId}">
                                         [공지] <c:out value="${post.postTitle}"/>
                                     </a>
                                 </td>
@@ -164,8 +160,6 @@
                     </tbody>
                 </table>
             </c:if>
-
-            <!-- 일반 게시물 목록 -->
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -186,7 +180,7 @@
                                         <c:if test="${post.postGroupLevel > 0}">
                                             <span style="margin-left: ${post.postGroupLevel * 20}px;">↳</span>
                                         </c:if>
-                                        <a href="/post/getPostDetail?postId=${post.postId}">
+                                        <a href="/post/getPostDetail?postId=${post.postId}&authorId=${param.authorId}">
                                             <c:out value="${post.postTitle}"/>
                                         </a>
                                     </td>
@@ -216,12 +210,9 @@
                     </c:choose>
                 </tbody>
             </table>
-
             <div class="text-end">
-                <a href="/post/createPost" class="post-btn-primary">글쓰기</a>
+                <a href="/post/createPost?authorId=${param.authorId}" class="post-btn-primary">글쓰기</a>
             </div>
-
-            <!-- 페이지네이션 -->
 <c:if test="${pagination != null}">
     <nav>
         <ul class="pagination justify-content-center">
@@ -230,6 +221,7 @@
                     <c:param name='pageNum' value='${pagination.currentPage - 1}' />
                     <c:param name='searchType' value='${not empty searchDto.searchType ? searchDto.searchType : ""}' />
                     <c:param name='searchKeyword' value='${not empty searchDto.searchKeyword ? searchDto.searchKeyword : ""}' />
+                    <c:param name='authorId' value='${param.authorId}' />
                 </c:url>">이전</a>
             </li>
             <c:forEach var="i" begin="${pagination.startPage}" end="${pagination.endPage}">
@@ -238,6 +230,7 @@
                         <c:param name='pageNum' value='${i}' />
                         <c:param name='searchType' value='${not empty searchDto.searchType ? searchDto.searchType : ""}' />
                         <c:param name='searchKeyword' value='${not empty searchDto.searchKeyword ? searchDto.searchKeyword : ""}' />
+                        <c:param name='authorId' value='${param.authorId}' />
                     </c:url>">${i}</a>
                 </li>
             </c:forEach>
@@ -246,6 +239,7 @@
                     <c:param name='pageNum' value='${pagination.currentPage + 1}' />
                     <c:param name='searchType' value='${not empty searchDto.searchType ? searchDto.searchType : ""}' />
                     <c:param name='searchKeyword' value='${not empty searchDto.searchKeyword ? searchDto.searchKeyword : ""}' />
+                    <c:param name='authorId' value='${param.authorId}' />
                 </c:url>">다음</a>
             </li>
         </ul>

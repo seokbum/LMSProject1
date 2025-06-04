@@ -27,4 +27,5 @@ public class PostDto {
     private Date postUpdatedAt;
     private Integer postNotice; 
     private MultipartFile postFile;
+    private String ParentPostId;
 }

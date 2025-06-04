@@ -2,91 +2,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ldb.lms.mapper.board.PostMapper">
 
-    <select id="getLastPostId" resultType="string">
-        SELECT post_id
-        FROM post
-        ORDER BY post_id DESC
-        LIMIT 1
-    </select>
-
-    <select id="getLastCommentId" resultType="string">
-        SELECT comment_id
-        FROM post_comment
-        ORDER BY comment_id DESC
-        LIMIT 1
-    </select>
-
-    <insert id="insertPost" parameterType="PostDto">
-        INSERT INTO post (
-            post_id, author_id, post_title, post_content, post_password,
-            post_group, post_group_level, post_group_step,
-            post_file, post_created_at, post_updated_at, post_read_count, post_notice
-        ) VALUES (
-            #{postId}, #{authorId}, #{postTitle}, #{postContent}, #{postPassword},
-            COALESCE(#{postGroup}, #{postId}), COALESCE(#{postGroupLevel}, 0), COALESCE(#{postGroupStep}, 0),
-            #{existingFilePath}, NOW(), NOW(), 0, #{postNotice}
-        )
-    </insert>
-
-    <update id="updatePost" parameterType="PostDto">
-        UPDATE post
-        SET post_title = #{postTitle},
-            post_content = #{postContent},
-            post_password = #{postPassword},
-            post_file = #{existingFilePath},
-            post_updated_at = NOW(),
-            post_notice = #{postNotice}
-        WHERE post_id = #{postId}
-    </update>
-
-    <delete id="deletePost" parameterType="string">
-        DELETE FROM post WHERE post_id = #{postId}
-    </delete>
-
-    <delete id="deleteWithComments" parameterType="string">
-        DELETE FROM post_comment WHERE post_id = #{postId}
-    </delete>
-
-    <update id="incrementReadCount" parameterType="string">
-        UPDATE post SET post_read_count = post_read_count + 1 WHERE post_id = #{postId}
-    </update>
-
-    <select id="getPost" parameterType="string" resultType="PostDto">
-        SELECT p.post_id, p.author_id,
-               COALESCE(s.student_name, pr.professor_name) AS userName,
-               p.post_title, p.post_content, p.post_password,
-               p.post_group, p.post_group_level, p.post_group_step,
-               p.post_file AS existingFilePath, p.post_read_count, p.post_created_at, p.post_updated_at, p.post_notice
-        FROM post p
-        LEFT JOIN student s ON p.author_id = s.student_id
-        LEFT JOIN professor pr ON p.author_id = pr.professor_id
-        WHERE p.post_id = #{postId}
-    </select>
-
+    <!-- 게시물 목록을 조회합니다.  -->
     <select id="listPosts" parameterType="map" resultType="PostDto">
-        SELECT p.post_id,
-               p.author_id,
-               COALESCE(s.student_name, pr.professor_name) AS userName,
-               p.post_title,
-               p.post_content,
-               p.post_read_count,
-               p.post_created_at,
-               p.post_updated_at,
-               p.post_group,
-               p.post_group_level,
-               p.post_group_step,
-               p.post_notice
+        SELECT
+            p.post_id,
+            p.author_id,
+            COALESCE(s.student_name, pr.professor_name) AS user_name,
+            p.post_title,
+            p.post_content,
+            p.post_password,
+            p.post_group,
+            p.post_group_level,
+            p.post_group_step,
+            p.post_file AS existing_file_path,
+            p.post_read_count,
+            p.post_created_at,
+            p.post_updated_at,
+            p.post_notice
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
         LEFT JOIN professor pr ON p.author_id = pr.professor_id
         <where>
-            <if test="searchDto.postNotice != null">
-                AND p.post_notice = #{searchDto.postNotice}
-            </if>
             <if test="searchDto.searchType != null and searchDto.searchType != ''">
                 <choose>
                     <when test="searchDto.searchType == 'userName'">
-                        AND COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                        AND (s.student_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                             OR pr.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
                     </when>
                     <when test="searchDto.searchType == 'postTitle'">
                         AND p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
@@ -96,41 +37,54 @@
                     </when>
                     <when test="searchDto.searchType == 'postTitle,userName'">
                         AND (p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                            OR COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
+                             OR s.student_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                             OR pr.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
                     </when>
                     <when test="searchDto.searchType == 'postTitle,postContent'">
                         AND (p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                            OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
+                             OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
                     </when>
                     <when test="searchDto.searchType == 'userName,postContent'">
-                        AND (COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                            OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
+                        AND (s.student_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                             OR pr.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                             OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
                     </when>
                     <when test="searchDto.searchType == 'postTitle,userName,postContent'">
                         AND (p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                            OR COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                            OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
+                             OR s.student_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                             OR pr.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                             OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
                     </when>
                 </choose>
             </if>
+            <if test="searchDto.postNotice != null">
+                AND p.post_notice = #{searchDto.postNotice}
+            </if>
         </where>
-        ORDER BY p.post_group DESC, p.post_group_step ASC
+        ORDER BY
+            CASE WHEN p.post_notice = 1 THEN 0 ELSE 1 END,
+            p.post_group DESC,
+            p.post_group_step ASC
         LIMIT #{pageDto.itemsPerPage} OFFSET #{pageDto.offset}
     </select>
 
+    <!-- 공지사항 목록을 조회합니다.  -->
     <select id="listNotices" parameterType="PostSearchDto" resultType="PostDto">
-        SELECT p.post_id,
-               p.author_id,
-               COALESCE(s.student_name, pr.professor_name) AS userName,
-               p.post_title,
-               p.post_content,
-               p.post_read_count,
-               p.post_created_at,
-               p.post_updated_at,
-               p.post_group,
-               p.post_group_level,
-               p.post_group_step,
-               p.post_notice
+        SELECT
+            p.post_id,
+            p.author_id,
+            COALESCE(s.student_name, pr.professor_name) AS user_name,
+            p.post_title,
+            p.post_content,
+            p.post_password,
+            p.post_group,
+            p.post_group_level,
+            p.post_group_step,
+            p.post_file AS existing_file_path,
+            p.post_read_count,
+            p.post_created_at,
+            p.post_updated_at,
+            p.post_notice
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
         LEFT JOIN professor pr ON p.author_id = pr.professor_id
@@ -138,19 +92,18 @@
         ORDER BY p.post_created_at DESC
     </select>
 
+    <!-- 게시물 총 개수를 조회합니다.  -->
     <select id="countPosts" parameterType="PostSearchDto" resultType="int">
         SELECT COUNT(*)
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
         LEFT JOIN professor pr ON p.author_id = pr.professor_id
         <where>
-            <if test="postNotice != null">
-                AND p.post_notice = #{postNotice}
-            </if>
             <if test="searchType != null and searchType != ''">
                 <choose>
                     <when test="searchType == 'userName'">
-                        AND COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchKeyword}, '%')
+                        AND (s.student_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                             OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                     <when test="searchType == 'postTitle'">
                         AND p.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
@@ -160,67 +113,218 @@
                     </when>
                     <when test="searchType == 'postTitle,userName'">
                         AND (p.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
-                            OR COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchKeyword}, '%'))
+                             OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                             OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                     <when test="searchType == 'postTitle,postContent'">
                         AND (p.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
-                            OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                             OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                     <when test="searchType == 'userName,postContent'">
-                        AND (COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchKeyword}, '%')
-                            OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                        AND (s.student_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                             OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                             OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                     <when test="searchType == 'postTitle,userName,postContent'">
                         AND (p.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
-                            OR COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchKeyword}, '%')
-                            OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                             OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                             OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                             OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                 </choose>
+            </if>
+            <if test="postNotice != null">
+                AND p.post_notice = #{postNotice}
             </if>
         </where>
     </select>
 
-    <update id="updateGroupStep">
+    <!-- 새로운 게시물을 삽입합니다.  -->
+    <insert id="insertPost" parameterType="PostDto">
+        INSERT INTO post (
+            post_id,
+            author_id,
+            post_title,
+            post_content,
+            post_password,
+            post_group,
+            post_group_level,
+            post_group_step,
+            post_file,
+            post_read_count,
+            post_created_at,
+            post_updated_at,
+            post_notice
+        ) VALUES (
+            #{postId},
+            #{authorId},
+            #{postTitle},
+            #{postContent},
+            #{postPassword},
+            #{postGroup},
+            #{postGroupLevel},
+            #{postGroupStep},
+            #{existingFilePath},
+            0,
+            NOW(),
+            NOW(),
+            #{postNotice}
+        )
+    </insert>
+
+    <!-- 가장 최근 게시물 ID를 조회합니다.  -->
+    <select id="getLastPostId" resultType="String">
+        SELECT post_id
+        FROM post
+        ORDER BY post_id DESC
+        LIMIT 1
+    </select>
+
+    <!-- 가장 최근 댓글 ID를 조회합니다.  -->
+    <select id="getLastCommentId" resultType="String">
+        SELECT comment_id
+        FROM post_comment
+        ORDER BY comment_id DESC
+        LIMIT 1
+    </select>
+
+    <!-- 최대 게시물 그룹 ID를 조회합니다.  -->
+    <select id="getMaxGroup" resultType="String">
+        SELECT MAX(post_group)
+        FROM post
+    </select>
+
+    <!-- 특정 게시물의 상세 정보를 조회합니다.  -->
+    <select id="getPost" parameterType="String" resultType="PostDto">
+        SELECT
+            p.post_id,
+            p.author_id,
+            COALESCE(s.student_name, pr.professor_name) AS user_name,
+            p.post_title,
+            p.post_content,
+            p.post_password,
+            p.post_group,
+            p.post_group_level,
+            p.post_group_step,
+            p.post_file AS existing_file_path,
+            p.post_read_count,
+            p.post_created_at,
+            p.post_updated_at,
+            p.post_notice
+        FROM post p
+        LEFT JOIN student s ON p.author_id = s.student_id
+        LEFT JOIN professor pr ON p.author_id = pr.professor_id
+        WHERE p.post_id = #{postId}
+    </select>
+
+    <!-- 게시물 조회수를 증가시킵니다.  -->
+    <update id="incrementReadCount" parameterType="String">
+        UPDATE post
+        SET post_read_count = post_read_count + 1
+        WHERE post_id = #{postId}
+    </update>
+
+    <!-- 게시물을 삭제합니다.  -->
+    <delete id="deletePost" parameterType="String">
+        DELETE FROM post
+        WHERE post_id = #{postId}
+    </delete>
+
+    <!-- 게시물의 댓글을 삭제합니다. -->
+    <delete id="deleteCommentsByPostId" parameterType="String">
+        DELETE FROM post_comment
+        WHERE post_id = #{postId}
+    </delete>
+
+    <!-- 게시물을 업데이트합니다.  -->
+    <update id="updatePost" parameterType="PostDto">
+        UPDATE post
+        SET
+            post_title = #{postTitle},
+            post_content = #{postContent},
+            post_password = #{postPassword},
+            post_file = #{existingFilePath},
+            post_updated_at = NOW(),
+            post_notice = #{postNotice}
+        WHERE post_id = #{postId}
+    </update>
+
+    <!-- 게시물의 그룹 스텝을 업데이트합니다.  -->
+    <update id="updateGroupStep" parameterType="map">
         UPDATE post
         SET post_group_step = post_group_step + 1
         WHERE post_group = #{postGroup}
         AND post_group_step >= #{postGroupStep}
     </update>
 
+    <!-- 새로운 댓글을 삽입합니다.  -->
     <insert id="insertComment" parameterType="CommentDto">
         INSERT INTO post_comment (
-            comment_id, post_id, writer_id, comment_content, parent_comment_id, created_at
+            comment_id,
+            post_id,
+            writer_id,
+            comment_content,
+            parent_comment_id,
+            created_at,
+            updated_at
         ) VALUES (
-            #{commentId}, #{postId}, #{writerId}, #{commentContent}, #{parentCommentId}, NOW()
+            #{commentId},
+            #{postId},
+            #{writerId},
+            #{commentContent},
+            #{parentCommentId},
+            NOW(),
+            NOW()
         )
     </insert>
 
-    <update id="updateComment" parameterType="CommentDto">
-        UPDATE post_comment
-        SET comment_content = #{commentContent},
-            updated_at = NOW()
-        WHERE comment_id = #{commentId}
-    </update>
-
-    <delete id="deleteComment" parameterType="string">
-        DELETE FROM post_comment WHERE comment_id = #{commentId}
-    </delete>
-
-    <select id="selectComment" parameterType="string" resultType="CommentDto">
-        SELECT comment_id, post_id, writer_id, comment_content,
-               parent_comment_id, created_at, updated_at
-        FROM post_comment
-        WHERE comment_id = #{commentId}
-    </select>
-
-    <select id="selectCommentList" parameterType="string" resultType="CommentDto">
-        SELECT c.comment_id, c.post_id, c.writer_id,
-               COALESCE(s.student_name, pr.professor_name) AS writer_name,
-               c.comment_content, c.parent_comment_id, c.created_at, c.updated_at
+    <!-- 특정 게시물의 댓글 목록을 조회합니다.  -->
+    <select id="selectCommentList" parameterType="String" resultType="CommentDto">
+        SELECT
+            c.comment_id,
+            c.post_id,
+            c.writer_id,
+            COALESCE(s.student_name, pr.professor_name) AS writer_name,
+            c.comment_content,
+            c.parent_comment_id,
+            c.created_at,
+            c.updated_at
         FROM post_comment c
         LEFT JOIN student s ON c.writer_id = s.student_id
         LEFT JOIN professor pr ON c.writer_id = pr.professor_id
         WHERE c.post_id = #{postId}
         ORDER BY c.created_at ASC
     </select>
+
+    <!-- 특정 댓글을 조회합니다.  -->
+    <select id="selectComment" parameterType="String" resultType="CommentDto">
+        SELECT
+            c.comment_id,
+            c.post_id,
+            c.writer_id,
+            COALESCE(s.student_name, pr.professor_name) AS writer_name,
+            c.comment_content,
+            c.parent_comment_id,
+            c.created_at,
+            c.updated_at
+        FROM post_comment c
+        LEFT JOIN student s ON c.writer_id = s.student_id
+        LEFT JOIN professor pr ON c.writer_id = pr.professor_id
+        WHERE c.comment_id = #{commentId}
+    </select>
+
+    <!-- 댓글을 업데이트합니다. -->
+    <update id="updateComment" parameterType="CommentDto">
+        UPDATE post_comment
+        SET
+            comment_content = #{commentContent},
+            updated_at = NOW()
+        WHERE comment_id = #{commentId}
+    </update>
+
+    <!-- 댓글을 삭제합니다.  -->
+    <delete id="deleteComment" parameterType="String">
+        DELETE FROM post_comment
+        WHERE comment_id = #{commentId}
+    </delete>
 </mapper>

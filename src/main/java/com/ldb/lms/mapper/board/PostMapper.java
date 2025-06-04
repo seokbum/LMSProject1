@@ -15,13 +15,15 @@ public interface PostMapper {
 
     String getLastCommentId();
 
+    String getMaxGroup();
+
     void insertPost(PostDto postDto);
 
     void updatePost(PostDto postDto);
 
     void deletePost(String postId);
 
-    void deleteWithComments(String postId);
+    void deleteCommentsByPostId(String postId);
 
     void incrementReadCount(String postId);
 
@@ -33,7 +35,7 @@ public interface PostMapper {
 
     Integer countPosts(PostSearchDto searchDto);
 
-    void updateGroupStep(Integer postGroup, Integer postGroupStep);
+    void updateGroupStep(Map<String, Object> param);
 
     void insertComment(CommentDto commentDto);
 

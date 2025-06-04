@@ -8,8 +8,8 @@ import lombok.ToString;
 @Setter
 @ToString
 public class PostPaginationDto {
-    private Integer itemsPerPage;
-    private Integer currentPage;
+    private Integer itemsPerPage = 10; 
+    private Integer currentPage = 1;   
     private Integer totalRows;
     private Integer totalPages;
     private Integer offset;

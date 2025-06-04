@@ -10,8 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 import java.util.Map;
 
@@ -28,8 +28,7 @@ public class PostApiController {
             @ModelAttribute PostSearchDto searchDto,
             @ModelAttribute PostPaginationDto pageDto,
             @RequestParam(value = "postType", defaultValue = "post") String postType) {
-    	searchDto.setPostNotice("notice".equals(postType) ? 1 : 0);
-        return ResponseEntity.ok(postService.listPosts(searchDto, pageDto));
+        return postService.getPosts(searchDto, pageDto, postType);
     }
 
     @PostMapping("uploadImage")
@@ -39,57 +38,52 @@ public class PostApiController {
         return postService.handleImageUpload(file, request);
     }
 
-    @PostMapping("write")
-    public ResponseEntity<Map<String, String>> writePost(
+    @PostMapping("create")
+    public ResponseEntity<Map<String, String>> createPost(
             @RequestPart("post") PostDto postDto,
-            @RequestPart(value = "file", required = false) MultipartFile file,
-            @RequestParam(value = "postType", defaultValue = "post") String postType,
-            HttpServletRequest request,
-            HttpSession session) {
-        postDto.setPostNotice("notice".equals(postType) ? 1 : 0);
-        return postService.handleWritePost(postDto, file, request, session);
+            HttpServletRequest request) {
+        return postService.handleCreatePost(postDto, request);
     }
 
     @PostMapping("update")
     public ResponseEntity<Map<String, String>> updatePost(
             @RequestPart("post") PostDto postDto,
-            @RequestPart(value = "file", required = false) MultipartFile file,
-            @RequestParam(value = "postType", defaultValue = "post") String postType,
-            HttpServletRequest request,
-            HttpSession session) {
-        postDto.setPostNotice("notice".equals(postType) ? 1 : 0);
-        return postService.handleUpdatePost(postDto, file, request, session);
+            HttpServletRequest request) {
+        return postService.handleUpdatePost(postDto, request);
+    }
+
+    @PostMapping("reply")
+    public ResponseEntity<Map<String, String>> replyPost(
+            @RequestPart("post") PostDto postDto,
+            HttpServletRequest request) {
+        return postService.handleReplyPost(postDto, request);
     }
 
     @PostMapping("delete")
     public ResponseEntity<Map<String, String>> deletePost(
             @RequestParam("postId") String postId,
-            @RequestParam("password") String password,
-            @RequestParam(value = "postType", defaultValue = "post") String postType,
-            HttpSession session,
+            @RequestParam("pass") String password,
+            @RequestParam("authorId") String authorId,
             HttpServletRequest request) {
-        return postService.handleDeletePost(postId, password, session, request);
+        return postService.handleDeletePost(postId, password, authorId, request);
     }
 
     @PostMapping("comment")
     public ResponseEntity<Map<String, String>> writeComment(
-            @RequestBody CommentDto commentDto,
-            HttpSession session) {
-        return postService.handleWriteComment(commentDto, session);
+            @RequestBody CommentDto commentDto) {
+        return postService.handleWriteComment(commentDto);
     }
 
     @PostMapping("updateComment")
     public ResponseEntity<Map<String, String>> updateComment(
-            @RequestBody CommentDto commentDto,
-            HttpSession session) {
-        return postService.handleUpdateComment(commentDto, session);
+            @RequestBody CommentDto commentDto) {
+        return postService.handleUpdateComment(commentDto);
     }
 
     @PostMapping("deleteComment")
     public ResponseEntity<Map<String, String>> deleteComment(
             @RequestParam("commentId") String commentId,
-            @RequestParam("postId") String postId,
-            HttpSession session) {
-        return postService.handleDeleteComment(commentId, postId, session);
+            @RequestParam("postId") String postId) {
+        return postService.handleDeleteComment(commentId, postId);
     }
 }
