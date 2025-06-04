@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Date;
+
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
@@ -21,8 +23,8 @@ public class PostDto {
     private Integer postGroupStep;
     private String existingFilePath;
     private Integer postReadCount;
-    private String postCreatedAt;
-    private String postUpdatedAt;
+    private Date postCreatedAt;
+    private Date postUpdatedAt;
     private Integer postNotice; 
     private MultipartFile postFile;
 }

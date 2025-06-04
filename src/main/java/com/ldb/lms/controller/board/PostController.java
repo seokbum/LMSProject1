@@ -41,6 +41,9 @@ public class PostController {
         pageDto.setCurrentPage(pageNum);
         postService.populatePostsModel(searchDto, pageDto, model);
         model.addAttribute("postType", postType);
+        System.out.println(searchDto);
+        System.out.println(pageDto);
+        System.out.println(model);
         return "board/post/getPosts";
     }
 

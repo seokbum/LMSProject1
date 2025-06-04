@@ -409,14 +409,13 @@ public class PostService {
         Integer currentPage = pageDto.getCurrentPage() != null && pageDto.getCurrentPage() > 0 ? pageDto.getCurrentPage() : 1;
         log.info("listPosts: pageSize={}, currentPage={}", pageSize, currentPage);
 
-        // 공지사항 목록 조회 (페이지네이션 없이)
         PostSearchDto noticeSearch = new PostSearchDto();
         noticeSearch.setPostNotice(1); // 공지사항은 postNotice = 1
         List<PostDto> notices = postMapper.listNotices(noticeSearch);
-
-        // postType을 postNotice로 변환
+        log.info("Fetched notices: {}", notices);
+        
         if (searchDto.getPostNotice() == null) {
-            searchDto.setPostNotice(0); // 기본적으로 일반 게시물 검색
+            searchDto.setPostNotice(0); 
         }
 
         Integer totalRows = postMapper.countPosts(searchDto);
@@ -446,6 +445,7 @@ public class PostService {
         param.put("pageDto", pageDto);
 
         List<PostDto> posts = postMapper.listPosts(param);
+        log.info("Fetched posts: {}", posts);
 
         Map<String, Object> response = new HashMap<>();
         response.put("notices", notices);

@@ -136,29 +136,29 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="notice" items="${notices}">
+                        <c:forEach var="post" items="${notices}">
                             <tr>
                                 <td>공지</td>
                                 <td>
-                                    <a href="/post/getPostDetail?postId=${notice.post_id}">
-                                        [공지] <c:out value="${notice.post_title}"/>
+                                    <a href="getPostDetail?postId=${post.postId}">
+                                        [공지] <c:out value="${post.postTitle}"/>
                                     </a>
                                 </td>
-                                <td><c:out value="${notice.user_name}"/></td>
+                                <td><c:out value="${post.userName}"/></td>
                                 <td>
                                     <c:set var="todayDate" value="<%= new java.util.Date() %>" />
                                     <fmt:formatDate var="todayFormatted" value="${todayDate}" pattern="yyyy-MM-dd" />
-                                    <fmt:formatDate var="postDateFormatted" value="${notice.post_created_at}" pattern="yyyy-MM-dd" />
+                                    <fmt:formatDate var="postDateFormatted" value="${post.postCreatedAt}" pattern="yyyy-MM-dd" />
                                     <c:choose>
                                         <c:when test="${todayFormatted == postDateFormatted}">
-                                            <fmt:formatDate value="${notice.post_created_at}" pattern="HH:mm" />
+                                            <fmt:formatDate value="${post.postCreatedAt}" pattern="HH:mm" />
                                         </c:when>
                                         <c:otherwise>
-                                            <fmt:formatDate value="${notice.post_created_at}" pattern="yyyy-MM-dd" />
+                                            <fmt:formatDate value="${post.postCreatedAt}" pattern="yyyy-MM-dd" />
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
-                                <td><c:out value="${notice.post_read_count}"/></td>
+                                <td><c:out value="${post.postReadCount}"/></td>
                             </tr>
                         </c:forEach>
                     </tbody>
@@ -183,28 +183,28 @@
                                 <tr>
                                     <td><c:out value="${pagination.totalRows - (pagination.offset + status.index)}"/></td>
                                     <td>
-                                        <c:if test="${post.post_group_level > 0}">
-                                            <span style="margin-left: ${post.post_group_level * 20}px;">↳</span>
+                                        <c:if test="${post.postGroupLevel > 0}">
+                                            <span style="margin-left: ${post.postGroupLevel * 20}px;">↳</span>
                                         </c:if>
-                                        <a href="/post/getPostDetail?postId=${post.post_id}">
-                                            <c:out value="${post.post_title}"/>
+                                        <a href="/post/getPostDetail?postId=${post.postId}">
+                                            <c:out value="${post.postTitle}"/>
                                         </a>
                                     </td>
-                                    <td><c:out value="${post.user_name}"/></td>
+                                    <td><c:out value="${post.userName}"/></td>
                                     <td>
                                         <c:set var="todayDate" value="<%= new java.util.Date() %>" />
                                         <fmt:formatDate var="todayFormatted" value="${todayDate}" pattern="yyyy-MM-dd" />
-                                        <fmt:formatDate var="postDateFormatted" value="${post.post_created_at}" pattern="yyyy-MM-dd" />
+                                        <fmt:formatDate var="postDateFormatted" value="${post.postCreatedAt}" pattern="yyyy-MM-dd" />
                                         <c:choose>
                                             <c:when test="${todayFormatted == postDateFormatted}">
-                                                <fmt:formatDate value="${post.post_created_at}" pattern="HH:mm" />
+                                                <fmt:formatDate value="${post.postCreatedAt}" pattern="HH:mm" />
                                             </c:when>
                                             <c:otherwise>
-                                                <fmt:formatDate value="${post.post_created_at}" pattern="yyyy-MM-dd" />
+                                                <fmt:formatDate value="${post.postCreatedAt}" pattern="yyyy-MM-dd" />
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
-                                    <td><c:out value="${post.post_read_count}"/></td>
+                                    <td><c:out value="${post.postReadCount}"/></td>
                                 </tr>
                             </c:forEach>
                         </c:when>
@@ -253,8 +253,6 @@
 </c:if>
         </div>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         $(document).ready(function() {
             $('#searchKeyword').on('keypress', function(e) {
