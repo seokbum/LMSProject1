@@ -9,7 +9,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시물 등록</title>
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
@@ -56,7 +55,7 @@
 <body>
 <div class="post-container mt-5">
     <h2 class="text-center h2">게시물 등록</h2>
-    <form id="postForm" action="create" method="post" enctype="multipart/form-data">
+    <form id="postForm" action="/api/post/create" method="post" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="postTitle" class="form-label">제목</label>
             <input type="text" class="form-control" id="postTitle" name="postTitle" required>
@@ -136,7 +135,7 @@ $(document).ready(function () {
         formData.append('postNotice', $('#postNotice').is(':checked') ? 1 : 0); 
         const fileInput = $('#postFile')[0];
         if (fileInput.files.length > 0) {
-            formData.append('postFile', fileInput.files[0]); 
+            formData.append('file', fileInput.files[0]); 
         }
 
         $.ajax({

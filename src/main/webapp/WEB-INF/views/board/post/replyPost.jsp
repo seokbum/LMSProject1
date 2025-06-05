@@ -9,53 +9,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>답글 등록</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://uicdn.com/editor/latest/toastui-editor.min.css" />
-    <script src="https://uicdn.com/editor/latest/toastui-editor-all.min.js"></script>
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-        .notice-container { width: 100%; margin: 0 auto; padding: 20px; font-family: 'Noto Sans KR', sans-serif; }
-        .form-label { font-weight: 500; margin-bottom: 5px; font-size: 16px; }
-        .form-control { padding: 10px; border: 1px solid #e2e8f0; border-radius: 4px; width: 100%; font-size: 16px; }
-        .notice-btn-primary { padding: 10px 20px; background: #3182ce; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        .notice-btn-primary:hover { background: #2b6cb0; }
-        .toast-editor { border: 1px solid #e2e8f0; border-radius: 4px; }
-        #editor { width: 100%; }
+        .post-container { 
+            width: 100%; 
+            margin: 0 auto; 
+            padding: 20px; 
+            font-family: 'Noto Sans KR', Arial, sans-serif; 
+        }
+        .form-label { 
+            font-weight: 500; 
+            margin-bottom: 5px; 
+        }
+        .form-select, .form-control { 
+            padding: 8px; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 4px; 
+            width: 100%; 
+        }
+        .post-btn-primary { 
+            padding: 8px 16px; 
+            background: #3182ce; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+        }
+        .post-btn-primary:hover { 
+            background: #2b6cb0; 
+        }
+        .row { 
+            display: flex; 
+            flex-wrap: wrap; 
+            margin: 0 -15px; 
+        }
+        .col-md-6 { 
+            padding: 0 15px; 
+            flex: 0 0 100%; /* 한 줄에 하나씩 배치 */
+            max-width: 100%; /* 한 줄에 하나씩 배치 */
+        }
+        .toast-editor { 
+            border: 1px solid #e2e8f0; 
+            border-radius: 4px; 
+        }
+        #editor { 
+            width: 100%; 
+        }
     </style>
 </head>
 <body>
-<div class="notice-container mt-5">
+<div class="post-container mt-5">
     <h2 class="text-center h2">답글 등록</h2>
-    <form id="postForm" action="/post/reply" method="post" enctype="multipart/form-data">
+    <form id="postForm" action="/api/post/reply" method="post" enctype="multipart/form-data">
         <input type="hidden" name="parentPostId" value="${postDto.parentPostId}">
-        <div class="mb-3">
-            <label for="authorId" class="form-label">ID</label>
-            <input type="text" class="form-control" id="authorId" name="authorId" value="${postDto.authorId != null ? postDto.authorId : 'S001'}" readonly>
-            <span class="form-text">ID: ${postDto.authorId}</span>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="authorId" class="form-label">ID</label>
+                <input type="text" class="form-control" id="authorId" name="authorId" value="P001" readonly>
+            </div>
+            <div class="col-md-6">
+                <label for="userName" class="form-label">작성자</label>
+                <input type="text" class="form-control" id="userName" value="${postDto.userName != null ? postDto.userName : '테스트 사용자'}" readonly>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="userName" class="form-label">작성자</label>
-            <input type="text" class="form-control" id="userName" value="${postDto.userName != null ? postDto.userName : '테스트 사용자'}" readonly>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="postTitle" class="form-label">제목</label>
+                <input type="text" class="form-control" id="postTitle" name="postTitle" value="Re: ${postDto.postTitle}" required>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="postTitle" class="form-label">제목</label>
-            <input type="text" class="form-control" id="postTitle" name="postTitle" value="${postDto.postTitle}" required>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="content" class="form-label">내용</label>
+                <textarea id="content" name="postContent" style="display: none;"></textarea>
+                <div id="editor" class="toast-editor"></div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="content" class="form-label">내용</label>
-            <textarea id="content" name="postContent" style="display: none;"></textarea>
-            <div id="editor" class="toast-editor"></div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="postPassword" class="form-label">비밀번호</label>
+                <input type="password" class="form-control" id="postPassword" name="postPassword" required>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="postPassword" class="form-label">비밀번호</label>
-            <input type="password" class="form-control" id="postPassword" name="postPassword" required>
-        </div>
-        <div class="mb-3">
-            <label for="postFile" class="form-label">첨부파일</label>
-            <input type="file" class="form-control" id="postFile" name="postFile">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="postFile" class="form-label">첨부파일</label>
+                <input type="file" class="form-control" id="postFile" name="postFile">
+            </div>
         </div>
         <div class="text-end">
-            <button type="submit" class="notice-btn-primary">등록</button>
-            <a href="/post/getPostDetail?postId=${postDto.parentPostId}&authorId=${param.authorId}" class="btn btn-secondary">취소</a>
+            <button type="submit" class="post-btn-primary">등록</button>
+            <a href="/post/getPostDetail?postId=${postDto.parentPostId}&authorId=P001" class="btn btn-secondary">취소</a>
         </div>
     </form>
 </div>

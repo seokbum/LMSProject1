@@ -9,10 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession; 
 @Slf4j
 @Controller
-@RequestMapping("/post")
+@RequestMapping("/post") 
 @RequiredArgsConstructor
 public class PostController {
 
@@ -23,11 +24,9 @@ public class PostController {
             @ModelAttribute PostSearchDto searchDto,
             @ModelAttribute PostPaginationDto pageDto,
             @RequestParam(value = "postType", defaultValue = "post") String postType,
-            @RequestParam(value = "authorId", defaultValue = "S001") String authorId,
+            HttpServletRequest request,
             Model model) {
-        // 테스트용 P001 하드코딩
-        authorId = "P001";
-        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
+        String authorId = "P001"; // 테스트용 하드코딩
         if (pageDto.getItemsPerPage() == null) {
             pageDto.setItemsPerPage(10);
         }
@@ -39,22 +38,18 @@ public class PostController {
 
     @GetMapping("createPost")
     public String createPost(
-            @RequestParam(value = "authorId", defaultValue = "S001") String authorId,
+            HttpServletRequest request,
             Model model) {
-        // 테스트용 P001 하드코딩
-        authorId = "P001";
-        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
+        String authorId = "P001"; // 테스트용 하드코딩
         return postService.prepareCreatePostView(authorId, model);
     }
 
     @GetMapping("updatePost")
     public String updatePost(
             @RequestParam("postId") String postId,
-            @RequestParam(value = "authorId", defaultValue = "S001") String authorId,
+            HttpServletRequest request,
             Model model) {
-        // 테스트용 P001 하드코딩
-        authorId = "P001";
-        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
+        String authorId = "P001"; // 테스트용 하드코딩
         return postService.prepareUpdatePostView(postId, authorId, model);
     }
 
@@ -62,33 +57,42 @@ public class PostController {
     public String getPostDetail(
             @RequestParam("postId") String postId,
             @RequestParam(value = "readcnt", defaultValue = "") String readcnt,
-            @RequestParam(value = "authorId", defaultValue = "S001") String authorId,
+            HttpServletRequest request,
             Model model) {
-        // 테스트용 P001 하드코딩
-        authorId = "P001";
-        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
+        String authorId = "P001"; // 테스트용 하드코딩
         return postService.preparePostDetailView(postId, readcnt, authorId, model);
     }
 
     @GetMapping("replyPost")
     public String replyPost(
             @RequestParam("postId") String postId,
-            @RequestParam(value = "authorId", defaultValue = "S001") String authorId,
+            HttpServletRequest request,
             Model model) {
-        // 테스트용 P001 하드코딩
-        authorId = "P001";
-        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
+        String authorId = "P001"; // 테스트용 하드코딩
         return postService.prepareReplyPostView(postId, authorId, model);
     }
 
-    @GetMapping("deletePost")
-    public String deletePost(
+  
+    @GetMapping("deletePost") 
+    public String showDeletePost( 
             @RequestParam("postId") String postId,
-            @RequestParam(value = "authorId", defaultValue = "S001") String authorId,
+            HttpServletRequest request,
             Model model) {
-        // 테스트용 P001 하드코딩
-        authorId = "P001";
-        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
+        String authorId = "P001"; 
+       
         return postService.prepareDeletePostView(postId, authorId, model);
+    }
+
+    
+    @PostMapping("delete") 
+    public String deletePost( 
+            @RequestParam("postId") String postId,
+            @RequestParam("pass") String password,
+            HttpSession session, 
+            HttpServletRequest request, 
+            Model model) { 
+        String authorId = "P001"; // 테스트용 하드코딩 (실제로는 session에서 가져옴)
+        String redirectUrl = postService.handleDeletePostByForm(postId, password, authorId, request, model);
+        return redirectUrl;
     }
 }

@@ -9,19 +9,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시물 상세</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-        body { background-color: #f8f9fa; font-family: 'Noto Sans KR', sans-serif; }
-        .post-container { max-width: 900px; margin: 30px auto; padding: 20px; }
-        .post-title { font-size: 2.2rem; color: #343a40; margin-bottom: 1.5rem; font-weight: bold; }
-        .table { background-color: #fff; border: 1px solid #e9ecef; }
-        .table th { width: 15%; background-color: #f1f3f5; color: #495057; }
-        .btn-custom { padding: 0.75rem 1.25rem; font-size: 1rem; font-weight: 500; }
-        .comment-form, .comment-list { margin-top: 20px; }
-        .comment-item { border-bottom: 1px solid #e2e8f0; padding: 10px 0; }
-        .comment-actions { display: flex; gap: 10px; }
-        .edit-form { display: none; margin-top: 10px; }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .post-container {
+            margin: 30px 0;
+            padding: 20px;
+            width: 100%;
+        }
+
+        .post-title {
+            font-size: 2.2rem;
+            color: #343a40;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+        }
+
+        .table {
+            background-color: #fff;
+            border: 1px solid #e9ecef;
+            width: 100%;
+        }
+
+        .table th {
+            width: 15%;
+            background-color: #f1f3f5;
+            color: #495057;
+        }
+
+        .btn-custom {
+            padding: 0.75rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .comment-form,
+        .comment-list {
+            margin-top: 20px;
+        }
+
+        .comment-item {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 10px 0;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-form {
+            display: none;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -124,7 +169,6 @@
 </div>
 <script>
 $(document).ready(function() {
-    // 댓글 등록
     $("#commentForm").submit(function(e) {
         e.preventDefault();
         const formData = {
@@ -138,21 +182,20 @@ $(document).ready(function() {
             data: JSON.stringify(formData),
             contentType: "application/json",
             success: (response) => {
-                if (response.message) {
+                if (response.success) {
                     alert(response.message);
                     window.location.reload();
                 } else {
-                    alert("댓글 등록 실패: " + response.error);
+                    alert("댓글 등록 실패: " + response.message);
                 }
             },
             error: (xhr) => {
                 console.error("Comment post failed:", xhr);
-                alert("댓글 등록 중 오류: " + (xhr.responseJSON?.error || "서버 오류"));
+                alert("댓글 등록 중 오류: " + (xhr.responseJSON?.message || "서버 오류"));
             }
         });
     });
 
-    // 댓글 수정 폼 표시
     $(".edit-comment").click(function() {
         const commentId = $(this).data("comment-id");
         $(`#comment-${commentId} .comment-content`).hide();
@@ -160,7 +203,6 @@ $(document).ready(function() {
         $(`#edit-form-${commentId}`).show();
     });
 
-    // 수정 취소
     $(".cancel-edit").click(function() {
         const form = $(this).closest(".edit-form");
         const commentId = form.find("input[name='commentId']").val();
@@ -169,7 +211,6 @@ $(document).ready(function() {
         form.hide();
     });
 
-    // 댓글 수정 제출
     $(".edit-form").submit(function(e) {
         e.preventDefault();
         const formData = {
@@ -178,26 +219,25 @@ $(document).ready(function() {
             commentContent: $(this).find("textarea[name='commentContent']").val()
         };
         $.ajax({
-            url: "/api/post/edit",
+            url: "/api/post/comment",
             type: "PUT",
             data: JSON.stringify(formData),
             contentType: "application/json",
             success: (response) => {
-                if (response.message) {
+                if (response.success) {
                     alert(response.message);
                     window.location.reload();
                 } else {
-                    alert("댓글 수정 실패: " + response.error);
+                    alert("댓글 수정 실패: " + response.message);
                 }
             },
             error: (xhr) => {
                 console.error("Comment update failed:", xhr);
-                alert("댓글 수정 중 오류: " + (xhr.responseJSON?.error || "서버 오류"));
+                alert("댓글 수정 중 오류: " + (xhr.responseJSON?.message || "서버 오류"));
             }
         });
     });
 
-    // 댓글 삭제
     $(".delete-comment").click(function() {
         if (!confirm("댓글을 삭제하시겠습니까?")) return;
         const commentId = $(this).data("comment-id");
@@ -207,17 +247,17 @@ $(document).ready(function() {
             type: "DELETE",
             data: JSON.stringify({ commentId, writerId }),
             contentType: "application/json",
-            success: (response) {
-                if (response.message) {
+            success: (response) => {
+                if (response.success) {
                     alert(response.message);
                     window.location.reload();
                 } else {
-                    alert("댓글 삭제 실패: " + response.error);
+                    alert("댓글 삭제 실패: " + response.message);
                 }
             },
             error: (xhr) => {
                 console.error("Comment deletion failed:", xhr);
-                alert("댓글 삭제 중 오류: " + (xhr.responseJSON?.error || "서버 오류"));
+                alert("댓글 삭제 중 오류: " + (xhr.responseJSON?.message || "서버 오류"));
             }
         });
     });

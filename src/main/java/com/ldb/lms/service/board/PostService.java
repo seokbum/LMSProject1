@@ -1,525 +1,459 @@
 package com.ldb.lms.service.board;
 
-import com.ldb.lms.dto.board.post.*;
+import com.ldb.lms.dto.ApiResponseDto;
+import com.ldb.lms.dto.board.post.CommentDto;
+import com.ldb.lms.dto.board.post.PostDto;
+import com.ldb.lms.dto.board.post.PostPaginationDto;
+import com.ldb.lms.dto.board.post.PostSearchDto;
 import com.ldb.lms.mapper.board.PostMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional; // import 유지
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
+
     private final PostMapper postMapper;
-    private static final String UPLOAD_DIR = "dist/assets/post_upload";
 
-    private synchronized String generateNewPostId() {
-        String maxPostId = postMapper.getLastPostId();
-        if (maxPostId == null || maxPostId.isEmpty()) {
-            return "PO001";
+    private String getUploadDir(HttpServletRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("HttpServletRequest is required to determine upload directory.");
         }
-        try {
-            int number = Integer.parseInt(maxPostId.substring(2)) + 1;
-            return "PO" + String.format("%03d", number);
-        } catch (NumberFormatException e) {
-            log.error("Post ID generation failed: {}", maxPostId, e);
-            return "PO001";
+        String realPath = request.getServletContext().getRealPath("");
+        if (realPath == null) {
+            log.warn("Real path is not available via getServletContext().getRealPath(\"\"). Using user.dir as fallback for development.");
+            realPath = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static";
         }
+        Path uploadPath = Paths.get(realPath, "dist", "assets", "upload");
+        return uploadPath.toString();
     }
 
-    private synchronized String generateNewCommentId() {
-        String maxCommentId = postMapper.getLastCommentId();
-        if (maxCommentId == null || maxCommentId.isEmpty()) {
-            return "CM001";
-        }
-        try {
-            int number = Integer.parseInt(maxCommentId.substring(2)) + 1;
-            return "CM" + String.format("%03d", number);
-        } catch (NumberFormatException e) {
-            log.error("Comment ID generation failed: {}", maxCommentId, e);
-            return "CM001";
-        }
-    }
-
-    private synchronized String getNextGroup() {
-        String maxGroup = postMapper.getMaxGroup();
-        if (maxGroup == null || maxGroup.isEmpty()) {
-            return "G001";
-        }
-        try {
-            int number = Integer.parseInt(maxGroup.substring(1)) + 1;
-            return "G" + String.format("%03d", number);
-        } catch (NumberFormatException e) {
-            log.error("Group ID generation failed: {}", maxGroup, e);
-            return "G001";
-        }
-    }
-
-    private String handleFileUpload(MultipartFile file, HttpServletRequest request) throws IOException {
-        if (file == null || file.isEmpty()) {
-            return null;
-        }
-        try {
-            String realPath = request.getServletContext().getRealPath("/");
-            String uploadPath = realPath + UPLOAD_DIR;
-            File dir = new File(uploadPath);
-            if (!dir.exists() && !dir.mkdirs()) {
-                log.error("Failed to create upload directory: {}", uploadPath);
-                throw new IOException("Failed to create upload directory: " + uploadPath);
-            }
-            String originalFileName = file.getOriginalFilename();
-            String uniqueFileName = System.currentTimeMillis() + "_" + originalFileName;
-            File destFile = new File(uploadPath + File.separator + uniqueFileName);
-            file.transferTo(destFile);
-            return "/" + UPLOAD_DIR + "/" + uniqueFileName;
-        } catch (IOException e) {
-            log.error("File upload failed: {}", file.getOriginalFilename(), e);
-            throw e;
-        }
-    }
-
-    public ResponseEntity<Map<String, Object>> getPosts(PostSearchDto searchDto, PostPaginationDto pageDto, String postType) {
-        if (searchDto == null || pageDto == null) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid parameters"));
-        }
-        if ("notice".equals(postType)) {
-            searchDto.setPostNotice(1);
-        } else {
-            searchDto.setPostNotice(null);
-        }
-        Map<String, Object> result = new HashMap<>();
-        int totalRows = postMapper.countPosts(searchDto);
-        pageDto.setTotalRows(totalRows);
-
-        if (pageDto.getItemsPerPage() == null) {
-            pageDto.setItemsPerPage(10);
-        }
-        if (pageDto.getCurrentPage() == null || pageDto.getCurrentPage() <= 0) {
-            pageDto.setCurrentPage(1);
-        }
-
-        pageDto.setTotalPages((int) Math.ceil((double) totalRows / pageDto.getItemsPerPage()));
-        pageDto.setOffset((pageDto.getCurrentPage() - 1) * pageDto.getItemsPerPage());
-        pageDto.setStartPage(Math.max(1, pageDto.getCurrentPage() - 2));
-        pageDto.setEndPage(Math.min(pageDto.getTotalPages(), pageDto.getCurrentPage() + 2));
-
-        List<PostDto> posts = postMapper.listPosts(Map.of("searchDto", searchDto, "pageDto", pageDto));
-        result.put("posts", posts);
-        result.put("pagination", pageDto);
-        if ("post".equals(postType)) {
-            result.put("notices", postMapper.listNotices(new PostSearchDto()));
-        }
-        return ResponseEntity.ok(result);
-    }
-
+    @Transactional 
     public String preparePostsView(PostSearchDto searchDto, PostPaginationDto pageDto, String postType, String authorId, Model model) {
-        Map<String, Object> result = getPosts(searchDto, pageDto, postType).getBody();
-        model.addAttribute("posts", result.get("posts"));
-        model.addAttribute("notices", result.get("notices"));
-        model.addAttribute("pagination", result.get("pagination"));
-        model.addAttribute("searchDto", searchDto);
-        model.addAttribute("authorId", authorId);
-        return "board/post/getPosts";
+        try {
+            List<PostDto> notices = postMapper.listNotices(searchDto);
+            model.addAttribute("notices", notices);
+
+            searchDto.setPostNotice(0);
+            int totalRows = postMapper.countPosts(searchDto);
+            pageDto.setTotalRows(totalRows);
+            pageDto.calculatePagination();
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("searchDto", searchDto);
+            params.put("pageDto", pageDto);
+
+            List<PostDto> posts = postMapper.listPosts(params);
+            model.addAttribute("posts", posts);
+            model.addAttribute("pagination", pageDto);
+            model.addAttribute("searchDto", searchDto);
+            model.addAttribute("postType", postType);
+            model.addAttribute("currentAuthorId", authorId);
+
+            return "board/post/getPosts";
+        } catch (Exception e) {
+            log.error("게시물 목록 조회 중 오류 발생: {}", e.getMessage(), e);
+            model.addAttribute("error", "게시물 목록을 불러오는 데 실패했습니다.");
+            return "error/500";
+        }
     }
 
     public String prepareCreatePostView(String authorId, Model model) {
-        PostDto postDto = new PostDto();
-        // 테스트용 P001 하드코딩
-        authorId = "P001";
-        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
-        postDto.setAuthorId(authorId);
-        model.addAttribute("postDto", postDto);
+        model.addAttribute("authorId", authorId);
         return "board/post/createPost";
     }
 
-    @Transactional
+    @Transactional 
     public String prepareUpdatePostView(String postId, String authorId, Model model) {
-        if (postId == null) {
-            model.addAttribute("error", "게시물 ID가 필요합니다.");
-            return "redirect:/post/getPosts";
-        }
-        // 테스트용 P001 하드코딩
-        authorId = "P001";
-        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
-        PostDto post = postMapper.getPost(postId);
-        if (post == null) {
-            model.addAttribute("error", "게시물을 찾을 수 없습니다.");
-            return "redirect:/post/getPosts";
-        }
-        model.addAttribute("post", post);
-        model.addAttribute("authorId", authorId);
-        return "board/post/updatePost";
-    }
-
-    @Transactional
-    public String preparePostDetailView(String postId, String readcnt, String authorId, Model model) {
-        if (postId == null) {
-            model.addAttribute("error", "게시물 ID가 필요합니다.");
-            return "redirect:/post/getPosts";
-        }
-        // 테스트용 P001 하드코딩
-        authorId = "P001";
-        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
-        PostDto post = postMapper.getPost(postId);
-        if (post == null) {
-            model.addAttribute("error", "게시물을 찾을 수 없습니다.");
-            return "redirect:/post/getPosts";
-        }
-        if (!"f".equals(readcnt)) {
-            postMapper.incrementReadCount(postId);
-            post.setPostReadCount((post.getPostReadCount() != null ? post.getPostReadCount() : 0) + 1);
-        }
-        model.addAttribute("post", post);
-        model.addAttribute("commentList", postMapper.selectCommentList(postId));
-        model.addAttribute("authorId", authorId);
-        return "board/post/getPostDetail";
-    }
-
-    @Transactional
-    public String prepareReplyPostView(String postId, String authorId, Model model) {
-        if (postId == null) {
-            model.addAttribute("error", "부모 게시물 ID가 필요합니다.");
-            return "redirect:/post/getPosts";
-        }
-        // 테스트용 P001 하드코딩
-        authorId = "P001";
-        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
-        PostDto parentPost = postMapper.getPost(postId);
-        if (parentPost == null) {
-            model.addAttribute("error", "부모 게시물을 찾을 수 없습니다.");
-            return "redirect:/post/getPosts";
-        }
-        PostDto postDto = new PostDto();
-        postDto.setParentPostId(postId);
-        postDto.setAuthorId(authorId);
-        model.addAttribute("postDto", postDto);
-        model.addAttribute("parentPostId", parentPost.getPostId());
-        model.addAttribute("authorId", authorId);
-        return "board/post/replyPost";
-    }
-
-    @Transactional
-    public String prepareDeletePostView(String postId, String authorId, Model model) {
-        if (postId == null) {
-            model.addAttribute("error", "게시물 ID가 필요합니다.");
-            return "redirect:/post/getPosts";
-        }
-        // 테스트용 P001 하드코딩
-        authorId = "P001";
-        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
-        PostDto post = postMapper.getPost(postId);
-        if (post == null) {
-            model.addAttribute("error", "게시물을 찾을 수 없습니다.");
-            return "redirect:/post/getPosts";
-        }
-        model.addAttribute("post", post);
-        model.addAttribute("authorId", authorId);
-        return "board/post/deletePost";
-    }
-
-    @Transactional
-    public ResponseEntity<Map<String, String>> handleCreatePost(PostDto postDto, MultipartFile file, HttpServletRequest request) {
-        Map<String, String> response = new HashMap<>();
         try {
-            if (postDto == null || postDto.getAuthorId() == null || postDto.getPostTitle() == null || 
-                postDto.getPostContent() == null || postDto.getPostPassword() == null) {
-                response.put("error", "필수 입력값이 누락되었습니다.");
-                return ResponseEntity.badRequest().body(response);
+            PostDto post = postMapper.getPost(postId);
+            if (post == null) {
+                model.addAttribute("error", "게시물을 찾을 수 없습니다.");
+                return "error/404";
             }
-            // 테스트용 P001 하드코딩
-            postDto.setAuthorId("P001");
-            // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
-            if (postDto.getPostNotice() != null && postDto.getPostNotice() == 1 && !postDto.getAuthorId().startsWith("P")) {
-                response.put("error", "학생은 공지사항을 작성할 수 없습니다.");
-                return ResponseEntity.badRequest().body(response);
+            if (!post.getAuthorId().equals(authorId)) {
+                model.addAttribute("error", "해당 게시물을 수정할 권한이 없습니다.");
+                return "error/403";
             }
-            String filePath = handleFileUpload(file, request);
-            postDto.setExistingFilePath(filePath);
-            String newPostId = generateNewPostId();
+
+            model.addAttribute("post", post);
+            model.addAttribute("currentAuthorId", authorId);
+            return "board/post/updatePost";
+        } catch (Exception e) {
+            log.error("게시물 수정 화면 준비 중 오류 발생: {}", e.getMessage(), e);
+            model.addAttribute("error", "게시물 수정 화면을 불러오는 데 실패했습니다.");
+            return "error/500";
+        }
+    }
+
+    @Transactional 
+    public String preparePostDetailView(String postId, String readcnt, String authorId, Model model) {
+        try {
+            if ("true".equalsIgnoreCase(readcnt)) {
+                postMapper.incrementReadCount(postId);
+            }
+
+            PostDto post = postMapper.getPost(postId);
+            if (post == null) {
+                model.addAttribute("error", "게시물을 찾을 수 없습니다.");
+                return "error/404";
+            }
+
+            List<CommentDto> commentList = postMapper.selectCommentList(postId);
+
+            model.addAttribute("post", post);
+            model.addAttribute("commentList", commentList);
+            model.addAttribute("currentAuthorId", authorId);
+            return "board/post/getPostDetail";
+        } catch (Exception e) {
+            log.error("게시물 상세 조회 중 오류 발생: {}", e.getMessage(), e);
+            model.addAttribute("error", "게시물 상세 정보를 불러오는 데 실패했습니다.");
+            return "error/500";
+        }
+    }
+
+    @Transactional 
+    public String prepareReplyPostView(String postId, String authorId, Model model) {
+        try {
+            PostDto parentPost = postMapper.getPost(postId);
+            if (parentPost == null) {
+                model.addAttribute("error", "부모 게시물을 찾을 수 없습니다.");
+                return "error/404";
+            }
+
+            PostDto replyDto = new PostDto();
+            replyDto.setParentPostId(parentPost.getPostId());
+            replyDto.setPostTitle("Re: " + parentPost.getPostTitle());
+            replyDto.setAuthorId(authorId);
+
+            model.addAttribute("postDto", replyDto);
+            model.addAttribute("currentAuthorId", authorId);
+            return "board/post/replyPost";
+        } catch (Exception e) {
+            log.error("답글 화면 준비 중 오류 발생: {}", e.getMessage(), e);
+            model.addAttribute("error", "답글 작성 화면을 불러오는 데 실패했습니다.");
+            return "error/500";
+        }
+    }
+
+    @Transactional 
+    public String prepareDeletePostView(String postId, String authorId, Model model) {
+        try {
+            PostDto post = postMapper.getPost(postId);
+            if (post == null) {
+                model.addAttribute("error", "게시물을 찾을 수 없습니다.");
+                return "error/404";
+            }
+            if (!post.getAuthorId().equals(authorId)) {
+                model.addAttribute("error", "해당 게시물을 삭제할 권한이 없습니다.");
+                return "error/403";
+            }
+
+            model.addAttribute("post", post);
+            model.addAttribute("currentAuthorId", authorId);
+            return "board/post/deletePost";
+        } catch (Exception e) {
+            log.error("게시물 삭제 화면 준비 중 오류 발생: {}", e.getMessage(), e);
+            model.addAttribute("error", "게시물 삭제 화면을 불러오는 데 실패했습니다.");
+            return "error/500";
+        }
+    }
+
+    @Transactional
+    public String handleDeletePostByForm(String postId, String password, String authorId, HttpServletRequest request, Model model) {
+        try {
+            PostDto post = postMapper.getPost(postId);
+            if (post == null) {
+                model.addAttribute("error", "삭제할 게시물을 찾을 수 없습니다.");
+                return "redirect:/post/getPostDetail?postId=" + postId + "&error=not_found";
+            }
+
+            if (!post.getAuthorId().equals(authorId)) {
+                model.addAttribute("error", "해당 게시물을 삭제할 권한이 없습니다.");
+                return "redirect:/post/getPostDetail?postId=" + postId + "&error=no_permission";
+            }
+
+            if (!post.getPostPassword().equals(password)) {
+                model.addAttribute("error", "비밀번호가 일치하지 않습니다.");
+                return "redirect:/post/getPostDetail?postId=" + postId + "&error=wrong_password";
+            }
+
+            if (post.getExistingFilePath() != null && !post.getExistingFilePath().isEmpty()) {
+                deleteFile(post.getExistingFilePath(), request);
+            }
+
+            postMapper.deleteCommentsByPostId(postId);
+            postMapper.deletePost(postId);
+
+            log.info("게시물 삭제 성공: {}", postId);
+            return "redirect:/post/getPosts";
+        } catch (Exception e) {
+            log.error("게시물 삭제 실패: {}", e.getMessage(), e);
+            model.addAttribute("error", "게시물 삭제 실패: " + e.getMessage());
+            return "redirect:/post/getPostDetail?postId=" + postId + "&error=server_error";
+        }
+    }
+
+    @Transactional
+    public ApiResponseDto<Map<String, Object>> getPosts(PostSearchDto searchDto, PostPaginationDto pageDto, String postType) {
+        try {
+            Map<String, Object> result = new HashMap<>();
+
+            if ("post".equals(postType)) {
+                searchDto.setPostNotice(1);
+                List<PostDto> notices = postMapper.listNotices(searchDto);
+                result.put("notices", notices);
+            }
+
+            if (!"notice".equals(postType)) {
+                searchDto.setPostNotice(0);
+                int totalRows = postMapper.countPosts(searchDto);
+                pageDto.setTotalRows(totalRows);
+                pageDto.calculatePagination();
+
+                Map<String, Object> params = new HashMap<>();
+                params.put("searchDto", searchDto);
+                params.put("pageDto", pageDto);
+
+                List<PostDto> posts = postMapper.listPosts(params);
+                result.put("posts", posts);
+                result.put("pagination", pageDto);
+                result.put("searchDto", searchDto);
+            }
+
+            return new ApiResponseDto<>(true, "게시물 목록 조회 성공", result);
+        } catch (Exception e) {
+            log.error("API 게시물 목록 조회 중 오류 발생: {}", e.getMessage(), e);
+            return new ApiResponseDto<>(false, "게시물 목록 조회 실패: " + e.getMessage(), null);
+        }
+    }
+
+    @Transactional
+    public ApiResponseDto<String> handleImageUpload(MultipartFile file, HttpServletRequest request) {
+        if (file.isEmpty()) {
+            return new ApiResponseDto<>(false, "업로드할 파일이 없습니다.", null);
+        }
+        try {
+            String savedFileName = saveFile(file, request);
+            String fileUrl = request.getContextPath() + "/dist/assets/upload/" + savedFileName;
+            return new ApiResponseDto<>(true, "이미지 업로드 성공", fileUrl);
+        } catch (IOException e) {
+            log.error("이미지 업로드 실패: {}", e.getMessage(), e);
+            return new ApiResponseDto<>(false, "이미지 업로드 실패: " + e.getMessage(), null);
+        }
+    }
+
+    @Transactional
+    public ApiResponseDto<String> handleCreatePost(PostDto postDto, MultipartFile file, HttpServletRequest request) {
+        try {
+            String lastPostId = postMapper.getLastPostId();
+            String newPostId = generateNextId(lastPostId, "POST");
+
+            Integer maxGroup = postMapper.getMaxGroup();
+            int newGroup = (maxGroup == null) ? 1 : maxGroup + 1;
+
             postDto.setPostId(newPostId);
-            postDto.setPostGroup(getNextGroup());
+            postDto.setPostGroup(newGroup);
             postDto.setPostGroupLevel(0);
             postDto.setPostGroupStep(0);
+            postDto.setPostReadCount(0);
+            postDto.setPostNotice(postDto.getPostNotice() != null ? 1 : 0);
+
+            if (file != null && !file.isEmpty()) {
+                String savedFileName = saveFile(file, request);
+                postDto.setExistingFilePath(savedFileName);
+            } else {
+                postDto.setExistingFilePath(null);
+            }
+
             postMapper.insertPost(postDto);
-            response.put("message", "게시물이 작성되었습니다.");
-            response.put("redirectUrl", "/post/getPosts");
-            return ResponseEntity.ok(response);
+            return new ApiResponseDto<>(true, "게시물 등록이 완료되었습니다.", "/post/getPostDetail?postId=" + newPostId + "&readcnt=true");
         } catch (Exception e) {
-            log.error("Post creation failed: {}", postDto, e);
-            response.put("error", "게시물 작성 실패: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            log.error("게시물 등록 실패: {}", e.getMessage(), e);
+            return new ApiResponseDto<>(false, "게시물 등록 실패: " + e.getMessage(), null);
         }
     }
 
     @Transactional
-    public ResponseEntity<Map<String, String>> handleUpdatePost(PostDto postDto, MultipartFile file, HttpServletRequest request) {
-        Map<String, String> response = new HashMap<>();
+    public ApiResponseDto<String> handleUpdatePost(PostDto postDto, MultipartFile file, HttpServletRequest request) {
         try {
-            if (postDto == null || postDto.getPostId() == null || postDto.getPostPassword() == null || 
-                postDto.getPostContent() == null) {
-                response.put("error", "필수 입력값이 누락되었습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-            // 테스트용 P001 하드코딩
-            postDto.setAuthorId("P001");
-            // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
-            if (postDto.getPostNotice() != null && postDto.getPostNotice() == 1 && !postDto.getAuthorId().startsWith("P")) {
-                response.put("error", "학생은 공지사항을 수정할 수 없습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
             PostDto existingPost = postMapper.getPost(postDto.getPostId());
             if (existingPost == null) {
-                response.put("error", "게시물을 찾을 수 없습니다.");
-                return ResponseEntity.badRequest().body(response);
+                return new ApiResponseDto<>(false, "수정할 게시물을 찾을 수 없습니다.", null);
             }
+
+            if (!existingPost.getAuthorId().equals(postDto.getAuthorId())) {
+                return new ApiResponseDto<>(false, "해당 게시물을 수정할 권한이 없습니다.", null);
+            }
+
             if (!existingPost.getPostPassword().equals(postDto.getPostPassword())) {
-                response.put("error", "비밀번호가 일치하지 않습니다.");
-                return ResponseEntity.badRequest().body(response);
+                return new ApiResponseDto<>(false, "비밀번호가 일치하지 않습니다.", null);
             }
-            String filePath = handleFileUpload(file, request);
-            postDto.setExistingFilePath(filePath != null ? filePath : existingPost.getExistingFilePath());
+
+            postDto.setPostNotice(postDto.getPostNotice() != null ? 1 : 0);
+
+            if (file != null && !file.isEmpty()) {
+                if (existingPost.getExistingFilePath() != null) {
+                    deleteFile(existingPost.getExistingFilePath(), request);
+                }
+                String newFileName = saveFile(file, request);
+                postDto.setExistingFilePath(newFileName);
+            } else {
+                postDto.setExistingFilePath(existingPost.getExistingFilePath());
+            }
+
             postMapper.updatePost(postDto);
-            response.put("message", "게시물이 수정되었습니다.");
-            response.put("redirectUrl", "/post/getPostDetail?postId=" + postDto.getPostId());
-            return ResponseEntity.ok(response);
+            return new ApiResponseDto<>(true, "게시물 수정이 완료되었습니다.", "/post/getPostDetail?postId=" + postDto.getPostId());
         } catch (Exception e) {
-            log.error("Post update failed: {}", postDto, e);
-            response.put("error", "게시물 수정 실패: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            log.error("게시물 수정 실패: {}", e.getMessage(), e);
+            return new ApiResponseDto<>(false, "게시물 수정 실패: " + e.getMessage(), null);
         }
     }
 
     @Transactional
-    public ResponseEntity<Map<String, String>> handleReplyPost(PostDto postDto, MultipartFile file, HttpServletRequest request) {
-        Map<String, String> response = new HashMap<>();
+    public ApiResponseDto<String> handleReplyPost(PostDto postDto, MultipartFile file, HttpServletRequest request) {
         try {
-            if (postDto == null || postDto.getParentPostId() == null || postDto.getPostContent() == null) {
-                response.put("error", "필수 입력값이 누락되었습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-            // 테스트용 P001 하드코딩
-            postDto.setAuthorId("P001");
-            // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
             PostDto parentPost = postMapper.getPost(postDto.getParentPostId());
             if (parentPost == null) {
-                response.put("error", "부모 게시물을 찾을 수 없습니다.");
-                return ResponseEntity.badRequest().body(response);
+                return new ApiResponseDto<>(false, "답글을 작성할 부모 게시물을 찾을 수 없습니다.", null);
             }
-            if (parentPost.getPostNotice() != null && parentPost.getPostNotice() == 1) {
-                response.put("error", "공지사항에는 답글을 작성할 수 없습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-            String filePath = handleFileUpload(file, request);
-            postDto.setExistingFilePath(filePath);
-            String newPostId = generateNewPostId();
+
+            String lastPostId = postMapper.getLastPostId();
+            String newPostId = generateNextId(lastPostId, "POST");
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("postGroup", parentPost.getPostGroup());
+            params.put("postGroupStep", parentPost.getPostGroupStep() + 1);
+            postMapper.updateGroupStep(params);
+
             postDto.setPostId(newPostId);
             postDto.setPostGroup(parentPost.getPostGroup());
             postDto.setPostGroupLevel(parentPost.getPostGroupLevel() + 1);
-            postMapper.updateGroupStep(Map.of("postGroup", parentPost.getPostGroup(), "postGroupStep", parentPost.getPostGroupStep() + 1));
             postDto.setPostGroupStep(parentPost.getPostGroupStep() + 1);
+            postDto.setPostReadCount(0);
+            postDto.setPostNotice(0);
+
+            if (file != null && !file.isEmpty()) {
+                String savedFileName = saveFile(file, request);
+                postDto.setExistingFilePath(savedFileName);
+            } else {
+                postDto.setExistingFilePath(null);
+            }
+
             postMapper.insertPost(postDto);
-            response.put("message", "답글을 작성했습니다.");
-            response.put("redirectUrl", "/post/getPosts");
-            return ResponseEntity.ok(response);
+            return new ApiResponseDto<>(true, "답글 등록이 완료되었습니다.", "/post/getPostDetail?postId=" + newPostId + "&readcnt=true");
         } catch (Exception e) {
-            log.error("Reply post failed: {}", postDto, e);
-            response.put("error", "답글 작성 실패: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            log.error("답글 등록 실패: {}", e.getMessage(), e);
+            return new ApiResponseDto<>(false, "답글 등록 실패: " + e.getMessage(), null);
         }
     }
 
     @Transactional
-    public ResponseEntity<Map<String, String>> handleDeletePost(String postId, String password, String authorId, HttpServletRequest request) {
-        Map<String, String> response = new HashMap<>();
+    public ApiResponseDto<String> handleWriteComment(CommentDto commentDto, HttpServletRequest request) {
         try {
-            if (postId == null || password == null || authorId == null) {
-                response.put("error", "잘못된 요청 데이터");
-                return ResponseEntity.badRequest().body(response);
-            }
-            // 테스트용 P001 하드코딩
-            authorId = "P001";
-            // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
-            PostDto post = postMapper.getPost(postId);
-            if (post == null) {
-                response.put("error", "게시물을 찾을 수 없습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-            if (!post.getPostPassword().equals(password)) {
-                response.put("error", "비밀번호가 일치하지 않습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-            if (!post.getAuthorId().equals(authorId)) {
-                response.put("error", "작성자만 삭제할 수 있습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-            if (post.getExistingFilePath() != null) {
-                String realPath = request.getServletContext().getRealPath("/");
-                File file = new File(realPath + post.getExistingFilePath());
-                if (file.exists()) {
-                    file.delete();
-                }
-            }
-            postMapper.deleteCommentsByPostId(postId);
-            postMapper.deletePost(postId);
-            response.put("message", "게시물이 삭제되었습니다.");
-            response.put("redirectUrl", "/post/getPosts");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            log.error("Post deletion failed: {}", postId, e);
-            response.put("error", "게시물 삭제 실패: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
-        }
-    }
+            String lastCommentId = postMapper.getLastCommentId();
+            String newCommentId = generateNextId(lastCommentId, "COMM");
 
-    @Transactional
-    public ResponseEntity<Map<String, String>> handleDeletePost(String postId, String password, String authorId) {
-        Map<String, String> response = new HashMap<>();
-        try {
-            if (postId == null || password == null || authorId == null) {
-                response.put("error", "잘못된 요청 데이터");
-                return ResponseEntity.badRequest().body(response);
-            }
-            // 테스트용 P001 하드코딩
-            authorId = "P001";
-            // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
-            PostDto post = postMapper.getPost(postId);
-            if (post == null) {
-                response.put("error", "게시물을 찾을 수 없습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-            if (!post.getPostPassword().equals(password)) {
-                response.put("error", "비밀번호가 일치하지 않습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-            if (!post.getAuthorId().equals(authorId)) {
-                response.put("error", "작성자만 삭제할 수 있습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-            // 파일 삭제는 서버 경로를 알 수 없으므로 생략 (필요 시 별도 처리)
-            postMapper.deleteCommentsByPostId(postId);
-            postMapper.deletePost(postId);
-            response.put("message", "게시물이 삭제되었습니다.");
-            response.put("redirectUrl", "/post/getPosts");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            log.error("Post deletion failed: {}", postId, e);
-            response.put("error", "게시물 삭제 실패: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
-        }
-    }
+            commentDto.setCommentId(newCommentId);
 
-    @Transactional
-    public ResponseEntity<Map<String, String>> handleWriteComment(CommentDto commentDto) {
-        Map<String, String> response = new HashMap<>();
-        try {
-            if (commentDto == null || commentDto.getPostId() == null || 
-                commentDto.getWriterId() == null || commentDto.getCommentContent() == null) {
-                response.put("error", "필수 입력값이 누락되었습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-            // 테스트용 P001 하드코딩
-            commentDto.setWriterId("P001");
-            // 실제 구현 시: commentDto.setWriterId((String) request.getSession().getAttribute("userId"));
-            // writerName은 Mapper에서 조인으로 처리
-            commentDto.setCommentId(generateNewCommentId());
             postMapper.insertComment(commentDto);
-            response.put("message", "댓글이 등록되었습니다.");
-            return ResponseEntity.ok(response);
+            return new ApiResponseDto<>(true, "댓글 등록이 완료되었습니다.", null);
         } catch (Exception e) {
-            log.error("Comment creation failed: {}", commentDto, e);
-            response.put("error", "댓글 등록 실패: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            log.error("댓글 등록 실패: {}", e.getMessage(), e);
+            return new ApiResponseDto<>(false, "댓글 등록 실패: " + e.getMessage(), null);
         }
     }
 
     @Transactional
-    public ResponseEntity<Map<String, String>> handleUpdateComment(CommentDto commentDto) {
-        Map<String, String> response = new HashMap<>();
+    public ApiResponseDto<String> handleUpdateComment(CommentDto commentDto, HttpServletRequest request) {
         try {
-            if (commentDto == null || commentDto.getCommentId() == null || 
-                commentDto.getCommentContent() == null || commentDto.getWriterId() == null) {
-                response.put("error", "필수 입력값이 누락되었습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-            // 테스트용 P001 하드코딩
-            commentDto.setWriterId("P001");
-            // 실제 구현 시: commentDto.setWriterId((String) request.getSession().getAttribute("userId"));
             CommentDto existingComment = postMapper.selectComment(commentDto.getCommentId());
             if (existingComment == null) {
-                response.put("error", "댓글을 찾을 수 없습니다.");
-                return ResponseEntity.badRequest().body(response);
+                return new ApiResponseDto<>(false, "수정할 댓글을 찾을 수 없습니다.", null);
             }
             if (!existingComment.getWriterId().equals(commentDto.getWriterId())) {
-                response.put("error", "작성자만 수정할 수 있습니다.");
-                return ResponseEntity.badRequest().body(response);
+                return new ApiResponseDto<>(false, "댓글을 수정할 권한이 없습니다.", null);
             }
+
             postMapper.updateComment(commentDto);
-            response.put("message", "댓글이 수정되었습니다.");
-            return ResponseEntity.ok(response);
+            return new ApiResponseDto<>(true, "댓글 수정이 완료되었습니다.", null);
         } catch (Exception e) {
-            log.error("Comment update failed: {}", commentDto, e);
-            response.put("error", "댓글 수정 실패: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            log.error("댓글 수정 실패: {}", e.getMessage(), e);
+            return new ApiResponseDto<>(false, "댓글 수정 실패: " + e.getMessage(), null);
         }
     }
 
     @Transactional
-    public ResponseEntity<Map<String, String>> handleDeleteComment(String commentId, String writerId) {
-        Map<String, String> response = new HashMap<>();
+    public ApiResponseDto<String> handleDeleteComment(String commentId, String loggedInWriterId, HttpServletRequest request) {
         try {
-            if (commentId == null || writerId == null) {
-                response.put("error", "잘못된 요청 데이터");
-                return ResponseEntity.badRequest().body(response);
-            }
-            // 테스트용 P001 하드코딩
-            writerId = "P001";
-            // 실제 구현 시: String writerId = (String) request.getSession().getAttribute("userId");
             CommentDto comment = postMapper.selectComment(commentId);
             if (comment == null) {
-                response.put("error", "댓글을 찾을 수 없습니다.");
-                return ResponseEntity.badRequest().body(response);
+                return new ApiResponseDto<>(false, "삭제할 댓글을 찾을 수 없습니다.", null);
             }
-            if (!comment.getWriterId().equals(writerId)) {
-                response.put("error", "작성자만 삭제할 수 있습니다.");
-                return ResponseEntity.badRequest().body(response);
+
+            if (!comment.getWriterId().equals(loggedInWriterId)) {
+                return new ApiResponseDto<>(false, "댓글을 삭제할 권한이 없습니다.", null);
             }
+
             postMapper.deleteComment(commentId);
-            response.put("message", "댓글이 삭제되었습니다.");
-            return ResponseEntity.ok(response);
+            return new ApiResponseDto<>(true, "댓글 삭제가 완료되었습니다.", null);
         } catch (Exception e) {
-            log.error("Comment deletion failed: {}", commentId, e);
-            response.put("error", "댓글 삭제 실패: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            log.error("댓글 삭제 실패: {}", e.getMessage(), e);
+            return new ApiResponseDto<>(false, "댓글 삭제 실패: " + e.getMessage(), null);
         }
     }
 
-    @Transactional
-    public ResponseEntity<Map<String, String>> handleImageUpload(MultipartFile file, HttpServletRequest request) {
-        Map<String, String> response = new HashMap<>();
-        try {
-            String filePath = handleFileUpload(file, request);
-            if (filePath != null) {
-                response.put("url", request.getContextPath() + filePath);
-                return ResponseEntity.ok(response);
-            } else {
-                response.put("error", "이미지 업로드 실패");
-                return ResponseEntity.badRequest().body(response);
+    private String generateNextId(String lastId, String prefix) {
+        if (lastId == null || !lastId.startsWith(prefix)) {
+            return prefix + "00001";
+        }
+        int num = Integer.parseInt(lastId.substring(prefix.length()));
+        return String.format(prefix + "%05d", num + 1);
+    }
+
+    private String saveFile(MultipartFile file, HttpServletRequest request) throws IOException {
+        String originalFileName = file.getOriginalFilename();
+        String uuid = UUID.randomUUID().toString();
+        String savedFileName = uuid + "_" + originalFileName;
+
+        Path uploadPath = Paths.get(getUploadDir(request));
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+        Path filePath = uploadPath.resolve(savedFileName);
+        file.transferTo(filePath.toFile());
+
+        return savedFileName;
+    }
+
+    private void deleteFile(String fileName, HttpServletRequest request) {
+        if (fileName != null && !fileName.isEmpty()) {
+            try {
+                Path realFilePath = Paths.get(getUploadDir(request), fileName);
+
+                File fileToDelete = realFilePath.toFile();
+                if (fileToDelete.exists() && fileToDelete.isFile()) {
+                    Files.deleteIfExists(fileToDelete.toPath());
+                    log.info("파일 삭제 성공: {}", realFilePath);
+                } else {
+                    log.warn("삭제할 파일이 존재하지 않거나 파일이 아닙니다: {}", realFilePath);
+                }
+            } catch (IOException e) {
+                log.error("파일 삭제 실패: {}", fileName, e);
             }
-        } catch (Exception e) {
-            log.error("Image upload failed", e);
-            response.put("error", "이미지 업로드 실패: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
         }
     }
 }

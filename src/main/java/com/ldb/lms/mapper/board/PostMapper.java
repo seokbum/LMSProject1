@@ -15,7 +15,7 @@ public interface PostMapper {
 
     String getLastCommentId();
 
-    String getMaxGroup();
+    Integer getMaxGroup(); // 
 
     void insertPost(PostDto postDto);
 

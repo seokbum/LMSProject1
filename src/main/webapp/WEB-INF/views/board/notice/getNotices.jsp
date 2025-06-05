@@ -2,8 +2,10 @@
 <%@ taglib uri="jakarta.tags.core" prefix="c"%>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt"%>           
 <%@ taglib uri="jakarta.tags.functions" prefix="fn"%> 
-
+<!DOCTYPE html>
+<html>
 <head>
+ 	<meta charset="UTF-8">
     <title>공지사항 목록</title> 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
@@ -202,3 +204,4 @@
         });
     </script>
 </body>
+</html>

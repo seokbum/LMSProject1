@@ -1,112 +1,130 @@
 package com.ldb.lms.controller.board;
 
-import com.ldb.lms.dto.board.post.*;
+import com.ldb.lms.dto.ApiResponseDto;
+import com.ldb.lms.dto.board.post.CommentDto;
+import com.ldb.lms.dto.board.post.PostDto;
+import com.ldb.lms.dto.board.post.PostPaginationDto;
+import com.ldb.lms.dto.board.post.PostSearchDto;
 import com.ldb.lms.service.board.PostService;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
 @Slf4j
-@RestController
+@Controller 
 @RequestMapping("/api/post")
-@RequiredArgsConstructor
 public class PostApiController {
 
     private final PostService postService;
+    private final ObjectMapper objectMapper;
+
+    public PostApiController(PostService postService) {
+        this.postService = postService;
+        this.objectMapper = new ObjectMapper();
+    }
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getPosts(
+    @ResponseBody
+    public ResponseEntity<ApiResponseDto<Map<String, Object>>> getPosts(
             @ModelAttribute PostSearchDto searchDto,
             @ModelAttribute PostPaginationDto pageDto,
             @RequestParam(value = "postType", defaultValue = "post") String postType) {
-        return postService.getPosts(searchDto, pageDto, postType);
+        return ResponseEntity.ok(postService.getPosts(searchDto, pageDto, postType));
     }
 
     @PostMapping("/uploadImage")
-    public ResponseEntity<Map<String, String>> uploadImage(
+    @ResponseBody
+    public ResponseEntity<ApiResponseDto<String>> uploadImage(
             @RequestParam("file") MultipartFile file,
             HttpServletRequest request) {
-        return postService.handleImageUpload(file, request);
+        return ResponseEntity.ok(postService.handleImageUpload(file, request));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Map<String, String>> createPost(
-    		@ModelAttribute PostDto postDto,
+    @ResponseBody
+    public ResponseEntity<ApiResponseDto<String>> createPost(
+            @ModelAttribute PostDto postDto,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            HttpSession session,
             HttpServletRequest request) {
-        // 테스트용 P001 하드코딩
         postDto.setAuthorId("P001");
-        // 실제 구현 시: 세션에서 ID 가져오기
-        // String authorId = (String) request.getSession().getAttribute("userId");
-        // postDto.setAuthorId(authorId);
-        return postService.handleCreatePost(postDto, postDto.getPostFile(),request);
+        return ResponseEntity.ok(postService.handleCreatePost(postDto, file, request));
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Map<String, String>> updatePost(
-            @RequestBody PostDto postDto,
+    @ResponseBody
+    public ResponseEntity<ApiResponseDto<String>> updatePost(
+            @RequestParam("post") String postJson,
             @RequestPart(value = "file", required = false) MultipartFile file,
-            HttpServletRequest request) {
-        // 테스트용 P001 하드코딩
+            HttpSession session,
+            HttpServletRequest request) throws Exception {
+        PostDto postDto = objectMapper.readValue(postJson, PostDto.class);
         postDto.setAuthorId("P001");
-        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
-        return postService.handleUpdatePost(postDto, file, request);
+        return ResponseEntity.ok(postService.handleUpdatePost(postDto, file, request));
     }
 
     @PostMapping("/reply")
-    public ResponseEntity<Map<String, String>> replyPost(
-            @RequestBody PostDto postDto,
+    @ResponseBody
+    public ResponseEntity<ApiResponseDto<String>> replyPost(
+            @RequestParam("post") String postJson,
             @RequestPart(value = "file", required = false) MultipartFile file,
-            HttpServletRequest request) {
-        // 테스트용 P001 하드코딩
+            HttpSession session,
+            HttpServletRequest request) throws Exception {
+        PostDto postDto = objectMapper.readValue(postJson, PostDto.class);
         postDto.setAuthorId("P001");
-        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
-        return postService.handleReplyPost(postDto, file, request);
-    }
-
-    @PostMapping("/delete")
-    public ResponseEntity<Map<String, String>> deletePost(
-            @RequestParam("postId") String postId,
-            @RequestParam("pass") String password,
-            @RequestParam("authorId") String authorId,
-            HttpServletRequest request) {
-        // 테스트용 P001 하드코딩
-        authorId = "P001";
-        // 실제 구현 시: authorId = (String) request.getSession().getAttribute("userId");
-        return postService.handleDeletePost(postId, password, authorId);
+        return ResponseEntity.ok(postService.handleReplyPost(postDto, file, request));
     }
 
     @PostMapping("/comment")
-    public ResponseEntity<Map<String, String>> writeComment(
+    @ResponseBody
+    public ResponseEntity<ApiResponseDto<String>> writeComment(
             @RequestBody CommentDto commentDto,
+            HttpSession session,
             HttpServletRequest request) {
-        // 테스트용 P001 하드코딩
         commentDto.setWriterId("P001");
-        // 실제 구현 시: commentDto.setWriterId((String) request.getSession().getAttribute("userId"));
-        return postService.handleWriteComment(commentDto);
+        return ResponseEntity.ok(postService.handleWriteComment(commentDto, request));
     }
 
     @PutMapping("/comment")
-    public ResponseEntity<Map<String, String>> updateComment(
+    @ResponseBody
+    public ResponseEntity<ApiResponseDto<String>> updateComment(
             @RequestBody CommentDto commentDto,
+            HttpSession session,
             HttpServletRequest request) {
-        // 테스트용 P001 하드코딩
         commentDto.setWriterId("P001");
-        // 실제 구현 시: commentDto.setWriterId((String) request.getSession().getAttribute("userId"));
-        return postService.handleUpdateComment(commentDto);
+        return ResponseEntity.ok(postService.handleUpdateComment(commentDto, request));
     }
 
     @DeleteMapping("/comment")
-    public ResponseEntity<Map<String, String>> deleteComment(
-            @RequestBody Map<String, String> request) {
-        // 테스트용 P001 하드코딩
-        String writerId = "P001";
-        // 실제 구현 시: String writerId = (String) request.getAttribute("userId");
-        return postService.handleDeleteComment(
-                request.get("commentId"), writerId);
+    @ResponseBody
+    public ResponseEntity<ApiResponseDto<String>> deleteComment(
+            @RequestBody Map<String, String> requestBody,
+            HttpSession session,
+            HttpServletRequest request) {
+        String commentId = requestBody.get("commentId");
+        String writerIdFromClient = requestBody.get("writerId");
+        String loggedInWriterId = "P001";
+
+        if (!loggedInWriterId.equals(writerIdFromClient)) {
+            return ResponseEntity.ok(new ApiResponseDto<>(false, "댓글을 삭제할 권한이 없습니다.", null));
+        }
+
+        return ResponseEntity.ok(postService.handleDeleteComment(commentId, loggedInWriterId, request));
     }
 }

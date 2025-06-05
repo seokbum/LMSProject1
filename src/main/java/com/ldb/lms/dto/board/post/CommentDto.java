@@ -1,11 +1,9 @@
 package com.ldb.lms.dto.board.post;
 
-import java.util.Date;
-
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -14,7 +12,7 @@ public class CommentDto {
     private String commentId;
     private String postId;
     private String writerId;
-    private String userName; 
+    private String writerName;
     private String commentContent;
     private String parentCommentId;
     private Date createdAt;
