@@ -18,7 +18,7 @@ public class PostDto {
     private String postTitle;
     private String postContent;
     private String postPassword;
-    private String postGroup;
+    private Integer  postGroup;
     private Integer postGroupLevel;
     private Integer postGroupStep;
     private String existingFilePath;
@@ -27,5 +27,5 @@ public class PostDto {
     private Date postUpdatedAt;
     private Integer postNotice; 
     private MultipartFile postFile;
-    private String ParentPostId;
+    private String parentPostId;
 }

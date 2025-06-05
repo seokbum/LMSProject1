@@ -25,7 +25,9 @@ public class PostController {
             @RequestParam(value = "postType", defaultValue = "post") String postType,
             @RequestParam(value = "authorId", defaultValue = "S001") String authorId,
             Model model) {
-        // pageDto 기본값 설정
+        // 테스트용 P001 하드코딩
+        authorId = "P001";
+        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
         if (pageDto.getItemsPerPage() == null) {
             pageDto.setItemsPerPage(10);
         }
@@ -39,6 +41,9 @@ public class PostController {
     public String createPost(
             @RequestParam(value = "authorId", defaultValue = "S001") String authorId,
             Model model) {
+        // 테스트용 P001 하드코딩
+        authorId = "P001";
+        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
         return postService.prepareCreatePostView(authorId, model);
     }
 
@@ -47,6 +52,9 @@ public class PostController {
             @RequestParam("postId") String postId,
             @RequestParam(value = "authorId", defaultValue = "S001") String authorId,
             Model model) {
+        // 테스트용 P001 하드코딩
+        authorId = "P001";
+        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
         return postService.prepareUpdatePostView(postId, authorId, model);
     }
 
@@ -56,6 +64,9 @@ public class PostController {
             @RequestParam(value = "readcnt", defaultValue = "") String readcnt,
             @RequestParam(value = "authorId", defaultValue = "S001") String authorId,
             Model model) {
+        // 테스트용 P001 하드코딩
+        authorId = "P001";
+        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
         return postService.preparePostDetailView(postId, readcnt, authorId, model);
     }
 
@@ -64,6 +75,9 @@ public class PostController {
             @RequestParam("postId") String postId,
             @RequestParam(value = "authorId", defaultValue = "S001") String authorId,
             Model model) {
+        // 테스트용 P001 하드코딩
+        authorId = "P001";
+        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
         return postService.prepareReplyPostView(postId, authorId, model);
     }
 
@@ -72,6 +86,9 @@ public class PostController {
             @RequestParam("postId") String postId,
             @RequestParam(value = "authorId", defaultValue = "S001") String authorId,
             Model model) {
+        // 테스트용 P001 하드코딩
+        authorId = "P001";
+        // 실제 구현 시: String authorId = (String) request.getSession().getAttribute("userId");
         return postService.prepareDeletePostView(postId, authorId, model);
     }
 }

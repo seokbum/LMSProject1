@@ -9,8 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>답글 등록</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="https://uicdn.com/editor/latest/toastui-editor.min.css" />
     <script src="https://uicdn.com/editor/latest/toastui-editor-all.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
@@ -30,11 +29,12 @@
         <input type="hidden" name="parentPostId" value="${postDto.parentPostId}">
         <div class="mb-3">
             <label for="authorId" class="form-label">ID</label>
-            <input type="text" class="form-control" id="authorId" name="authorId" value="${param.authorId != null ? param.authorId : 'S001'}" readonly>
+            <input type="text" class="form-control" id="authorId" name="authorId" value="${postDto.authorId != null ? postDto.authorId : 'S001'}" readonly>
+            <span class="form-text">ID: ${postDto.authorId}</span>
         </div>
         <div class="mb-3">
             <label for="userName" class="form-label">작성자</label>
-            <input type="text" class="form-control" id="userName" value="${userName != null ? userName : '테스트 사용자'}" readonly>
+            <input type="text" class="form-control" id="userName" value="${postDto.userName != null ? postDto.userName : '테스트 사용자'}" readonly>
         </div>
         <div class="mb-3">
             <label for="postTitle" class="form-label">제목</label>
@@ -112,28 +112,24 @@
             $.ajax({
                 url: "/api/post/reply",
                 type: "POST",
-                data: POST,
-                formData,
+                data: formData,
                 processData: false,
                 contentType: false,
                 success: (response) => {
                     if (response.message) {
                         alert(response.message);
-                        window.location.href = response.redirect;
-                        window.redirectUrl;
+                        window.location.href = response.redirectUrl;
                     } else {
-                        alert("Reply post failed: " + response.error);
+                        alert("답글 작성 실패: " + response.error);
                     }
                 },
                 error: (xhr) => {
-                    error: console.error("Reply post failed: ", xhr);
-                    console.error("Post reply failed:", xhr);
-                    alert("Reply failed failed: ");
+                    console.error("Reply post failed:", xhr);
+                    alert("답글 작성 중 오류");
                 }
-            }
             });
         });
-    }
+    });
 </script>
 </body>
 </html>

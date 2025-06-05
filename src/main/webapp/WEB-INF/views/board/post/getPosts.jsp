@@ -8,6 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>문의게시판 목록</title> 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
         .post-container { 
@@ -101,13 +102,13 @@
                         <label for="searchType" class="form-label">검색 조건</label>
                         <select name="searchType" id="searchType" class="form-select">
                             <option value="">전체</option>
-                            <option value="authorName" <c:if test="${searchDto.searchType == 'authorName'}">selected</c:if>>작성자</option>
+                            <option value="userName" <c:if test="${searchDto.searchType == 'userName'}">selected</c:if>>작성자</option>
                             <option value="postTitle" <c:if test="${searchDto.searchType == 'postTitle'}">selected</c:if>>제목</option>
                             <option value="postContent" <c:if test="${searchDto.searchType == 'postContent'}">selected</c:if>>내용</option>
-                            <option value="postTitle,authorName" <c:if test="${searchDto.searchType == 'postTitle,authorName'}">selected</c:if>>제목+작성자</option>
+                            <option value="postTitle,userName" <c:if test="${searchDto.searchType == 'postTitle,userName'}">selected</c:if>>제목+작성자</option>
                             <option value="postTitle,postContent" <c:if test="${searchDto.searchType == 'postTitle,postContent'}">selected</c:if>>제목+내용</option>
-                            <option value="authorName,postContent" <c:if test="${searchDto.searchType == 'authorName,postContent'}">selected</c:if>>작성자+내용</option>
-                            <option value="postTitle,authorName,postContent" <c:if test="${searchDto.searchType == 'postTitle,authorName,postContent'}">selected</c:if>>제목+작성자+내용</option>
+                            <option value="userName,postContent" <c:if test="${searchDto.searchType == 'userName,postContent'}">selected</c:if>>작성자+내용</option>
+                            <option value="postTitle,userName,postContent" <c:if test="${searchDto.searchType == 'postTitle,userName,postContent'}">selected</c:if>>제목+작성자+내용</option>
                         </select>
                     </div>
                     <div class="col-md-6">
@@ -115,7 +116,7 @@
                         <input type="text" name="searchKeyword" id="searchKeyword" class="form-control" value="${fn:escapeXml(searchDto.searchKeyword)}" placeholder="검색어를 입력하세요">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">&nbsp;</label>
+                        <label class="form-label"> </label>
                         <button type="submit" id="searchButton" class="post-btn-primary w-100">검색</button>
                     </div>
                 </div>
@@ -213,38 +214,38 @@
             <div class="text-end">
                 <a href="/post/createPost?authorId=${param.authorId}" class="post-btn-primary">글쓰기</a>
             </div>
-<c:if test="${pagination != null}">
-    <nav>
-        <ul class="pagination justify-content-center">
-            <li class="page-item <c:if test="${pagination.currentPage <= 1}">disabled</c:if>">
-                <a class="page-link" href="<c:url value='/post/getPosts'>
-                    <c:param name='pageNum' value='${pagination.currentPage - 1}' />
-                    <c:param name='searchType' value='${not empty searchDto.searchType ? searchDto.searchType : ""}' />
-                    <c:param name='searchKeyword' value='${not empty searchDto.searchKeyword ? searchDto.searchKeyword : ""}' />
-                    <c:param name='authorId' value='${param.authorId}' />
-                </c:url>">이전</a>
-            </li>
-            <c:forEach var="i" begin="${pagination.startPage}" end="${pagination.endPage}">
-                <li class="page-item <c:if test="${i == pagination.currentPage}">active</c:if>">
-                    <a class="page-link" href="<c:url value='/post/getPosts'>
-                        <c:param name='pageNum' value='${i}' />
-                        <c:param name='searchType' value='${not empty searchDto.searchType ? searchDto.searchType : ""}' />
-                        <c:param name='searchKeyword' value='${not empty searchDto.searchKeyword ? searchDto.searchKeyword : ""}' />
-                        <c:param name='authorId' value='${param.authorId}' />
-                    </c:url>">${i}</a>
-                </li>
-            </c:forEach>
-            <li class="page-item <c:if test="${pagination.currentPage >= pagination.totalPages}">disabled</c:if>">
-                <a class="page-link" href="<c:url value='/post/getPosts'>
-                    <c:param name='pageNum' value='${pagination.currentPage + 1}' />
-                    <c:param name='searchType' value='${not empty searchDto.searchType ? searchDto.searchType : ""}' />
-                    <c:param name='searchKeyword' value='${not empty searchDto.searchKeyword ? searchDto.searchKeyword : ""}' />
-                    <c:param name='authorId' value='${param.authorId}' />
-                </c:url>">다음</a>
-            </li>
-        </ul>
-    </nav>
-</c:if>
+            <c:if test="${pagination != null}">
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item <c:if test="${pagination.currentPage <= 1}">disabled</c:if>">
+                            <a class="page-link" href="<c:url value='/post/getPosts'>
+                                <c:param name='pageNum' value='${pagination.currentPage - 1}' />
+                                <c:param name='searchType' value='${not empty searchDto.searchType ? searchDto.searchType : ""}' />
+                                <c:param name='searchKeyword' value='${not empty searchDto.searchKeyword ? searchDto.searchKeyword : ""}' />
+                                <c:param name='authorId' value='${param.authorId}' />
+                            </c:url>">이전</a>
+                        </li>
+                        <c:forEach var="i" begin="${pagination.startPage}" end="${pagination.endPage}">
+                            <li class="page-item <c:if test="${i == pagination.currentPage}">active</c:if>">
+                                <a class="page-link" href="<c:url value='/post/getPosts'>
+                                    <c:param name='pageNum' value='${i}' />
+                                    <c:param name='searchType' value='${not empty searchDto.searchType ? searchDto.searchType : ""}' />
+                                    <c:param name='searchKeyword' value='${not empty searchDto.searchKeyword ? searchDto.searchKeyword : ""}' />
+                                    <c:param name='authorId' value='${param.authorId}' />
+                                </c:url>">${i}</a>
+                            </li>
+                        </c:forEach>
+                        <li class="page-item <c:if test="${pagination.currentPage >= pagination.totalPages}">disabled</c:if>">
+                            <a class="page-link" href="<c:url value='/post/getPosts'>
+                                <c:param name='pageNum' value='${pagination.currentPage + 1}' />
+                                <c:param name='searchType' value='${not empty searchDto.searchType ? searchDto.searchType : ""}' />
+                                <c:param name='searchKeyword' value='${not empty searchDto.searchKeyword ? searchDto.searchKeyword : ""}' />
+                                <c:param name='authorId' value='${param.authorId}' />
+                            </c:url>">다음</a>
+                        </li>
+                    </ul>
+                </nav>
+            </c:if>
         </div>
     </div>
     <script>

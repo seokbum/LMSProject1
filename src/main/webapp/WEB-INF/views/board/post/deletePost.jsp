@@ -34,6 +34,10 @@
     <form action="/post/delete" method="post" class="mt-4">
         <input type="hidden" name="postId" value="${post.postId}">
         <div class="form-group">
+            <label class="font-weight-bold">ID:</label>
+            <span class="ml-2">${post.authorId}</span>
+        </div>
+        <div class="form-group">
             <label class="font-weight-bold">작성자:</label>
             <span class="ml-2">${post.userName}</span>
         </div>

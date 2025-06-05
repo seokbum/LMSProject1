@@ -257,61 +257,63 @@
         AND post_group_step >= #{postGroupStep}
     </update>
 
-    <!-- 새로운 댓글을 삽입합니다.  -->
-    <insert id="insertComment" parameterType="CommentDto">
-        INSERT INTO post_comment (
-            comment_id,
-            post_id,
-            writer_id,
-            comment_content,
-            parent_comment_id,
-            created_at,
-            updated_at
-        ) VALUES (
-            #{commentId},
-            #{postId},
-            #{writerId},
-            #{commentContent},
-            #{parentCommentId},
-            NOW(),
-            NOW()
-        )
-    </insert>
-
-    <!-- 특정 게시물의 댓글 목록을 조회합니다.  -->
-    <select id="selectCommentList" parameterType="String" resultType="CommentDto">
-        SELECT
-            c.comment_id,
-            c.post_id,
-            c.writer_id,
-            COALESCE(s.student_name, pr.professor_name) AS writer_name,
-            c.comment_content,
-            c.parent_comment_id,
-            c.created_at,
-            c.updated_at
-        FROM post_comment c
-        LEFT JOIN student s ON c.writer_id = s.student_id
-        LEFT JOIN professor pr ON c.writer_id = pr.professor_id
-        WHERE c.post_id = #{postId}
-        ORDER BY c.created_at ASC
-    </select>
-
-    <!-- 특정 댓글을 조회합니다.  -->
-    <select id="selectComment" parameterType="String" resultType="CommentDto">
-        SELECT
-            c.comment_id,
-            c.post_id,
-            c.writer_id,
-            COALESCE(s.student_name, pr.professor_name) AS writer_name,
-            c.comment_content,
-            c.parent_comment_id,
-            c.created_at,
-            c.updated_at
-        FROM post_comment c
-        LEFT JOIN student s ON c.writer_id = s.student_id
-        LEFT JOIN professor pr ON c.writer_id = pr.professor_id
-        WHERE c.comment_id = #{commentId}
-    </select>
+    <!-- 새로운 댓글을 삽입합니다. -->
+	<insert id="insertComment" parameterType="CommentDto">
+	    INSERT INTO post_comment (
+	        comment_id,
+	        post_id,
+	        writer_id,
+	        writer_name,
+	        comment_content,
+	        parent_comment_id,
+	        created_at,
+	        updated_at
+	    ) VALUES (
+	        #{commentId},
+	        #{postId},
+	        #{writerId},
+	        #{writerName},
+	        #{commentContent},
+	        #{parentCommentId},
+	        NOW(),
+	        NOW()
+	    )
+	</insert>
+	
+	<!-- 특정 게시물의 댓글 목록을 조회합니다. -->
+	<select id="selectCommentList" parameterType="String" resultType="CommentDto">
+	    SELECT
+	        c.comment_id,
+	        c.post_id,
+	        c.writer_id,
+	        COALESCE(s.student_name, pr.professor_name) AS writer_name,
+	        c.comment_content,
+	        c.parent_comment_id,
+	        c.created_at,
+	        c.updated_at
+	    FROM post_comment c
+	    LEFT JOIN student s ON c.writer_id = s.student_id
+	    LEFT JOIN professor pr ON c.writer_id = pr.professor_id
+	    WHERE c.post_id = #{postId}
+	    ORDER BY c.created_at DESC
+	</select>
+	
+	<!-- 특정 댓글을 조회합니다. -->
+	<select id="selectComment" parameterType="String" resultType="CommentDto">
+	    SELECT
+	        c.comment_id,
+	        c.post_id,
+	        c.writer_id,
+	        COALESCE(s.student_name, pr.professor_name) AS writer_name,
+	        c.comment_content,
+	        c.parent_comment_id,
+	        c.created_at,
+	        c.updated_at
+	    FROM post_comment c
+	    LEFT JOIN student s ON c.writer_id = s.student_id
+	    LEFT JOIN professor pr ON c.writer_id = pr.professor_id
+	    WHERE c.comment_id = = #{commentId}
+	</select>
 
     <!-- 댓글을 업데이트합니다. -->
     <update id="updateComment" parameterType="CommentDto">

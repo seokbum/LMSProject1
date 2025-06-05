@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시물 수정</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <link rel="stylesheet" href="https://uicdn.com/editor/latest/toastui-editor.min.css" />
     <script src="https://uicdn.com/editor/latest/toastui-editor-all.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
@@ -30,6 +30,7 @@
         <div class="mb-3">
             <label for="authorId" class="form-label">ID</label>
             <input type="text" class="form-control" id="authorId" name="authorId" value="${post.authorId}" readonly>
+            <span class="form-text">ID: ${post.authorId}</span>
         </div>
         <div class="mb-3">
             <label for="userName" class="form-label">작성자</label>
