@@ -465,6 +465,7 @@ public class MypageService {
 				request.setAttribute("chg", "비밀번호변경 실패");
 			}
 			else {
+				request.getSession().invalidate();//완료했으면 세션지우기
 				request.setAttribute("chg", "비밀번호변경 완료");
 			}
 		}
@@ -473,6 +474,7 @@ public class MypageService {
 				request.setAttribute("chg", "비밀번호변경 실패");
 			}
 			else {
+				request.getSession().invalidate();//완료했으면 세션지우기
 				request.setAttribute("chg", "비밀번호변경 완료");
 			}
 		}
