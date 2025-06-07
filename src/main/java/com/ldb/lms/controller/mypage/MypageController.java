@@ -90,7 +90,6 @@ public class MypageController {
 	@PostMapping("changePw")
 	public String callChangePw(@ModelAttribute UpdatePwDto dto,HttpServletRequest request) {
 		System.out.println("dto :::"+dto);
-		request.getSession().invalidate();//세션초기화
 		mypageService.changePw(dto,request);
 		return "mypage/updatePw";
 	}
