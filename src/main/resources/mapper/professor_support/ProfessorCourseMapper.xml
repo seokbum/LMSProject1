@@ -122,29 +122,20 @@
 	</select>
 	
 	
-    <select id="countEnrollments" resultType="int">
+    <select id="getCurrentEnrollmentById" resultType="int">
         SELECT course_current_enrollment 
 		FROM   course
 		WHERE  course_id = #{courseId}
     </select>
 	
-	<update id="changeCourse" parameterType="java.util.Map">
+	<update id="updateCourseStatus">
 		UPDATE course
-	    <set>
-	        <choose>
-	            <when test="courseStatus == 'CLOSED'">
-	                course_status = 'OPEN'
-	            </when>
-	            <when test="courseStatus == 'OPEN'">
-	                course_status = 'CLOSED'
-	            </when>
-	        </choose>
-	        </set>
-	    WHERE course_id = #{courseId}
+	    SET    course_status = #{courseStatus}
+	    WHERE  course_id = #{courseId}
 	</update>
 	
 	<!-- course 테이블 업데이트 -->
-    <update id="updateCourseInfo" parameterType="RegistCourseDto">
+    <update id="updateCourseInfo" parameterType="com.ldb.lms.domain.Course">
         UPDATE course
         SET course_name = #{courseName},
             course_max_cnt = #{courseMaxCnt},
@@ -156,7 +147,7 @@
     </update>
 
     <!-- course_time 테이블 업데이트 -->
-    <update id="updateCourseTimeInfo" parameterType="RegistCourseDto">
+    <update id="updateCourseTimeInfo" parameterType="com.ldb.lms.domain.CourseTime">
         UPDATE course_time
         SET course_time_yoil = #{courseTimeYoil},
             course_time_loc = #{courseTimeLoc},
@@ -166,14 +157,14 @@
     </update>
     
     <!-- course 테이블 삭제 -->
-    <delete id="deleteCourseInfo">
+    <delete id="deleteCourse">
         DELETE 
         FROM  course
         WHERE course_id = #{courseId}
     </delete>
     
     <!-- course_time 테이블 삭제 -->
-    <delete id="deleteCourseTimeInfo">
+    <delete id="deleteCourseTime">
         DELETE 
         FROM  course_time
         WHERE course_id = #{courseId}

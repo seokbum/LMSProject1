@@ -1,18 +1,25 @@
 package com.ldb.lms.controller.professor_support;
 
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.ldb.lms.dto.ApiResponseDto;
 import com.ldb.lms.dto.professor_support.PaginationDto;
 import com.ldb.lms.dto.professor_support.RegistCourseDto;
 import com.ldb.lms.service.learning_support.LearningService;
@@ -57,20 +64,66 @@ public class ProfessorCourseManagementController {
 	
 	@PutMapping("/{courseId}")
 	public String updateCourse (
-			@PathVariable String courseId,
+			@RequestParam Map<String, Object> paramMap,
 			@SessionAttribute(name="login", required=false) String professorId,
 			@ModelAttribute(name = "RegistCourseDto") RegistCourseDto rDto,
-			RedirectAttributes redirectAttributes
-			) {
+			RedirectAttributes redirectAttributes) {
+		
+		String page = (String) paramMap.get("page");
+		String search = (String) paramMap.get("search");
+		String sortDirection = (String) paramMap.get("sortDirection");
+		
 		// 임시 하드코딩
 		professorId = "P001";
-		
+		rDto.setProfessorId(professorId);
 		log.info("==RegistcourseDto : {}", rDto.toString());
 		
-		// TODO: 리다이렉트 처리 및 강의정보 수정, 삭제,개설 처리 해야함. 
-		return "redirect:";
+		// 강의 상세정보 수정
+		try {
+			professorCourseManagementService.updateCourse(rDto);
+		} catch(Exception e) {
+			redirectAttributes.addFlashAttribute("message", e.getMessage());
+		}
+		
+		return "redirect:/professors/courses/management?page="
+			+ page + "&search=" + search + "&sortDirection=" + sortDirection;
 	}
 	
+	@PutMapping("/{courseId}/status")
+	@ResponseBody
+	public ResponseEntity<ApiResponseDto<Void>> updateCourseStatus(
+			@PathVariable String courseId,
+			@RequestParam String courseStatus) {
+		
+		try {
+			professorCourseManagementService.updateCourseStatus(courseId, courseStatus);
+			return ResponseEntity.ok(new ApiResponseDto<>(true, "변경처리 성공", null));
+		} catch(Exception e) {
+			return ResponseEntity
+					.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ApiResponseDto<>(false, "강의상태 변경 실패: " + e.getMessage(), null));
+		}
+	}
+	
+	@DeleteMapping("/{courseId}")
+	public String deleteCourse(
+			@PathVariable String courseId,
+			@RequestParam Map<String, Object> paramMap,
+			RedirectAttributes redirectAttributes) {
+
+		String page = (String) paramMap.get("page");
+		String search = (String) paramMap.get("search");
+		String sortDirection = (String) paramMap.get("sortDirection");
+		
+		try {
+			professorCourseManagementService.deleteCourse(courseId);
+		} catch(Exception e) {
+			redirectAttributes.addFlashAttribute("message", "강의 삭제처리 실패");
+		}
+		
+		return "redirect:/professors/courses/management?page="
+				+ page + "&search=" + search + "&sortDirection=" + sortDirection;
+	}
 }
 
 
