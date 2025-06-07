@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -32,13 +31,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/professors/courses/management")
 public class ProfessorCourseManagementController {
 
-    private final LearningService learningService;
-	
-	private final ProfessorCourseManagementService professorCourseManagementService;
+    private final ProfessorCourseManagementService professorCourseManagementService;
 	
 	public ProfessorCourseManagementController(ProfessorCourseManagementService professorCourseManagementService, LearningService learningService) {
 		this.professorCourseManagementService = professorCourseManagementService;
-		this.learningService = learningService;
 	}
 
 	@GetMapping
@@ -46,18 +42,13 @@ public class ProfessorCourseManagementController {
 			@ModelAttribute PaginationDto paginationDto,
 			@SessionAttribute(name="login", required=false) String professorId,
 			Model model) {
-		// 임시 하드코딩
-		professorId = "P001";
 		
-		if (StringUtils.hasText(professorId)) {
 			paginationDto.setProfessorId(professorId);
 			professorCourseManagementService.calcPage(paginationDto);
 			List<RegistCourseDto> courses = 
 					professorCourseManagementService.getCourses(paginationDto);
 			model.addAttribute("courses", courses);
-		} else {
-			throw new RuntimeException("로그인정보가 확인되지 않습니다.");
-		}
+		
 
 		return "professor_support/manageCourse";
 	}
@@ -73,8 +64,6 @@ public class ProfessorCourseManagementController {
 		String search = (String) paramMap.get("search");
 		String sortDirection = (String) paramMap.get("sortDirection");
 		
-		// 임시 하드코딩
-		professorId = "P001";
 		rDto.setProfessorId(professorId);
 		log.info("==RegistcourseDto : {}", rDto.toString());
 		

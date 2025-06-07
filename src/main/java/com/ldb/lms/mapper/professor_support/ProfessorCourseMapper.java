@@ -38,6 +38,8 @@ public interface ProfessorCourseMapper {
 	int deleteCourse(String courseId);
 
 	int deleteCourseTime(String courseId);
+
+	String getProfessorNameById(String professorId);
 	
 	
 }

@@ -121,11 +121,18 @@
         LIMIT #{offset}, #{itemsPerPage}
 	</select>
 	
-	
+	<!-- 현재 수강인원 조회 -->
     <select id="getCurrentEnrollmentById" resultType="int">
         SELECT course_current_enrollment 
 		FROM   course
 		WHERE  course_id = #{courseId}
+    </select>
+	
+	<!-- 교수 이름 조회 -->
+    <select id="getProfessorNameById" resultType="String">
+        SELECT professor_name 
+		FROM   professor
+		WHERE  professor_id = #{professorId}
     </select>
 	
 	<update id="updateCourseStatus">

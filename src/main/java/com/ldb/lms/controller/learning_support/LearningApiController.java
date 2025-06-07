@@ -54,18 +54,19 @@ public class LearningApiController {
 
     @GetMapping("searchCourse")
     public ResponseEntity<Map<String, Object>> searchCourse(
+    		@SessionAttribute(value = "login", required = false) String studentId,
             @ModelAttribute SearchDto searchDto,
             @ModelAttribute PaginationDto pageDto) {
     	
-        String studentId = "S001"; // 테스트용 하드코딩
         searchDto.setStudentId(studentId);
 
         return ResponseEntity.ok(learningService.searchCourse(searchDto, pageDto));
     }
 
     @GetMapping("searchRegistrationCourses")
-    public ResponseEntity<List<RegistrationDto>> searchRegistrationCourses() {
-        String studentId = "S001"; // 테스트용 하드코딩
+    public ResponseEntity<List<RegistrationDto>> searchRegistrationCourses(
+    		@SessionAttribute(value = "login", required = false) String studentId) {
+
         return ResponseEntity.ok(learningService.searchRegistrationCourses(studentId));
     }
 	
@@ -76,15 +77,6 @@ public class LearningApiController {
             @SessionAttribute(value = "login", required = false) String studentId) {
 		
 		Map<String, Object> response = new HashMap<>();
-		
-		if (studentId == null) {
-			// login 처리전까지 하드코딩
-//            response.put("success", false);
-//            response.put("errorMsg", "Login required");
-//            return ResponseEntity.badRequest().body(response);
-			studentId = "S001";
-        }
-
         map.put("studentId", studentId);
         
         try {
@@ -103,15 +95,8 @@ public class LearningApiController {
 			@RequestParam Map<String, Object> map,
 			@SessionAttribute(value = "login", required = false) String studentId
 			) {
-
-		if (studentId == null) {
-			// login 처리전까지 하드코딩
-//            response.put("success", false);
-//            response.put("errorMsg", "Login required");
-//            return ResponseEntity.badRequest().body(response);
-			studentId = "S001";
-			map.put("studentId", studentId);
-        }
+		
+		map.put("studentId", studentId);
 		
 		try {
 			learningService.deleteCourse(map);
@@ -129,15 +114,7 @@ public class LearningApiController {
 	public ResponseEntity<ApiResponseDto<List<AttendanceDto>>> viewCourseTime(
 			@SessionAttribute(value = "login", required = false) String studentId
 			) {
-		
-		if (studentId == null) {
-			// login 처리전까지 하드코딩
-//            response.put("success", false);
-//            response.put("errorMsg", "Login required");
-//            return ResponseEntity.badRequest().body(response);
-			studentId = "S001";
-        }
-		
+
 		try {
 			List<AttendanceDto> timetable =  learningService.viewCourseTime(studentId);
 			return ResponseEntity.ok(new ApiResponseDto<List<AttendanceDto>>(true, "조회 성공", timetable));
@@ -146,7 +123,6 @@ public class LearningApiController {
 					.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(new ApiResponseDto<>(false, "조회 실패: " + e.getMessage(), null));
 		}
-		
 	}
 	
 	
