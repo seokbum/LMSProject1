@@ -201,11 +201,20 @@
 								</button>
 							</td>
 							<td>
-								<a href="/professors/manage/deleteCourseInfo
-								?page=${paginationDto.page}&search=${param.search}&courseId=${course.courseId}"
+								<%-- <a href="/professors/courses/management/${course.courseId}
+								?page=${paginationDto.page}&search=${param.search}&sortDirection=${param.sortDirection}"
 								class="btn btn-secondary btn-sm" onclick="return confirm('정말 삭제하시겠습니까?');"> 
 								<i class="bi bi-trash"></i> 삭제
-								</a> 
+								</a>  --%>
+								<form action="/professors/courses/management/${course.courseId}" method="post" style="display:inline;">
+							        <input type="hidden" name="_method" value="DELETE"/>
+							        <input type="hidden" name="page" value="${paginationDto.page}"/>
+							        <input type="hidden" name="search" value="${param.search}"/>
+							        <input type="hidden" name="sortDirection" value="${param.sortDirection}"/>
+							        <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('정말 삭제하시겠습니까?');">
+							            <i class="bi bi-trash"></i> 삭제
+							        </button>
+							    </form>
 								<c:if test="${fn:toUpperCase(course.courseStatus) == 'OPEN'}">
 									<button class="btn btn-danger btn-sm ms-1 chg-course"
 										data-course-id="${course.courseId}"
@@ -457,18 +466,15 @@
 	
 			if (confirm("강의를 개설or종료 하시겠습니까?")) {
 				$.ajax({
-					url : "/professor_support/courses/management",
-					type : "POST",
-					data : {
-						courseId : courseId,
-						courseStatus : courseStatus
-					},
-					dataType : "json",
+					url : "/professors/courses/management/" + courseId + "/status",
+					type : "put",
+					data : {courseStatus : courseStatus},
+					dataType: "json",
 					success : function(response) {
-						if (response.result === "success") {
+						if (response.success) {
 							window.location.reload();
-						} else if (response.result === "fail") {
-							alert(response.errorMsg);
+						} else {
+							alert(response.message);
 						}
 					},
 					error : function(xhr, status, error) {
@@ -512,12 +518,18 @@
 				name : "search",
 				value : "${param.search}"
 			}).appendTo("#updateCourseForm");
+			
+			$("<input>").attr({
+				type : "hidden",
+				name : "sortDirection",
+				value : "${param.sortDirection}"
+			}).appendTo("#updateCourseForm");
 		}
 
 		// 이벤트 바인딩
 		$(document).ready(function() {
-			if ("${errorMsg}") {
-				alert("강의수정실패");
+			if ("${message}") {
+				alert("${message}");
 			}
 			
 			// 검색 버튼 및 Enter 키 이벤트

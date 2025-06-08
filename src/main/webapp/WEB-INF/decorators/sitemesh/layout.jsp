@@ -183,9 +183,10 @@ body {
 							<!--end::User Image-->
 
 							<!--begin::Menu Footer-->
-							<li class="user-footer"><a href="mypage/userInfo"
-								class="btn btn-default btn-flat">Profile</a> <a
-								href="mypage/logout"
+							<li class="user-footer"><a href="/mypage/userInfo"
+								class="btn btn-default btn-flat">Profile</a> 
+								<a
+								href="/mypage/logout"
 								class="btn btn-default btn-flat float-end">Sign out</a></li>
 							<!--end::Menu Footer-->
 						</ul></li>
@@ -224,7 +225,7 @@ body {
 								</p>
 						</a>
 							<ul class="nav nav-treeview">
-								<li class="nav-item"><a href="${path}/mypage/userInfo"
+								<li class="nav-item"><a href="/mypage/userInfo"
 									class="nav-link active"> <i class="nav-icon bi bi-circle"></i>
 										<p>개인정보</p>
 								</a></li>

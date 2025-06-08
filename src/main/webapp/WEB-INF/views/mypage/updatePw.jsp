@@ -121,7 +121,7 @@ h4 {
 
 			<button class="btn btn-custom w-100 mb-3">비밀번호 변경</button>
 			<div class="text-center">
-				<a href="javascript:c()" class="btn btn-link-custom">비밀번호를 나중에
+				<a  href="javascript:c()" class="btn btn-link-custom">비밀번호를 나중에
 					바꾸고 싶으면 클릭!</a>
 			</div>
 		</form>
@@ -131,16 +131,20 @@ h4 {
 <c:if test="${chg!=null}">
 <div class="card">
         <h4 class="text-center mb-4">${chg}</h4>
-         <a href="javascript:c()" class="btn-link-custom">로그인 화면으로 돌아가기</a>
+         <a href="javascript:goLogin()" class="btn-link-custom">창 나가기</a>
 </div>
 </c:if>	
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script type="text/javascript">
-		function c() {
-			window.close();
-
+		function c() {		
+				window.close();	
 		}
+		function goLogin(){
+			opener.location.href="/mypage/doLogin";
+			window.close();	
+		}
+		
 
 		function passwordChk(p) {
 			const passVal = document.querySelector("#passValid");

@@ -32,14 +32,6 @@ public class LearningController {
 			Model model
 	) {
 		
-//		if (studentId == null) {
-//			// login 처리전까지 하드코딩
-//            response.put("success", false);
-//            response.put("errorMsg", "Login required");
-//            return ResponseEntity.badRequest().body(response);
-//        }
-		studentId = "S001";
-		
 		StudentRegistrationSummaryDto registList = learningService.getStudentRegistrationSummary(studentId);
 		
 		model.addAttribute("registration", registList.getRegistrations());

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.ldb.lms.dto.mypage.FindIdDto;
 import com.ldb.lms.dto.mypage.FindPwDto;
 import com.ldb.lms.dto.mypage.RegisterUserDto;
+import com.ldb.lms.dto.mypage.UpdateInfoDto;
 import com.ldb.lms.dto.mypage.UpdatePwDto;
 import com.ldb.lms.service.mypage.MypageService;
 
@@ -41,14 +42,15 @@ public class MypageController {
 		return "mypage/doLogin";
 	}
 	
-	//너무간단한데 이 1문장도 서비스에서 처리??
+
 	@GetMapping("logout")
 	public String callLogout(HttpServletRequest request) {
 		mypageService.logout(request);
-		return "mypage/doLogin";
+		//String path = request.getContextPath();
+		System.out.println("Redirecting to /mypage/doLogin");
+		return "redirect:/mypage/doLogin";		
 	}
-	
-	
+		
 	@PostMapping("login")
 	public String login(@RequestParam String id , @RequestParam String password ,HttpServletRequest request) {
 		Map<String,String> login = mypageService.login(id,password,request);
@@ -73,31 +75,30 @@ public class MypageController {
 	
 	@PostMapping("findPwProcess")
 	public String findPwProcess(@ModelAttribute FindPwDto dto,HttpServletRequest request) {
-		if(mypageService.findPwProcess(dto,request)) {
+		/*if(mypageService.findPwProcess(dto,request)) {
 			return "mypage/updatePw";
-		}
+		}*/
+		mypageService.findPwProcess(dto,request);
 		return "mypage/findPw";
 	}
 	
-	@GetMapping("updatePw")
+	@PostMapping("updatePw")
 	public String callUpdatePw() {
 		return "mypage/updatePw";
 	}
 	
 	@PostMapping("changePw")
 	public String callChangePw(@ModelAttribute UpdatePwDto dto,HttpServletRequest request) {
+		System.out.println("dto :::"+dto);
 		mypageService.changePw(dto,request);
 		return "mypage/updatePw";
 	}
-	
-	
-	
+		
 	@GetMapping("registerUser")
 	public String callRegisterUser(HttpServletRequest request) {
 		mypageService.getDeptAll(request);
 		return "mypage/registerUser";
 	}
-	
 	
 	@GetMapping("registerImg")
 	public String callRegisterImg(HttpServletRequest request) {
@@ -123,14 +124,43 @@ public class MypageController {
 	@PostMapping("registerSuccess")
 	public String registerSuccess(HttpServletRequest request){
 		//어차피 회원가입성공 시 모든세션정보를 서비스 내에서 날림
-		/*if(mypageService.registerSuccess(request)) {
-			return "mypage/doLogin";
-		}
-		return "mypage/registerUser";*/
+		/*
+		if(mypageService.registerSuccess(request)) {
+			return "mypage/doLogin";}
+		return "mypage/registerUser";
+		*/
 		mypageService.registerSuccess(request);
 		return "mypage/registerUser";
 	}
 	
+	@GetMapping("userInfo")
+	public String getUserInfo(HttpServletRequest request){
+		return "mypage/userInfo";
+	}
+	
+	@GetMapping("updateEmail")
+	public String updateEmail(HttpServletRequest request){
+		return "mypage/updateEmail";
+	}
+	
+	@GetMapping("updatePhone")
+	public String updatePhone(HttpServletRequest request){
+		return "mypage/updatePhone";
+	}
+	
+	@PostMapping("userUpdate")
+	public String userUpdate(HttpServletRequest request
+			, @ModelAttribute UpdateInfoDto dto){
+		String id = (String)request.getSession().getAttribute("login");
+		dto.setId(id);
+		if(!mypageService.userUpdate(dto,request)) {
+			request.setAttribute("msg", "변경 실패");
+		}
+		else {
+			request.setAttribute("msg", "변경 성공");
+		}
+		return "mypage/userInfo";
+	}
 	
 	
 	

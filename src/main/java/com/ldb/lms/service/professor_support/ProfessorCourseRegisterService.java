@@ -3,10 +3,12 @@ package com.ldb.lms.service.professor_support;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.ldb.lms.domain.Course;
 import com.ldb.lms.domain.CourseTime;
 import com.ldb.lms.dto.professor_support.RegistCourseDto;
+import com.ldb.lms.exception.CourseRegistrationException;
 import com.ldb.lms.mapper.learning_support.CourseMapper;
 import com.ldb.lms.mapper.professor_support.ConvertDtoMapper;
 import com.ldb.lms.mapper.professor_support.ProfessorCourseMapper;
@@ -31,32 +33,57 @@ public class ProfessorCourseRegisterService {
 			this.professorCourseMapper = professorCourseMapper;
 		}
 	
+	public String getProfessorName(String professorId) {
+		String professorName = professorCourseMapper.getProfessorNameById(professorId);
+        if (!StringUtils.hasText(professorName)) {
+            log.warn("사용자 정보가 존재하지 않습니다. {}", professorId);
+            throw new CourseRegistrationException("user.not.found");
+        }
+        return professorName; 
+	}	
+	
 	@Transactional
 	public void insertCourseAndCourseTime(RegistCourseDto rDto) {
 		
-		try {
-			long maxCourseId = professorCourseMapper.getMaxcourseIdNumber();
-			long maxCtId = professorCourseMapper.getMaxcourseTimeIdNumber();
-			String courseId = "C" + (++maxCourseId);
-			String courseTimeId = "CT" + (++maxCtId);
-			rDto.setCourseId(courseId);
-			rDto.setCourseTimeId(courseTimeId);
-			Course course =  convertMapper.toCourse(rDto);
-			CourseTime courseTime =  convertMapper.toCourseTime(rDto);
-			professorCourseMapper.insertCourseInfo(course);
-			professorCourseMapper.insertCourseTime(courseTime);
-		} catch(Exception e) {
-			log.error("강의 생성중 오류 발생. {}", rDto, e);
-			throw new RuntimeException("Course insert failed", e);
-		}
+		// 시간 검증
+        String[] startTimeParts = rDto.getCourseTimeStart().split(":");
+        String[] endTimeParts = rDto.getCourseTimeEnd().split(":");
+        int startHour = Integer.parseInt(startTimeParts[0]);
+        int endHour = Integer.parseInt(endTimeParts[0]);
+        
+        if (startHour < 9 || startHour > 17 || endHour < 9 || endHour > 17) {
+            throw new CourseRegistrationException("course.time.invalid");
+        }
+        if (startHour >= endHour) {
+            throw new CourseRegistrationException("course.time.invalid");
+        }
+		
+	
+		long maxCourseId = professorCourseMapper.getMaxcourseIdNumber();
+		long maxCtId = professorCourseMapper.getMaxcourseTimeIdNumber();
+		String courseId = "C" + (++maxCourseId);
+		String courseTimeId = "CT" + (++maxCtId);
+		rDto.setCourseId(courseId);
+		rDto.setCourseTimeId(courseTimeId);
+		Course course =  convertMapper.toCourse(rDto);
+		CourseTime courseTime =  convertMapper.toCourseTime(rDto);
+		professorCourseMapper.insertCourseInfo(course);
+		professorCourseMapper.insertCourseTime(courseTime);
     }
 
 	
-
-	
-
-   
-
-	
-	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

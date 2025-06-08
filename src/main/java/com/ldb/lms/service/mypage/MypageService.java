@@ -24,6 +24,7 @@ import com.ldb.lms.dto.mypage.LoginDto;
 import com.ldb.lms.dto.mypage.Professor;
 import com.ldb.lms.dto.mypage.RegisterUserDto;
 import com.ldb.lms.dto.mypage.Student;
+import com.ldb.lms.dto.mypage.UpdateInfoDto;
 import com.ldb.lms.dto.mypage.UpdatePwDto;
 import com.ldb.lms.mapper.mypage.DeptMapper;
 import com.ldb.lms.mapper.mypage.ProStuMapper;
@@ -31,6 +32,7 @@ import com.ldb.lms.mapper.mypage.ProfessorMapper;
 import com.ldb.lms.mapper.mypage.StudentMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 ;
 
@@ -354,7 +356,7 @@ public class MypageService {
 	}
 
 
-	/*public boolean index(HttpServletRequest request) {
+	public boolean index(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		String dbId = (String)session.getAttribute("login");
 		if(dbId==null) {
@@ -376,11 +378,15 @@ public class MypageService {
 		}
 		return false;
 
-	}*/
+	}
 
 
 	public void logout(HttpServletRequest request) {
-		request.getSession().invalidate();
+		HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+            System.out.println("Session invalidated");
+        }
 	}
 
 
@@ -395,13 +401,13 @@ public class MypageService {
 	}
 
 
-	public boolean findPwProcess(FindPwDto dto, HttpServletRequest request) {
+	public void findPwProcess(FindPwDto dto, HttpServletRequest request) {
 		String pass = proStuMapper.findPw(dto);
 		String id = dto.getId();
 		String email = dto.getEmail();
 		if(pass==null) {
 			request.setAttribute("msg", "입력하신정보가 맞지않아요");
-			return false;
+			return;
 		}
 		else {
 			//임시비번
@@ -416,14 +422,15 @@ public class MypageService {
 				sDto.setNewPw(hashPw);
 				if(proStuMapper.updateStuPw(sDto)<1) {
 					request.setAttribute("msg", "임시비밀번호 업데이트실패");
-					return false;
+					return;
 				}
 				else {
 					//업데이트성공시 (해쉬처리 전의 임시비밀번호를 이메일로 보내준다)
 					EmailUtil.sendTempPw(email, id, tempPw);
 					request.setAttribute("id", id);
 					request.setAttribute("email", email);//updatePw에서사용
-					return true;
+					request.setAttribute("msg", "success");
+					return ;
 				}
 			}
 			else if(id.contains("P")) {
@@ -432,17 +439,18 @@ public class MypageService {
 				pDto.setNewPw(hashPw);
 				if(proStuMapper.updateProPw(pDto)<1) {
 					request.setAttribute("msg", "임시비밀번호 업데이트실패");
-					return false;
+					return;
 				}
 				else {
 					//업데이트성공시 (해쉬처리 전의 임시비밀번호를 이메일로 보내준다)
 					EmailUtil.sendTempPw(email, id, tempPw);
 					request.setAttribute("id", id);
 					request.setAttribute("email", email);
-					return true;
+					request.setAttribute("msg", "success");
+					return;
 				}
 			}
-			return false;
+			return;
 		}
 	}
 
@@ -457,6 +465,7 @@ public class MypageService {
 				request.setAttribute("chg", "비밀번호변경 실패");
 			}
 			else {
+				request.getSession().invalidate();//완료했으면 세션지우기
 				request.setAttribute("chg", "비밀번호변경 완료");
 			}
 		}
@@ -465,8 +474,35 @@ public class MypageService {
 				request.setAttribute("chg", "비밀번호변경 실패");
 			}
 			else {
+				request.getSession().invalidate();//완료했으면 세션지우기
 				request.setAttribute("chg", "비밀번호변경 완료");
 			}
+		}
+	}
+
+
+	public boolean userUpdate(UpdateInfoDto dto,HttpServletRequest request) {
+		System.out.println("dto :::: "+dto);
+		if(dto.getId().contains("S")) {
+			int updateStuInfo = proStuMapper.updateStuInfo(dto);
+			System.out.println("dtoUpdate L "+updateStuInfo);
+			if(updateStuInfo<1) {
+				return false;	
+			}
+			else {
+				return true;
+			}
+		}
+		else if(dto.getId().contains("P")) {
+			if(proStuMapper.updateProInfo(dto)<1) {
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+		else {
+			return false;
 		}
 	}
 }
