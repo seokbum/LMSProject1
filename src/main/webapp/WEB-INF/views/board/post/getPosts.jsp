@@ -112,18 +112,18 @@
                         <label for="searchType" class="form-label">검색 조건</label>
                         <select name="searchType" id="searchType" class="form-select">
                             <option value="">전체</option>
-                            <option value="userName" <c:if test="${searchDto.searchType == 'userName'}">selected</c:if>>작성자</option>
-                            <option value="postTitle" <c:if test="${searchDto.searchType == 'postTitle'}">selected</c:if>>제목</option>
-                            <option value="postContent" <c:if test="${searchDto.searchType == 'postContent'}">selected</c:if>>내용</option>
-                            <option value="postTitle,userName" <c:if test="${searchDto.searchType == 'postTitle,userName'}">selected</c:if>>제목+작성자</option>
-                            <option value="postTitle,postContent" <c:if test="${searchDto.searchType == 'postTitle,postContent'}">selected</c:if>>제목+내용</option>
-                            <option value="userName,postContent" <c:if test="${searchDto.searchType == 'userName,postContent'}">selected</c:if>>작성자+내용</option>
-                            <option value="postTitle,userName,postContent" <c:if test="${searchDto.searchType == 'postTitle,userName,postContent'}">selected</c:if>>제목+작성자+내용</option>
+                            <option value="userName" <c:if test="${search.searchType == 'userName'}">selected</c:if>>작성자</option>
+                            <option value="postTitle" <c:if test="${search.searchType == 'postTitle'}">selected</c:if>>제목</option>
+                            <option value="postContent" <c:if test="${search.searchType == 'postContent'}">selected</c:if>>내용</option>
+                            <option value="postTitle,userName" <c:if test="${search.searchType == 'postTitle,userName'}">selected</c:if>>제목+작성자</option>
+                            <option value="postTitle,postContent" <c:if test="${search.searchType == 'postTitle,postContent'}">selected</c:if>>제목+내용</option>
+                            <option value="userName,postContent" <c:if test="${search.searchType == 'userName,postContent'}">selected</c:if>>작성자+내용</option>
+                            <option value="postTitle,userName,postContent" <c:if test="${search.searchType == 'postTitle,userName,postContent'}">selected</c:if>>제목+작성자+내용</option>
                         </select>
                     </div>
                     <div class="col-md-6">
                         <label for="searchKeyword" class="form-label">검색어</label>
-                        <input type="text" name="searchKeyword" id="searchKeyword" class="form-control" value="${fn:escapeXml(searchDto.searchKeyword)}" placeholder="검색어를 입력하세요">
+                        <input type="text" name="searchKeyword" id="searchKeyword" class="form-control" value="${fn:escapeXml(search.searchKeyword)}" placeholder="검색어를 입력하세요">
                     </div>
                     <div class="col-md-3">
                         <label class="form-label"> </label>
@@ -143,8 +143,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <c:if test="${not empty notices}">
-                        <c:forEach var="notice" items="${notices}">
+                    <%-- 공지사항 목록 --%>
+                    <c:if test="${not empty noticeList}"> 
+                        <c:forEach var="notice" items="${noticeList}"> <%-- 'notices'를 'noticeList'로 변경 --%>
                             <tr class="notice-row">
                                 <td>공지</td>
                                 <td>
@@ -169,9 +170,10 @@
                         </c:forEach>
                     </c:if>
 
+                    <%-- 일반 게시글 목록 --%>
                     <c:choose>
-                        <c:when test="${not empty posts}">
-                            <c:forEach var="post" items="${posts}" varStatus="status">
+                        <c:when test="${not empty postList}"> <%-- 'posts'를 'postList'로 변경 --%>
+                            <c:forEach var="post" items="${postList}" varStatus="status"> <%-- 'posts'를 'postList'로 변경 --%>
                                 <tr>
                                     <td><c:out value="${pagination.totalRows - (pagination.offset + status.index)}"/></td>
                                     <td>
@@ -201,7 +203,9 @@
                             </c:forEach>
                         </c:when>
                         <c:otherwise>
-                            <c:if test="${empty notices}"> <tr>
+                          
+                            <c:if test="${empty noticeList}"> 
+                                <tr>
                                     <td colspan="5" class="text-center">게시물이 없습니다.</td>
                                 </tr>
                             </c:if>
@@ -218,26 +222,26 @@
                     <ul class="pagination justify-content-center">
                         <li class="page-item <c:if test="${pagination.currentPage <= 1}">disabled</c:if>">
                             <a class="page-link" href="<c:url value='/post/getPosts'>
-                                <c:param name='pageNum' value='${pagination.currentPage - 1}' />
-                                <c:param name='searchType' value='${fn:escapeXml(searchDto.searchType)}' />
-                                <c:param name='searchKeyword' value='${fn:escapeXml(searchDto.searchKeyword)}' />
-                                <c:param name='postType' value='post' /> </c:url>">이전</a>
+                                <c:param name='currentPage' value='${pagination.currentPage - 1}' /> <%-- pageNum 대신 currentPage 사용 --%>
+                                <c:param name='searchType' value='${fn:escapeXml(search.searchType)}' /> <%-- searchDto 대신 search 사용 --%>
+                                <c:param name='searchKeyword' value='${fn:escapeXml(search.searchKeyword)}' /> <%-- searchDto 대신 search 사용 --%>
+                                </c:url>">이전</a>
                         </li>
                         <c:forEach var="i" begin="${pagination.startPage}" end="${pagination.endPage}">
                             <li class="page-item <c:if test="${i == pagination.currentPage}">active</c:if>">
                                 <a class="page-link" href="<c:url value='/post/getPosts'>
-                                    <c:param name='pageNum' value='${i}' />
-                                    <c:param name='searchType' value='${fn:escapeXml(searchDto.searchType)}' />
-                                    <c:param name='searchKeyword' value='${fn:escapeXml(searchDto.searchKeyword)}' />
-                                    <c:param name='postType' value='post' /> </c:url>">${i}</a>
+                                    <c:param name='currentPage' value='${i}' /> <%-- pageNum 대신 currentPage 사용 --%>
+                                    <c:param name='searchType' value='${fn:escapeXml(search.searchType)}' /> <%-- searchDto 대신 search 사용 --%>
+                                    <c:param name='searchKeyword' value='${fn:escapeXml(search.searchKeyword)}' /> <%-- searchDto 대신 search 사용 --%>
+                                    </c:url>">${i}</a>
                             </li>
                         </c:forEach>
                         <li class="page-item <c:if test="${pagination.currentPage >= pagination.totalPages}">disabled</c:if>">
                             <a class="page-link" href="<c:url value='/post/getPosts'>
-                                <c:param name='pageNum' value='${pagination.currentPage + 1}' />
-                                <c:param name='searchType' value='${fn:escapeXml(searchDto.searchType)}' />
-                                <c:param name='searchKeyword' value='${fn:escapeXml(searchDto.searchKeyword)}' />
-                                <c:param name='postType' value='post' /> </c:url>">다음</a>
+                                <c:param name='currentPage' value='${pagination.currentPage + 1}' /> <%-- pageNum 대신 currentPage 사용 --%>
+                                <c:param name='searchType' value='${fn:escapeXml(search.searchType)}' /> <%-- searchDto 대신 search 사용 --%>
+                                <c:param name='searchKeyword' value='${fn:escapeXml(search.searchKeyword)}' /> <%-- searchDto 대신 search 사용 --%>
+                                </c:url>">다음</a>
                         </li>
                     </ul>
                 </nav>

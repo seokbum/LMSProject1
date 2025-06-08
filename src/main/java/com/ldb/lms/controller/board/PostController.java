@@ -1,98 +1,82 @@
 package com.ldb.lms.controller.board;
 
-import com.ldb.lms.dto.board.post.PostDto;
+import java.util.Map;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
+import jakarta.servlet.http.HttpSession;
+
 import com.ldb.lms.dto.board.post.PostPaginationDto;
 import com.ldb.lms.dto.board.post.PostSearchDto;
 import com.ldb.lms.service.board.PostService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession; 
+
 @Slf4j
 @Controller
-@RequestMapping("/post") 
+@RequestMapping("/post")
 @RequiredArgsConstructor
 public class PostController {
 
     private final PostService postService;
 
-    @GetMapping("getPosts")
+    @GetMapping("/getPosts")
     public String getPosts(
             @ModelAttribute PostSearchDto searchDto,
             @ModelAttribute PostPaginationDto pageDto,
-            @RequestParam(value = "postType", defaultValue = "post") String postType,
-            HttpServletRequest request,
             Model model) {
-        String authorId = "P001"; // 테스트용 하드코딩
-        if (pageDto.getItemsPerPage() == null) {
-            pageDto.setItemsPerPage(10);
-        }
-        if (pageDto.getCurrentPage() == null || pageDto.getCurrentPage() < 1) {
-            pageDto.setCurrentPage(1);
-        }
-        return postService.preparePostsView(searchDto, pageDto, postType, authorId, model);
+        log.info("getPosts 호출 - searchType: {}, searchKeyword: {}, currentPage: {}",
+                 searchDto.getSearchType(), searchDto.getSearchKeyword(), pageDto.getCurrentPage());
+        
+        Map<String, Object> pageData = postService.getPostsPageData(searchDto, pageDto);
+        
+        model.addAllAttributes(pageData);
+
+        return "board/post/getPosts";
     }
 
-    @GetMapping("createPost")
-    public String createPost(
-            HttpServletRequest request,
-            Model model) {
-        String authorId = "P001"; // 테스트용 하드코딩
-        return postService.prepareCreatePostView(authorId, model);
+    @GetMapping("/getPostDetail")
+    public String getPostDetail(@RequestParam("postId") String postId, Model model) {
+        log.info("getPostDetail 호출 - postId: {}", postId);
+        Map<String, Object> postData = postService.getPostDetailData(postId);
+        model.addAllAttributes(postData); 
+        return "board/post/getPostDetail";
     }
 
-    @GetMapping("updatePost")
-    public String updatePost(
-            @RequestParam("postId") String postId,
-            HttpServletRequest request,
-            Model model) {
-        String authorId = "P001"; // 테스트용 하드코딩
-        return postService.prepareUpdatePostView(postId, authorId, model);
+    @GetMapping("/createPost")
+    public String createPostForm(Model model, HttpSession session) {
+        log.info("createPostForm 호출");
+        Map<String, Object> formData = postService.getCreatePostFormData(session);
+        model.addAllAttributes(formData);
+        return "board/post/createPost";
     }
 
-    @GetMapping("getPostDetail")
-    public String getPostDetail(
-            @RequestParam("postId") String postId,
-            @RequestParam(value = "readcnt", defaultValue = "") String readcnt,
-            HttpServletRequest request,
-            Model model) {
-        String authorId = "P001"; // 테스트용 하드코딩
-        return postService.preparePostDetailView(postId, readcnt, authorId, model);
+    @GetMapping("/updatePost")
+    public String updatePostForm(@RequestParam("postId") String postId, Model model, HttpSession session) {
+        log.info("updatePostForm 호출 - postId: {}", postId);
+        Map<String, Object> formData = postService.getUpdatePostFormData(postId, session);
+        model.addAllAttributes(formData);
+        return "board/post/updatePost";
     }
 
-    @GetMapping("replyPost")
-    public String replyPost(
-            @RequestParam("postId") String postId,
-            HttpServletRequest request,
-            Model model) {
-        String authorId = "P001"; // 테스트용 하드코딩
-        return postService.prepareReplyPostView(postId, authorId, model);
+    @GetMapping("/deletePost")
+    public String deletePostConfirm(@RequestParam("postId") String postId, Model model, HttpSession session) {
+        log.info("deletePostConfirm 호출 - postId: {}", postId);
+        Map<String, Object> formData = postService.getDeletePostFormData(postId, session);
+        model.addAllAttributes(formData);
+        return "board/post/deletePost";
     }
 
-  
-    @GetMapping("deletePost") 
-    public String showDeletePost( 
-            @RequestParam("postId") String postId,
-            HttpServletRequest request,
-            Model model) {
-        String authorId = "P001"; 
-       
-        return postService.prepareDeletePostView(postId, authorId, model);
-    }
-
-    
-    @PostMapping("delete") 
-    public String deletePost( 
-            @RequestParam("postId") String postId,
-            @RequestParam("pass") String password,
-            HttpSession session, 
-            HttpServletRequest request, 
-            Model model) { 
-        String authorId = "P001"; // 테스트용 하드코딩 (실제로는 session에서 가져옴)
-        String redirectUrl = postService.handleDeletePostByForm(postId, password, authorId, request, model);
-        return redirectUrl;
+    @GetMapping("/replyPost")
+    public String replyPostForm(@RequestParam("postId") String postId, Model model, HttpSession session) {
+        log.info("replyPostForm 호출 - parentPostId: {}", postId);
+        Map<String, Object> formData = postService.getReplyPostFormData(postId, session);
+        model.addAllAttributes(formData);
+        return "board/post/replyPost";
     }
 }

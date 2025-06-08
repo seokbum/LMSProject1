@@ -11,39 +11,39 @@ import java.util.Map;
 @Mapper
 public interface PostMapper {
 
-    String getLastPostId();
-
-    String getLastCommentId();
-
-    Integer getMaxGroup(); // 
-
-    void insertPost(PostDto postDto);
-
-    void updatePost(PostDto postDto);
-
-    void deletePost(String postId);
-
-    void deleteCommentsByPostId(String postId);
-
-    void incrementReadCount(String postId);
-
-    PostDto getPost(String postId);
-
-    List<PostDto> listPosts(Map<String, Object> param);
-
     List<PostDto> listNotices(PostSearchDto searchDto);
-
+    
+    List<PostDto> listPosts(Map<String, Object> params);
+    
     Integer countPosts(PostSearchDto searchDto);
-
-    void updateGroupStep(Map<String, Object> param);
-
+    
+    PostDto getPost(String postId);
+    
+    String getLastPostId(); 
+    
+    Integer getMaxGroup();
+    
+    void insertPost(PostDto postDto);
+    
+    void updatePost(PostDto postDto);
+    
+    void deletePost(String postId);
+    
+    void incrementReadCount(String postId);
+    
+    void updateGroupStep(Map<String, Object> param); 
+    
+    String getLastCommentId();
+    
     void insertComment(CommentDto commentDto);
-
+    
     void updateComment(CommentDto commentDto);
-
+    
     void deleteComment(String commentId);
-
+    
+    void deleteCommentsByPostId(String postId); 
+    
     CommentDto selectComment(String commentId);
-
+    
     List<CommentDto> selectCommentList(String postId);
 }

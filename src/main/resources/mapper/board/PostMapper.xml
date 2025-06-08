@@ -2,19 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ldb.lms.mapper.board.PostMapper">
 
-    <!-- 게시물 목록을 조회합니다. -->
     <select id="listPosts" parameterType="map" resultType="PostDto">
         SELECT
             p.post_id,
             p.author_id,
-            COALESCE(s.student_name, pr.professor_name) AS user_name,
+            COALESCE(s.student_name, pr.professor_name) AS userName,
             p.post_title,
             p.post_content,
             p.post_password,
             p.post_group,
             p.post_group_level,
             p.post_group_step,
-            p.post_file AS existing_file_path,
+            p.post_file AS existingFilePath,
             p.post_read_count,
             p.post_created_at,
             p.post_updated_at,
@@ -51,9 +50,9 @@
                     </when>
                     <when test="searchDto.searchType == 'postTitle,userName,postContent'">
                         AND (p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                             OR s.student_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                             OR pr.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                             OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
+                            OR s.student_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                            OR pr.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                            OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
                     </when>
                 </choose>
             </if>
@@ -61,23 +60,22 @@
                 AND p.post_notice = #{searchDto.postNotice}
             </if>
         </where>
-        ORDER BY p.post_notice DESC, p.post_id DESC
+        ORDER BY p.post_group DESC, p.post_group_step ASC
         LIMIT #{pageDto.itemsPerPage} OFFSET #{pageDto.offset}
     </select>
 
-    <!-- 공지사항 목록을 조회합니다. -->
     <select id="listNotices" parameterType="PostSearchDto" resultType="PostDto">
         SELECT
             p.post_id,
             p.author_id,
-            COALESCE(s.student_name, pr.professor_name) AS user_name,
+            COALESCE(s.student_name, pr.professor_name) AS userName,
             p.post_title,
             p.post_content,
             p.post_password,
             p.post_group,
             p.post_group_level,
             p.post_group_step,
-            p.post_file AS existing_file_path,
+            p.post_file AS existingFilePath,
             p.post_read_count,
             p.post_created_at,
             p.post_updated_at,
@@ -89,7 +87,6 @@
         ORDER BY p.post_id DESC
     </select>
 
-    <!-- 게시물 총 개수를 조회합니다. -->
     <select id="countPosts" parameterType="PostSearchDto" resultType="int">
         SELECT COUNT(*)
         FROM post p
@@ -124,9 +121,9 @@
                     </when>
                     <when test="searchType == 'postTitle,userName,postContent'">
                         AND (p.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
-                             OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%')
-                             OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
-                             OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
+                            OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                            OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
+                            OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
                     </when>
                 </choose>
             </if>
@@ -136,7 +133,6 @@
         </where>
     </select>
 
-    <!-- 새로운 게시물을 삽입합니다. -->
     <insert id="insertPost" parameterType="PostDto">
         INSERT INTO post (
             post_id,
@@ -169,7 +165,6 @@
         )
     </insert>
 
-    <!-- 가장 최근 게시물 ID를 조회합니다. -->
     <select id="getLastPostId" resultType="String">
         SELECT post_id
         FROM post
@@ -177,7 +172,6 @@
         LIMIT 1
     </select>
 
-    <!-- 가장 최근 댓글 ID를 조회합니다. -->
     <select id="getLastCommentId" resultType="String">
         SELECT comment_id
         FROM post_comment
@@ -185,25 +179,23 @@
         LIMIT 1
     </select>
 
-    <!-- 최대 게시물 그룹 ID를 조회합니다. -->
     <select id="getMaxGroup" resultType="Integer">
         SELECT MAX(post_group)
         FROM post
     </select>
 
-    <!-- 특정 게시물의 상세 정보를 조회합니다. -->
     <select id="getPost" parameterType="String" resultType="PostDto">
         SELECT
             p.post_id,
             p.author_id,
-            COALESCE(s.student_name, pr.professor_name) AS user_name,
+            COALESCE(s.student_name, pr.professor_name) AS userName,
             p.post_title,
             p.post_content,
             p.post_password,
             p.post_group,
             p.post_group_level,
             p.post_group_step,
-            p.post_file AS existing_file_path,
+            p.post_file AS existingFilePath,
             p.post_read_count,
             p.post_created_at,
             p.post_updated_at,
@@ -214,26 +206,27 @@
         WHERE p.post_id = #{postId}
     </select>
 
-    <!-- 게시물 조회수를 증가시킵니다. -->
     <update id="incrementReadCount" parameterType="String">
         UPDATE post
         SET post_read_count = post_read_count + 1
         WHERE post_id = #{postId}
     </update>
 
-    <!-- 게시물을 삭제합니다. -->
     <delete id="deletePost" parameterType="String">
         DELETE FROM post
         WHERE post_id = #{postId}
     </delete>
 
-    <!-- 게시물의 댓글을 삭제합니다. -->
     <delete id="deleteCommentsByPostId" parameterType="String">
         DELETE FROM post_comment
         WHERE post_id = #{postId}
     </delete>
 
-    <!-- 게시물을 업데이트합니다. -->
+	<select id="getMaxPostId" resultType="String">
+        SELECT MAX(post_id)
+        FROM post
+    </select>
+
     <update id="updatePost" parameterType="PostDto">
         UPDATE post
         SET
@@ -246,15 +239,13 @@
         WHERE post_id = #{postId}
     </update>
 
-    <!-- 게시물의 그룹 스텝을 업데이트합니다. -->
     <update id="updateGroupStep" parameterType="map">
         UPDATE post
         SET post_group_step = post_group_step + 1
         WHERE post_group = #{postGroup}
-        AND post_group_step >= #{postGroupStep}
+        AND post_group_step > #{postGroupStep}
     </update>
 
-    <!-- 새로운 댓글을 삽입합니다. -->
     <insert id="insertComment" parameterType="CommentDto">
         INSERT INTO post_comment (
             comment_id,
@@ -275,21 +266,12 @@
         )
     </insert>
 
-    <select id="getUserNameByWriterId" parameterType="String" resultType="String">
-        SELECT COALESCE(s.student_name, pr.professor_name) AS writer_name
-        FROM student s
-        LEFT JOIN professor pr ON s.student_id = pr.professor_id
-        WHERE s.student_id = #{writerId} OR pr.professor_id = #{writerId}
-        LIMIT 1
-    </select>    
-    
-    <!-- 특정 게시물의 댓글 목록을 조회합니다. -->
     <select id="selectCommentList" parameterType="String" resultType="CommentDto">
         SELECT
             c.comment_id,
             c.post_id,
             c.writer_id,
-            COALESCE(s.student_name, pr.professor_name) AS writer_name,
+            COALESCE(s.student_name, pr.professor_name) AS writerName,
             c.comment_content,
             c.parent_comment_id,
             c.created_at,
@@ -298,16 +280,15 @@
         LEFT JOIN student s ON c.writer_id = s.student_id
         LEFT JOIN professor pr ON c.writer_id = pr.professor_id
         WHERE c.post_id = #{postId}
-        ORDER BY c.created_at DESC
+        ORDER BY c.created_at ASC
     </select>
-    
-    <!-- 특정 댓글을 조회합니다. -->
+
     <select id="selectComment" parameterType="String" resultType="CommentDto">
         SELECT
             c.comment_id,
             c.post_id,
             c.writer_id,
-            COALESCE(s.student_name, pr.professor_name) AS writer_name,
+            COALESCE(s.student_name, pr.professor_name) AS writerName,
             c.comment_content,
             c.parent_comment_id,
             c.created_at,
@@ -318,7 +299,6 @@
         WHERE c.comment_id = #{commentId}
     </select>
 
-    <!-- 댓글을 업데이트합니다. -->
     <update id="updateComment" parameterType="CommentDto">
         UPDATE post_comment
         SET
@@ -327,7 +307,6 @@
         WHERE comment_id = #{commentId}
     </update>
 
-    <!-- 댓글을 삭제합니다. -->
     <delete id="deleteComment" parameterType="String">
         DELETE FROM post_comment
         WHERE comment_id = #{commentId}
