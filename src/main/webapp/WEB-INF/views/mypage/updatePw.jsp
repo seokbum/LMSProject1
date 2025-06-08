@@ -103,6 +103,10 @@ h4 {
 			<div class="mb-3">
 				<label for="pw" class="form-label">현재 비밀번호</label> <input
 					type="password" class="form-control" id="pw" name="pw">
+				<c:if test="${error!=null}">
+				<font id="errorMessage" style="color: red">${error}</font>
+				</c:if>
+					
 			</div>
 
 			<div class="mb-3">
@@ -144,6 +148,17 @@ h4 {
 			opener.location.href="/mypage/doLogin";
 			window.close();	
 		}
+		
+		//오류메시지발생 후  해당필드에 값 입력시 사라짐
+		const pwInput = document.getElementById('pw');
+		const errorMessage = document.getElementById('errorMessage');
+
+		if (errorMessage) {
+			pwInput.addEventListener('input', function() {
+				errorMessage.style.display = 'none';
+			});
+		}
+		
 		
 
 		function passwordChk(p) {

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
+import com.ldb.lms.dto.mypage.DeleteUserDto;
 import com.ldb.lms.dto.mypage.Dept;
 import com.ldb.lms.dto.mypage.FindIdDto;
 import com.ldb.lms.dto.mypage.FindPwDto;
@@ -456,28 +457,42 @@ public class MypageService {
 
 
 	public void changePw(UpdatePwDto dto,HttpServletRequest request) {
+		FindPwDto pwDto = new FindPwDto();
 		String id = dto.getId();
-		String newPw = dto.getNewPw();
-		String hashpw = BCrypt.hashpw(newPw, BCrypt.gensalt());
-		dto.setNewPw(hashpw); //암호화된 비밀번호로 업데이트
-		if(id.contains("S")) {
-			if(proStuMapper.updateStuPw(dto)<1) {
-				request.setAttribute("chg", "비밀번호변경 실패");
+		pwDto.setEmail(dto.getEmail());
+		pwDto.setId(id);
+		String pw = proStuMapper.findPw(pwDto); //입력한비밀번호와 DB의비밀번호비교
+		
+		if(BCrypt.checkpw(dto.getPw(), pw)) {
+			String newPw = dto.getNewPw();
+			String hashpw = BCrypt.hashpw(newPw, BCrypt.gensalt());
+			dto.setNewPw(hashpw); //암호화된 비밀번호로 업데이트
+			if(id.contains("S")) {
+				if(proStuMapper.updateStuPw(dto)<1) {
+					request.setAttribute("chg", "비밀번호변경 실패");
+				}
+				else {
+					request.getSession().invalidate();//완료했으면 세션지우기
+					request.setAttribute("chg", "비밀번호변경 완료");
+				}
 			}
 			else {
-				request.getSession().invalidate();//완료했으면 세션지우기
-				request.setAttribute("chg", "비밀번호변경 완료");
+				if(proStuMapper.updateProPw(dto)<1) {
+					request.setAttribute("chg", "비밀번호변경 실패");
+				}
+				else {
+					request.getSession().invalidate();//완료했으면 세션지우기
+					request.setAttribute("chg", "비밀번호변경 완료");
+				}
 			}
 		}
+		//존재하지않는 비밀번호입력 시
 		else {
-			if(proStuMapper.updateProPw(dto)<1) {
-				request.setAttribute("chg", "비밀번호변경 실패");
-			}
-			else {
-				request.getSession().invalidate();//완료했으면 세션지우기
-				request.setAttribute("chg", "비밀번호변경 완료");
-			}
+			request.setAttribute("error", "현재비밀번호가 잘못작성됨");
 		}
+		
+		
+		
 	}
 
 
@@ -504,5 +519,25 @@ public class MypageService {
 		else {
 			return false;
 		}
+	}
+
+
+	public void deleteUser(HttpServletRequest request, DeleteUserDto dto) {
+		/*FindPwDto pwDto = new FindPwDto();
+		pwDto.setEmail(dto.getStudentEmail());
+		pwDto.setId(dto.getStudentId());
+		String pw = proStuMapper.findPw(pwDto);
+		//비밀번호검증
+		if(BCrypt.checkpw(dto.getPw(), pw)){
+			dto.setStudentStatus("퇴학");
+			studentMapper.deleteUser(dto);	
+		}
+		else {
+			
+		}*/
+		
+		
+	
+		
 	}
 }

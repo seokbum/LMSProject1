@@ -15,6 +15,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/professors/**")
                 .addPathPatterns("/api/learning_support/**")
                 .addPathPatterns("/learning_support/**")
+                .addPathPatterns("/mypage/userInfo")
+                .addPathPatterns("/mypage/updatePhone")
+                .addPathPatterns("/mypage/updateEmail")
                 .excludePathPatterns("/", "/login", "/css/**", "/js/**");
     }
 }

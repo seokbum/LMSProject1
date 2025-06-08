@@ -20,14 +20,14 @@ public class HomeController {
 	private final MypageService mypageService;
 	
     @GetMapping("/")
-    public String home(HttpServletRequest request,  Model model) {
-    	/*mypageService.index(request);
-    	return "index";*/
+    public String home(HttpServletRequest request,  Model model) {  
     	if(mypageService.index(request)) {
     		return "index";
     	}
     	else {
-    		return "redirect:mypage/doLogin";
+    		request.setAttribute("msg", "로그인하세요");
+    		request.setAttribute("url", "mypage/doLogin");
+    		return "alert";
     	}
         
     }
