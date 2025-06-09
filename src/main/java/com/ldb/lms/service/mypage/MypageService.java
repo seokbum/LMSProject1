@@ -523,18 +523,20 @@ public class MypageService {
 
 
 	public void deleteUser(HttpServletRequest request, DeleteUserDto dto) {
-		/*FindPwDto pwDto = new FindPwDto();
+		FindPwDto pwDto = new FindPwDto();
 		pwDto.setEmail(dto.getStudentEmail());
 		pwDto.setId(dto.getStudentId());
 		String pw = proStuMapper.findPw(pwDto);
 		//비밀번호검증
 		if(BCrypt.checkpw(dto.getPw(), pw)){
 			dto.setStudentStatus("퇴학");
-			studentMapper.deleteUser(dto);	
+			if(studentMapper.deleteUser(dto)>=1) {
+				request.getSession().invalidate();
+				return;
+			}
 		}
-		else {
-			
-		}*/
+			request.setAttribute("msg", "입력오류");
+			return;
 		
 		
 	

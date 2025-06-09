@@ -10,7 +10,4 @@ public class DeleteUserDto {
 	private String studentStatus;
 	private String studentEmail;
 	private String pw;
-	
-	
-	
 }

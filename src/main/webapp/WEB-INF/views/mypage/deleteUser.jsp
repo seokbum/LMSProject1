@@ -105,7 +105,7 @@ h4 {
 <body>
 	<div class="card">
 		<h4 class="text-center mb-4">자퇴 form</h4>
-		<form action="delete" method="post">
+		<form action="deleteUser" method="post">
 
 			<div class="mb-3">
 				<label for="id" class="form-label">아이디</label> <input type="text"
