@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.ldb.lms.dto.mypage.DeleteUserDto;
 import com.ldb.lms.dto.mypage.FindIdDto;
 import com.ldb.lms.dto.mypage.FindPwDto;
 import com.ldb.lms.dto.mypage.RegisterUserDto;
@@ -160,6 +161,18 @@ public class MypageController {
 			request.setAttribute("msg", "변경 성공");
 		}
 		return "mypage/userInfo";
+	}
+	
+	@GetMapping("deleteUser")
+	public String callDeleteUser(HttpServletRequest request){
+		mypageService.getDeptAll(request);
+		return "mypage/deleteUser";
+	}
+	
+	@PostMapping("deleteUser")
+	public String postDeleteUser(HttpServletRequest request,@ModelAttribute DeleteUserDto dto){
+		mypageService.deleteUser(request,dto);
+		return "mypage/deleteUser";
 	}
 	
 	
