@@ -104,9 +104,9 @@ h4 {
 </head>
 <body>
 	<div class="card">
-		<h4 class="text-center mb-4">자퇴 form</h4>
+	<c:if test="${msg==null}">
+	<h4 class="text-center mb-4">자퇴 form</h4>
 		<form action="deleteUser" method="post">
-
 			<div class="mb-3">
 				<label for="id" class="form-label">아이디</label> <input type="text"
 					class="form-control" id="id" name="studentId">
@@ -143,13 +143,23 @@ h4 {
 					클릭!</a>
 			</div>
 		</form>
+	</c:if>
+	<c:if test="${msg!=null}">
+		<h3 style="green">${msg}</h3>
+		<button class="btn btn-custom w-100 mb-3" onclick="exit()">나가기</button>
+	</c:if>
+		
 	</div>
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script type="text/javascript">
     function c() {		
 		window.close();	
-}
+		}
+    function exit(){
+		opener.location.href="/";
+		window.close();	
+	}
       
 
     </script>

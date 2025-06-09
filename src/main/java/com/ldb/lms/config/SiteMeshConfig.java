@@ -19,6 +19,7 @@ public class SiteMeshConfig {
                 .addExcludedPath("/mypage/*");
                 
                 builder.addDecoratorPath("/mypage/userInfo", "sitemesh/layout.jsp");
+                builder.addDecoratorPath("/mypage/getCourseTimetable","sitemesh/layout.jsp");
                 
             }
         });

@@ -531,15 +531,13 @@ public class MypageService {
 		if(BCrypt.checkpw(dto.getPw(), pw)){
 			dto.setStudentStatus("퇴학");
 			if(studentMapper.deleteUser(dto)>=1) {
+				EmailUtil.sendDeleteMsg(dto.getStudentEmail(), dto.getStudentName());
 				request.getSession().invalidate();
+				request.setAttribute("msg", "자퇴 완료(이메일 확인바람)");
 				return;
 			}
 		}
 			request.setAttribute("msg", "입력오류");
-			return;
-		
-		
-	
-		
+			return;	
 	}
 }
