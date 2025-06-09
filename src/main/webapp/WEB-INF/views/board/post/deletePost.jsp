@@ -1,61 +1,60 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c"%>
-<%@ taglib uri="jakarta.tags.fmt" prefix="fmt"%>
-<%@ taglib uri="jakarta.tags.functions" prefix="fn"%>
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>게시물 삭제</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .board-container {
-            margin: 30px 0;
-            padding: 20px;
-            width: 100%;
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-        .form-label {
-            font-weight: bold;
-        }
-        .btn-custom {
-            padding: 0.75rem 1.25rem;
-            font-size: 1rem;
-            font-weight: 500;
-        }
-    </style>
 </head>
 <body>
-<div class="board-container">
-    <h1 class="fs-1">게시물 삭제</h1>
-    <form id="deleteForm" action="/post/delete" method="post">
-        <input type="hidden" name="postId" value="${post.postId}">
-        <div class="mb-3">
-            <label for="postPassword" class="form-label">비밀번호</label>
-            <input type="password" class="form-control" id="postPassword" name="postPassword" required>
+<div class="container-fluid">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card card-danger shadow-sm">
+                <div class="card-header">
+                    <h3 class="card-title">게시물 삭제</h3>
+                </div>
+                <form id="deleteForm">
+                    <div class="card-body">
+                        <p>게시물을 삭제하면 복구할 수 없습니다. 계속하시려면 비밀번호를 입력해주세요.</p>
+                        <p><strong>제목:</strong> ${post.postTitle}</p>
+                        <div class="mb-3">
+                            <label for="postPassword" class="form-label">비밀번호</label>
+                            <input type="password" id="postPassword" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <a href="/post/getPostDetail?postId=${post.postId}" class="btn btn-secondary">취소</a>
+                        <button type="submit" class="btn btn-danger">삭제 확인</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="text-end">
-            <button type="submit" class="btn btn-danger btn-custom">삭제</button>
-            <a href="/post/getPostDetail?postId=${post.postId}" class="btn btn-secondary btn-custom">취소</a>
-        </div>
-    </form>
+    </div>
 </div>
-
 <script>
-$(document).ready(function() {
-    $("#deleteForm").submit(function(e) {
+    $('#deleteForm').on('submit', function(e) {
         e.preventDefault();
-        const formData = $(this).serialize();
+        const password = $('#postPassword').val();
+        if (!password) {
+            alert("비밀번호를 입력해주세요.");
+            return;
+        }
+        
+        const url = `/api/post/deletePost/${'${post.postId}'}?postPassword=${encodeURIComponent(password)}`;
+        
         $.ajax({
-            url: "/api/post/delete",
-            type: "POST",
-            data: formData,
-            contentType: "application/x-www-form-urlencoded",
-            success: (response) => { window.location.href = response.redirectUrl; },
-            error: (xhr) => { alert("삭제 중 오류: " + xhr.responseJSON?.error); }
+            url: url,
+            type: 'DELETE',
+            success: (res) => {
+                alert(res.message);
+                window.location.href = res.data;
+            },
+            error: (xhr) => {
+                alert('삭제 실패: ' + (xhr.responseJSON ? xhr.responseJSON.message : "서버 오류"));
+            }
         });
     });
-});
 </script>
 </body>
 </html>

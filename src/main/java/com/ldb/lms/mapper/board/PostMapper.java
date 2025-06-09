@@ -4,36 +4,33 @@ import com.ldb.lms.dto.board.post.CommentDto;
 import com.ldb.lms.dto.board.post.PostDto;
 import com.ldb.lms.dto.board.post.PostSearchDto;
 import org.apache.ibatis.annotations.Mapper;
-
 import java.util.List;
 import java.util.Map;
 
 @Mapper
 public interface PostMapper {
 
-    List<PostDto> listNotices(PostSearchDto searchDto);
-    
-    List<PostDto> listPosts(Map<String, Object> params);
-    
-    Integer countPosts(PostSearchDto searchDto);
-    
-    PostDto getPost(String postId);
-    
-    String getLastPostId(); 
-    
-    Integer getMaxGroup();
-    
     void insertPost(PostDto postDto);
     
     void updatePost(PostDto postDto);
     
     void deletePost(String postId);
     
+    PostDto getPost(String postId);
+    
+    List<PostDto> listPosts(Map<String, Object> params);
+    
+    List<PostDto> listNotices(PostSearchDto noticeSearchDto);
+    
+    int countPosts(PostSearchDto searchDto);
+    
     void incrementReadCount(String postId);
     
-    void updateGroupStep(Map<String, Object> param); 
+    Integer getMaxGroup();
     
-    String getLastCommentId();
+    void updateGroupStep(Map<String, Object> params);
+    
+    String getLastPostId();
     
     void insertComment(CommentDto commentDto);
     
@@ -41,9 +38,11 @@ public interface PostMapper {
     
     void deleteComment(String commentId);
     
-    void deleteCommentsByPostId(String postId); 
+    void deleteCommentsByPostId(String postId);
+    
+    List<CommentDto> selectCommentList(String postId);
     
     CommentDto selectComment(String commentId);
     
-    List<CommentDto> selectCommentList(String postId);
+    String getLastCommentId();
 }

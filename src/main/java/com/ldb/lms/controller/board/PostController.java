@@ -1,19 +1,17 @@
 package com.ldb.lms.controller.board;
 
 import java.util.Map;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import jakarta.servlet.http.HttpSession;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import com.ldb.lms.dto.board.post.PostPaginationDto;
 import com.ldb.lms.dto.board.post.PostSearchDto;
 import com.ldb.lms.service.board.PostService;
-
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,21 +28,30 @@ public class PostController {
             @ModelAttribute PostSearchDto searchDto,
             @ModelAttribute PostPaginationDto pageDto,
             Model model) {
-        log.info("getPosts 호출 - searchType: {}, searchKeyword: {}, currentPage: {}",
-                 searchDto.getSearchType(), searchDto.getSearchKeyword(), pageDto.getCurrentPage());
-        
+        log.info("getPosts 호출 - currentPage: {}", pageDto.getCurrentPage());
         Map<String, Object> pageData = postService.getPostsPageData(searchDto, pageDto);
-        
         model.addAllAttributes(pageData);
+        return "board/post/getPosts";
+    }
 
+    @PostMapping("/searchPosts")
+    public String searchPosts(
+            @ModelAttribute PostSearchDto searchDto,
+            @ModelAttribute PostPaginationDto pageDto,
+            Model model) {
+        log.info("searchPosts 호출 - searchType: {}, searchKeyword: {}", searchDto.getSearchType(), searchDto.getSearchKeyword());
+        pageDto.setCurrentPage(1);
+        Map<String, Object> pageData = postService.getPostsPageData(searchDto, pageDto);
+        model.addAllAttributes(pageData);
         return "board/post/getPosts";
     }
 
     @GetMapping("/getPostDetail")
-    public String getPostDetail(@RequestParam("postId") String postId, Model model) {
+    public String getPostDetail(@RequestParam("postId") String postId, Model model, HttpSession session) {
         log.info("getPostDetail 호출 - postId: {}", postId);
         Map<String, Object> postData = postService.getPostDetailData(postId);
-        model.addAllAttributes(postData); 
+        model.addAllAttributes(postData);
+        model.addAttribute("currentAuthorId", postService.getCurrentUserId(session));
         return "board/post/getPostDetail";
     }
 

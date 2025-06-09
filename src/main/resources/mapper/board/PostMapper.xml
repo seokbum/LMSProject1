@@ -2,83 +2,63 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ldb.lms.mapper.board.PostMapper">
 
+    <sql id="postSearchCondition">
+        <where>
+            <if test="searchKeyword != null and searchKeyword != '' and searchType != null and searchType != ''">
+                AND (
+                <trim prefixOverrides="OR">
+                    <if test="searchType.contains('postTitle')">
+                        p.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </if>
+                    <if test="searchType.contains('postContent')">
+                        OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </if>
+                    <if test="searchType.contains('userName')">
+                        OR COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </if>
+                </trim>
+                )
+            </if>
+            <if test="postNotice != null">
+                AND p.post_notice = #{postNotice}
+            </if>
+        </where>
+    </sql>
+
     <select id="listPosts" parameterType="map" resultType="PostDto">
         SELECT
             p.post_id,
             p.author_id,
             COALESCE(s.student_name, pr.professor_name) AS userName,
             p.post_title,
-            p.post_content,
-            p.post_password,
             p.post_group,
             p.post_group_level,
             p.post_group_step,
-            p.post_file AS existingFilePath,
             p.post_read_count,
             p.post_created_at,
-            p.post_updated_at,
             p.post_notice
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
         LEFT JOIN professor pr ON p.author_id = pr.professor_id
-        <where>
-            <if test="searchDto.searchType != null and searchDto.searchType != ''">
-                <choose>
-                    <when test="searchDto.searchType == 'userName'">
-                        AND (s.student_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                             OR pr.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
-                    </when>
-                    <when test="searchDto.searchType == 'postTitle'">
-                        AND p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                    </when>
-                    <when test="searchDto.searchType == 'postContent'">
-                        AND p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                    </when>
-                    <when test="searchDto.searchType == 'postTitle,userName'">
-                        AND (p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                             OR s.student_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                             OR pr.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
-                    </when>
-                    <when test="searchDto.searchType == 'postTitle,postContent'">
-                        AND (p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                             OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
-                    </when>
-                    <when test="searchDto.searchType == 'userName,postContent'">
-                        AND (s.student_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                             OR pr.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                             OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
-                    </when>
-                    <when test="searchDto.searchType == 'postTitle,userName,postContent'">
-                        AND (p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                            OR s.student_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                            OR pr.professor_name LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
-                            OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%'))
-                    </when>
-                </choose>
-            </if>
-            <if test="searchDto.postNotice != null">
-                AND p.post_notice = #{searchDto.postNotice}
-            </if>
-        </where>
-        ORDER BY p.post_group DESC, p.post_group_step ASC
+        <include refid="postSearchCondition">
+            <property name="searchType" value="${searchDto.searchType}"/>
+            <property name="searchKeyword" value="${searchDto.searchKeyword}"/>
+            <property name="postNotice" value="${searchDto.postNotice}"/>
+        </include>
+        ORDER BY
+            p.post_group DESC,
+            p.post_group_step ASC
         LIMIT #{pageDto.itemsPerPage} OFFSET #{pageDto.offset}
     </select>
-
+    
     <select id="listNotices" parameterType="PostSearchDto" resultType="PostDto">
         SELECT
             p.post_id,
             p.author_id,
             COALESCE(s.student_name, pr.professor_name) AS userName,
             p.post_title,
-            p.post_content,
-            p.post_password,
-            p.post_group,
-            p.post_group_level,
-            p.post_group_step,
-            p.post_file AS existingFilePath,
             p.post_read_count,
             p.post_created_at,
-            p.post_updated_at,
             p.post_notice
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
@@ -86,102 +66,14 @@
         WHERE p.post_notice = 1
         ORDER BY p.post_id DESC
     </select>
-
+    
     <select id="countPosts" parameterType="PostSearchDto" resultType="int">
-        SELECT COUNT(*)
+        SELECT
+            COUNT(*)
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
         LEFT JOIN professor pr ON p.author_id = pr.professor_id
-        <where>
-            <if test="searchType != null and searchType != ''">
-                <choose>
-                    <when test="searchType == 'userName'">
-                        AND (s.student_name LIKE CONCAT('%', #{searchKeyword}, '%')
-                             OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
-                    </when>
-                    <when test="searchType == 'postTitle'">
-                        AND p.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
-                    </when>
-                    <when test="searchType == 'postContent'">
-                        AND p.post_content LIKE CONCAT('%', #{searchKeyword}, '%')
-                    </when>
-                    <when test="searchType == 'postTitle,userName'">
-                        AND (p.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
-                             OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%')
-                             OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%'))
-                    </when>
-                    <when test="searchType == 'postTitle,postContent'">
-                        AND (p.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
-                             OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
-                    </when>
-                    <when test="searchType == 'userName,postContent'">
-                        AND (s.student_name LIKE CONCAT('%', #{searchKeyword}, '%')
-                             OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
-                             OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
-                    </when>
-                    <when test="searchType == 'postTitle,userName,postContent'">
-                        AND (p.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
-                            OR s.student_name LIKE CONCAT('%', #{searchKeyword}, '%')
-                            OR pr.professor_name LIKE CONCAT('%', #{searchKeyword}, '%')
-                            OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%'))
-                    </when>
-                </choose>
-            </if>
-            <if test="postNotice != null">
-                AND p.post_notice = #{postNotice}
-            </if>
-        </where>
-    </select>
-
-    <insert id="insertPost" parameterType="PostDto">
-        INSERT INTO post (
-            post_id,
-            author_id,
-            post_title,
-            post_content,
-            post_password,
-            post_group,
-            post_group_level,
-            post_group_step,
-            post_file,
-            post_read_count,
-            post_created_at,
-            post_updated_at,
-            post_notice
-        ) VALUES (
-            #{postId},
-            #{authorId},
-            #{postTitle},
-            #{postContent},
-            #{postPassword},
-            #{postGroup},
-            #{postGroupLevel},
-            #{postGroupStep},
-            #{existingFilePath},
-            0,
-            NOW(),
-            NOW(),
-            #{postNotice}
-        )
-    </insert>
-
-    <select id="getLastPostId" resultType="String">
-        SELECT post_id
-        FROM post
-        ORDER BY post_id DESC
-        LIMIT 1
-    </select>
-
-    <select id="getLastCommentId" resultType="String">
-        SELECT comment_id
-        FROM post_comment
-        ORDER BY comment_id DESC
-        LIMIT 1
-    </select>
-
-    <select id="getMaxGroup" resultType="Integer">
-        SELECT MAX(post_group)
-        FROM post
+        <include refid="postSearchCondition"/>
     </select>
 
     <select id="getPost" parameterType="String" resultType="PostDto">
@@ -203,29 +95,23 @@
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
         LEFT JOIN professor pr ON p.author_id = pr.professor_id
-        WHERE p.post_id = #{postId}
+        WHERE
+            p.post_id = #{postId}
     </select>
 
-    <update id="incrementReadCount" parameterType="String">
-        UPDATE post
-        SET post_read_count = post_read_count + 1
-        WHERE post_id = #{postId}
-    </update>
-
-    <delete id="deletePost" parameterType="String">
-        DELETE FROM post
-        WHERE post_id = #{postId}
-    </delete>
-
-    <delete id="deleteCommentsByPostId" parameterType="String">
-        DELETE FROM post_comment
-        WHERE post_id = #{postId}
-    </delete>
-
-	<select id="getMaxPostId" resultType="String">
-        SELECT MAX(post_id)
-        FROM post
-    </select>
+    <insert id="insertPost" parameterType="PostDto">
+        INSERT INTO post (
+            post_id, author_id, post_title,
+            post_content, post_password, post_group,
+            post_group_level, post_group_step, post_file,
+            post_read_count, post_created_at, post_updated_at, post_notice
+        ) VALUES (
+            #{postId}, #{authorId}, #{postTitle},
+            #{postContent}, #{postPassword}, #{postGroup},
+            #{postGroupLevel}, #{postGroupStep}, #{existingFilePath},
+            0, NOW(), NOW(), #{postNotice}
+        )
+    </insert>
 
     <update id="updatePost" parameterType="PostDto">
         UPDATE post
@@ -236,79 +122,90 @@
             post_file = #{existingFilePath},
             post_updated_at = NOW(),
             post_notice = #{postNotice}
-        WHERE post_id = #{postId}
+        WHERE
+            post_id = #{postId}
     </update>
 
     <update id="updateGroupStep" parameterType="map">
         UPDATE post
-        SET post_group_step = post_group_step + 1
-        WHERE post_group = #{postGroup}
-        AND post_group_step > #{postGroupStep}
+        SET
+            post_group_step = post_group_step + 1
+        WHERE
+            post_group = #{postGroup} AND post_group_step > #{postGroupStep}
     </update>
 
-    <insert id="insertComment" parameterType="CommentDto">
-        INSERT INTO post_comment (
-            comment_id,
-            post_id,
-            writer_id,
-            comment_content,
-            parent_comment_id,
-            created_at,
-            updated_at
-        ) VALUES (
-            #{commentId},
-            #{postId},
-            #{writerId},
-            #{commentContent},
-            #{parentCommentId},
-            NOW(),
-            NOW()
-        )
-    </insert>
+    <update id="incrementReadCount" parameterType="String">
+        UPDATE post
+        SET
+            post_read_count = post_read_count + 1
+        WHERE
+            post_id = #{postId}
+    </update>
+    
+    <delete id="deletePost" parameterType="String">
+        DELETE FROM post
+        WHERE post_id = #{postId}
+    </delete>
 
+    <select id="getLastPostId" resultType="String">
+        SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1
+    </select>
+
+    <select id="getMaxGroup" resultType="Integer">
+        SELECT MAX(post_group) FROM post
+    </select>
+    
     <select id="selectCommentList" parameterType="String" resultType="CommentDto">
         SELECT
-            c.comment_id,
-            c.post_id,
-            c.writer_id,
+            c.comment_id, c.post_id, c.writer_id,
             COALESCE(s.student_name, pr.professor_name) AS writerName,
-            c.comment_content,
-            c.parent_comment_id,
-            c.created_at,
-            c.updated_at
+            c.comment_content, c.parent_comment_id,
+            c.created_at, c.updated_at
         FROM post_comment c
         LEFT JOIN student s ON c.writer_id = s.student_id
         LEFT JOIN professor pr ON c.writer_id = pr.professor_id
         WHERE c.post_id = #{postId}
         ORDER BY c.created_at ASC
     </select>
-
+    
     <select id="selectComment" parameterType="String" resultType="CommentDto">
         SELECT
-            c.comment_id,
-            c.post_id,
-            c.writer_id,
-            COALESCE(s.student_name, pr.professor_name) AS writerName,
-            c.comment_content,
-            c.parent_comment_id,
-            c.created_at,
-            c.updated_at
-        FROM post_comment c
-        LEFT JOIN student s ON c.writer_id = s.student_id
-        LEFT JOIN professor pr ON c.writer_id = pr.professor_id
-        WHERE c.comment_id = #{commentId}
+            comment_id, post_id, writer_id, comment_content
+        FROM post_comment
+        WHERE comment_id = #{commentId}
     </select>
-
+    
+    <insert id="insertComment" parameterType="CommentDto">
+        INSERT INTO post_comment (
+            comment_id, post_id, writer_id,
+            comment_content, parent_comment_id,
+            created_at, updated_at
+        ) VALUES (
+            #{commentId}, #{postId}, #{writerId},
+            #{commentContent}, #{parentCommentId},
+            NOW(), NOW()
+        )
+    </insert>
+    
     <update id="updateComment" parameterType="CommentDto">
         UPDATE post_comment
         SET
             comment_content = #{commentContent},
             updated_at = NOW()
-        WHERE comment_id = #{commentId}
+        WHERE
+            comment_id = #{commentId}
     </update>
-
+    
     <delete id="deleteComment" parameterType="String">
-        DELETE FROM post_comment
-        WHERE comment_id = #{commentId}
+        DELETE FROM post_comment WHERE comment_id = #{commentId}
     </delete>
+    
+    <delete id="deleteCommentsByPostId" parameterType="String">
+        DELETE FROM post_comment WHERE post_id = #{postId}
+    </delete>
+    
+    <select id="getLastCommentId" resultType="String">
+        SELECT comment_id FROM post_comment ORDER BY comment_id DESC LIMIT 1
+    </select>
+    
 </mapper>
