@@ -175,6 +175,11 @@ public class MypageController {
 		return "mypage/deleteUser";
 	}
 	
+	@GetMapping("getCourseTimetable")
+	public String postDeleteUser(){
+		return "mypage/getCourseTimetable";
+	}
+	
 	
 	
 	

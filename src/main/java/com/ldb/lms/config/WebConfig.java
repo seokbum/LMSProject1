@@ -19,6 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/mypage/updatePhone")
                 .addPathPatterns("/mypage/updateEmail")
                 .addPathPatterns("/mypage/deleteUser")
+                .addPathPatterns("/mypage/getCourseTimetable")
                 .excludePathPatterns("/", "/login", "/css/**", "/js/**");
     }
 }
