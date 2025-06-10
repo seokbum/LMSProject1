@@ -55,14 +55,14 @@ public class PostApiController {
         return postService.handleUpdatePostApi(postDto, removeFile, request, session);
     }
 
-    @DeleteMapping("/deletePost/{postId}")
+    @PostMapping("/deletePost/{postId}")
     public ResponseEntity<ApiResponseDto<String>> deletePost(
             @PathVariable String postId,
             @RequestParam("postPassword") String postPassword,
             HttpServletRequest request,
             HttpSession session) {
         
-        log.info("deletePost API 호출: postId={}", postId);
+        log.info("deletePost API (POST) 호출: postId={}", postId);
         return postService.handleDeletePostApi(postId, postPassword, request, session);
     }
 

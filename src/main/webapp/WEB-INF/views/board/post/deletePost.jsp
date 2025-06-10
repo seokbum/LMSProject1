@@ -35,17 +35,18 @@
 <script>
     $('#deleteForm').on('submit', function(e) {
         e.preventDefault();
+        
         const password = $('#postPassword').val();
         if (!password) {
             alert("비밀번호를 입력해주세요.");
             return;
         }
         
-        const url = `/api/post/deletePost/${'${post.postId}'}?postPassword=${encodeURIComponent(password)}`;
+        const url = "/api/post/deletePost/" + "${post.postId}" + "?postPassword=" + encodeURIComponent(password);
         
         $.ajax({
             url: url,
-            type: 'DELETE',
+            type: 'Post',
             success: (res) => {
                 alert(res.message);
                 window.location.href = res.data;
