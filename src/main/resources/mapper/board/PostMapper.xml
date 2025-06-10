@@ -69,7 +69,7 @@
     
     <select id="countPosts" parameterType="PostSearchDto" resultType="int">
         SELECT
-            COUNT(*)
+            COUNT(*)+1
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
         LEFT JOIN professor pr ON p.author_id = pr.professor_id

@@ -30,7 +30,7 @@ public class PostApiController {
 
     private final PostService postService;
 
-    @PostMapping("/createPost")
+    @PostMapping("createPost")
     public ResponseEntity<ApiResponseDto<String>> createPost(
             @RequestPart("postDto") PostDto postDto,
             @RequestPart(value = "postFile", required = false) MultipartFile postFile,
@@ -42,7 +42,7 @@ public class PostApiController {
         return postService.handleCreatePostApi(postDto, request, session);
     }
 
-    @PostMapping("/updatePost")
+    @PostMapping("updatePost")
     public ResponseEntity<ApiResponseDto<String>> updatePost(
             @RequestPart("postDto") PostDto postDto,
             @RequestPart(value = "postFile", required = false) MultipartFile postFile,
@@ -55,18 +55,18 @@ public class PostApiController {
         return postService.handleUpdatePostApi(postDto, removeFile, request, session);
     }
 
-    @DeleteMapping("/deletePost/{postId}")
+    @PostMapping("deletePost/{postId}")
     public ResponseEntity<ApiResponseDto<String>> deletePost(
             @PathVariable String postId,
             @RequestParam("postPassword") String postPassword,
             HttpServletRequest request,
             HttpSession session) {
         
-        log.info("deletePost API 호출: postId={}", postId);
+        log.info("deletePost API (POST) 호출: postId={}", postId);
         return postService.handleDeletePostApi(postId, postPassword, request, session);
     }
 
-    @PostMapping("/imageUpload")
+    @PostMapping("imageUpload")
     public ResponseEntity<ApiResponseDto<Map<String, String>>> imageUpload(
             @RequestParam("file") MultipartFile file,
             HttpServletRequest request) {
@@ -75,7 +75,7 @@ public class PostApiController {
         return postService.handleImageUploadApi(file, request);
     }
 
-    @PostMapping("/comments/write")
+    @PostMapping("comments/write")
     public ResponseEntity<ApiResponseDto<String>> writeComment(
             @RequestBody CommentDto commentDto,
             HttpSession session) {
@@ -94,7 +94,7 @@ public class PostApiController {
         }
     }
 
-    @PutMapping("/comments/update")
+    @PutMapping("comments/update")
     public ResponseEntity<ApiResponseDto<String>> updateComment(
             @RequestBody CommentDto commentDto,
             HttpSession session) {
@@ -113,7 +113,7 @@ public class PostApiController {
         }
     }
 
-    @PostMapping("/comments/delete/{commentId}")
+    @PostMapping("comments/delete/{commentId}")
     public ResponseEntity<ApiResponseDto<String>> deleteComment(
             @PathVariable String commentId,
             HttpSession session) {
