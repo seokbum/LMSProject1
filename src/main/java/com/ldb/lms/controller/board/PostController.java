@@ -23,7 +23,7 @@ public class PostController {
 
     private final PostService postService;
 
-    @GetMapping("/getPosts")
+    @GetMapping("getPosts")
     public String getPosts(
             @ModelAttribute PostSearchDto searchDto,
             @ModelAttribute PostPaginationDto pageDto,
@@ -34,7 +34,7 @@ public class PostController {
         return "board/post/getPosts";
     }
 
-    @PostMapping("/searchPosts")
+    @PostMapping("searchPosts")
     public String searchPosts(
             @ModelAttribute PostSearchDto searchDto,
             @ModelAttribute PostPaginationDto pageDto,
@@ -46,7 +46,7 @@ public class PostController {
         return "board/post/getPosts";
     }
 
-    @GetMapping("/getPostDetail")
+    @GetMapping("getPostDetail")
     public String getPostDetail(@RequestParam("postId") String postId, Model model, HttpSession session) {
         log.info("getPostDetail 호출 - postId: {}", postId);
         Map<String, Object> postData = postService.getPostDetailData(postId);
@@ -55,7 +55,7 @@ public class PostController {
         return "board/post/getPostDetail";
     }
 
-    @GetMapping("/createPost")
+    @GetMapping("createPost")
     public String createPostForm(Model model, HttpSession session) {
         log.info("createPostForm 호출");
         Map<String, Object> formData = postService.getCreatePostFormData(session);
@@ -63,7 +63,7 @@ public class PostController {
         return "board/post/createPost";
     }
 
-    @GetMapping("/updatePost")
+    @GetMapping("updatePost")
     public String updatePostForm(@RequestParam("postId") String postId, Model model, HttpSession session) {
         log.info("updatePostForm 호출 - postId: {}", postId);
         Map<String, Object> formData = postService.getUpdatePostFormData(postId, session);
@@ -71,7 +71,7 @@ public class PostController {
         return "board/post/updatePost";
     }
 
-    @GetMapping("/deletePost")
+    @GetMapping("deletePost")
     public String deletePostConfirm(@RequestParam("postId") String postId, Model model, HttpSession session) {
         log.info("deletePostConfirm 호출 - postId: {}", postId);
         Map<String, Object> formData = postService.getDeletePostFormData(postId, session);
@@ -79,7 +79,7 @@ public class PostController {
         return "board/post/deletePost";
     }
 
-    @GetMapping("/replyPost")
+    @GetMapping("replyPost")
     public String replyPostForm(@RequestParam("postId") String postId, Model model, HttpSession session) {
         log.info("replyPostForm 호출 - parentPostId: {}", postId);
         Map<String, Object> formData = postService.getReplyPostFormData(postId, session);
