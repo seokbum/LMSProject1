@@ -1,11 +1,12 @@
 package com.ldb.lms.service.board;
 
-import com.ldb.lms.dto.board.notice.NoticeDto;
-import com.ldb.lms.dto.board.notice.NoticePaginationDto;
-import com.ldb.lms.dto.board.notice.NoticeSearchDto;
-import com.ldb.lms.mapper.board.NoticeMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.io.File;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,15 +15,16 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ldb.lms.dto.board.notice.NoticeDto;
+import com.ldb.lms.dto.board.notice.NoticePaginationDto;
+import com.ldb.lms.dto.board.notice.NoticeSearchDto;
+import com.ldb.lms.mapper.mybatis.board.NoticeMapper;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.File;
-import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service

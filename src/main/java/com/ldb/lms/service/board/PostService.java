@@ -8,18 +8,21 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
 import com.ldb.lms.dto.ApiResponseDto;
 import com.ldb.lms.dto.board.post.CommentDto;
 import com.ldb.lms.dto.board.post.PostDto;
 import com.ldb.lms.dto.board.post.PostPaginationDto;
 import com.ldb.lms.dto.board.post.PostSearchDto;
-import com.ldb.lms.mapper.board.PostMapper;
+import com.ldb.lms.mapper.mybatis.board.PostMapper;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

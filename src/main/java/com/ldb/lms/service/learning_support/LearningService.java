@@ -16,7 +16,7 @@ import com.ldb.lms.dto.learning_support.RegistrationDto;
 import com.ldb.lms.dto.learning_support.SearchDto;
 import com.ldb.lms.dto.learning_support.StudentRegistrationSummaryDto;
 import com.ldb.lms.dto.professor_support.PaginationDto;
-import com.ldb.lms.mapper.learning_support.CourseMapper;
+import com.ldb.lms.mapper.mybatis.learning_support.CourseMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

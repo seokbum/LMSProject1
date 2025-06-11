@@ -27,10 +27,10 @@ import com.ldb.lms.dto.mypage.RegisterUserDto;
 import com.ldb.lms.dto.mypage.Student;
 import com.ldb.lms.dto.mypage.UpdateInfoDto;
 import com.ldb.lms.dto.mypage.UpdatePwDto;
-import com.ldb.lms.mapper.mypage.DeptMapper;
-import com.ldb.lms.mapper.mypage.ProStuMapper;
-import com.ldb.lms.mapper.mypage.ProfessorMapper;
-import com.ldb.lms.mapper.mypage.StudentMapper;
+import com.ldb.lms.mapper.mybatis.mypage.DeptMapper;
+import com.ldb.lms.mapper.mybatis.mypage.ProStuMapper;
+import com.ldb.lms.mapper.mybatis.mypage.ProfessorMapper;
+import com.ldb.lms.mapper.mybatis.mypage.StudentMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

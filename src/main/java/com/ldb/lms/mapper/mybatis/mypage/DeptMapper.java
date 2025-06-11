@@ -1,4 +1,4 @@
-package com.ldb.lms.mapper.mypage;
+package com.ldb.lms.mapper.mybatis.mypage;
 
 import java.util.List;
 

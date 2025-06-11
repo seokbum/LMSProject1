@@ -1,4 +1,4 @@
-package com.ldb.lms.mapper.mypage;
+package com.ldb.lms.mapper.mybatis.mypage;
 
 import org.apache.ibatis.annotations.Mapper;
 

@@ -12,8 +12,8 @@ import com.ldb.lms.domain.Course;
 import com.ldb.lms.domain.CourseTime;
 import com.ldb.lms.dto.professor_support.PaginationDto;
 import com.ldb.lms.dto.professor_support.RegistCourseDto;
-import com.ldb.lms.mapper.professor_support.ConvertDtoMapper;
-import com.ldb.lms.mapper.professor_support.ProfessorCourseMapper;
+import com.ldb.lms.mapper.mapstruct.ConvertDtoMapper;
+import com.ldb.lms.mapper.mybatis.professor_support.ProfessorCourseMapper;
 
 import lombok.extern.slf4j.Slf4j;
 

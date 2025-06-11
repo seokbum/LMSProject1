@@ -1,4 +1,4 @@
-package com.ldb.lms.mapper.learning_support;
+package com.ldb.lms.mapper.mybatis.learning_support;
 
 import java.util.List;
 import java.util.Map;

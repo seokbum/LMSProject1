@@ -1,4 +1,4 @@
-package com.ldb.lms.mapper.board;
+package com.ldb.lms.mapper.mybatis.board;
 
 import com.ldb.lms.dto.board.notice.NoticeDto;
 import com.ldb.lms.dto.board.notice.NoticeSearchDto;

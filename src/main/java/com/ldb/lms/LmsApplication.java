@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @SpringBootApplication
-@MapperScan("com.ldb.lms.mapper.**")
+@MapperScan("com.ldb.lms.mapper.mybatis")
 public class LmsApplication extends SpringBootServletInitializer {
 	public static void main(String[] args) {
 		SpringApplication.run(LmsApplication.class, args);

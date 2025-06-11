@@ -1,4 +1,4 @@
-package com.ldb.lms.mapper.professor_support;
+package com.ldb.lms.mapper.mybatis.professor_support;
 
 import java.util.List;
 import java.util.Map;

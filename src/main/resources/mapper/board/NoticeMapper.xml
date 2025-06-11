@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ldb.lms.mapper.board.NoticeMapper">
+<mapper namespace="com.ldb.lms.mapper.mybatis.board.NoticeMapper">
 
     <!-- 공지사항 목록을 조회하는 쿼리. 검색 조건과 페이징을 적용하여 결과를 반환 -->
     <select id="listNotice" parameterType="map" resultType="NoticeDto">

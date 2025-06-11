@@ -4,7 +4,7 @@
 
 
 
-<mapper namespace="com.ldb.lms.mapper.mypage.ProStuMapper">
+<mapper namespace="com.ldb.lms.mapper.mybatis.mypage.ProStuMapper">
 
 <!-- 이름과 이메일로 교수 또는 학생의 id를 조회(union을 이용해 두개의select문을 한번에) -->
 	<select id="findId" resultType="String" parameterType="FindIdDto">

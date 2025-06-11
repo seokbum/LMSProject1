@@ -68,6 +68,7 @@ public class LearningApiController {
     		@SessionAttribute(value = "login", required = false) String studentId) {
 
         return ResponseEntity.ok(learningService.searchRegistrationCourses(studentId));
+        
     }
 	
 	@PostMapping("registerCourse")
@@ -81,12 +82,10 @@ public class LearningApiController {
         
         try {
 			learningService.registerCourse(map);
-			return ResponseEntity.ok(new ApiResponseDto<>(true, "등록처리 성공", null));
+			return ApiResponseDto.ok(null);
 		} catch(Exception e) {
 			e.printStackTrace();
-			return ResponseEntity
-					.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new ApiResponseDto<>(false, "수정 실패: " + e.getMessage(), null));
+			return ApiResponseDto.error("강의수정 실패: " + e.getMessage());
 		}
 	}
 	
@@ -100,12 +99,10 @@ public class LearningApiController {
 		
 		try {
 			learningService.deleteCourse(map);
-			return ResponseEntity.ok(new ApiResponseDto<>(true, "삭제처리 성공", null));
+			return ApiResponseDto.ok(null);
 		} catch(Exception e) {
 			e.printStackTrace();
-			return ResponseEntity
-					.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new ApiResponseDto<>(false, "수정 실패: " + e.getMessage(), null));
+			return ApiResponseDto.error("강의삭제 실패: " + e.getMessage());
 		}
 		
 	}
@@ -117,11 +114,13 @@ public class LearningApiController {
 
 		try {
 			List<AttendanceDto> timetable =  learningService.viewCourseTime(studentId);
-			return ResponseEntity.ok(new ApiResponseDto<List<AttendanceDto>>(true, "조회 성공", timetable));
+			if (timetable.isEmpty()) {
+	            return ApiResponseDto.fail("등록된 시간표가 없습니다.");
+	        }
+			return ApiResponseDto.ok(timetable);
 		} catch(Exception e) {
-			return ResponseEntity
-					.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new ApiResponseDto<>(false, "조회 실패: " + e.getMessage(), null));
+			return ApiResponseDto.error("시간표 조회 실패: " + e.getMessage());
+			
 		}
 	}
 	

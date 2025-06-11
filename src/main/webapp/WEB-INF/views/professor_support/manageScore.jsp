@@ -2,7 +2,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
-<c:set var="path" value="${pageContext.request.contextPath}" scope="application" />
+
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -155,7 +155,7 @@
         <!-- 교수 및 학과 정보 -->
         <div class="mb-4">
             <div class="professor-info">
-                <h4>교수: <span>${professorName}</span> | 학과: <span>${deptName}</span></h4>
+                <h4>교수: <span>${professorInfo.professorName}</span> | 학과: <span>${professorInfo.deptName}</span></h4>
             </div>
         </div>
 
@@ -233,16 +233,20 @@
             var coursesData = []; 
             // 페이지 로드시 해당교수의 과목 로드
             $.ajax({
-                url: '${path}/professor_support/score/getCoursesInfo', 
+                url: '/professors/courses/score/getCourseList', 
                 type: 'get',
                 dataType: 'json',
                 success: function (data) {
-                	coursesData = data; 
+					if (!data.success) {
+						alert(data.message);
+					}
+                	coursesData = data.data; 
                  	// 초기 과목 목록 렌더링
                     renderCourses(coursesData);
                 },
                 error: function (xhr, status, error) {
                     console.error('과목 목록 데이터를 가져오는 데 실패했습니다.', error);
+                    alert('과목 목록 조회 중 오류가 발생했습니다. 다시 시도해주세요.');
                 }
             }); 
 
@@ -260,11 +264,11 @@
                 $.each(data, function(index, course) {
                     courseList.append(
                         '<tr>' +
-                        '<td>' + course.course_name + '</td>' +
-                        '<td>' + course.course_id + '</td>' +
-                        '<td>' + course.course_current_enrollment + '</td>' +
+                        '<td>' + course.courseName + '</td>' +
+                        '<td>' + course.courseId + '</td>' +
+                        '<td>' + course.courseCurrentEnrollment + '</td>' +
                         '<td> <a href="#" class="btn-link-custom manage-link" data-course-id="' 
-                        + course.course_id + '" data-course-name="' + course.course_name + '">관리</a></td>' +
+                        + course.courseId + '" data-course-name="' + course.courseName + '">관리</a></td>' +
                         '</tr>'
                     );
                 });
@@ -276,7 +280,7 @@
                     var courseName = $(this).data('course-name');
                     
                     $.ajax({
-                        url: '${path}/professor_support/score/getScoreInfo', 
+                        url: '/professors/courses/score/getScoreInfo', 
                         type: 'get',
                         data: {
 							   courseId: courseId,
@@ -288,7 +292,7 @@
                         	loadGradeDetails(courseId); // 성적 상세 정보 로드
                         },
                         error: function (xhr, status, error) {
-                            console.error('과목 목록 데이터를 가져오는 데 실패했습니다.', error);
+                            console.error('성적 데이터를 가져오는 데 실패했습니다.', error);
                         }
                     });
                     
@@ -301,12 +305,12 @@
                 var filteredCourses = [];
                 // 검색어와 일치하는 과목 필터링
                 for (var i = 0; i < coursesData.length; i++) {
-                    if (coursesData[i].course_name.toLowerCase().indexOf(searchTerm) !== -1) {
+                    if (coursesData[i].courseName.toLowerCase().indexOf(searchTerm) !== -1) {
                         filteredCourses.push(coursesData[i]);
                     }
                 }
-                renderCourses(filteredCourses); // 필터링된 과목 렌dering
-            })
+                renderCourses(filteredCourses); // 필터링된 과목 rendering
+            });
            
 
             // 과목 목록 정렬 기능

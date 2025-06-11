@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.ldb.lms.mapper.mypage.DeptMapper">
+<mapper namespace="com.ldb.lms.mapper.mybatis.mypage.DeptMapper">
 
 <!-- 학과이름에 맞는 id 반환 -->
 <select id="selectId" parameterType="String" resultType="String">
