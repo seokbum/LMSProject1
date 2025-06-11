@@ -18,14 +18,14 @@
 	</select>
 	
 	<!-- 넘어온 id와 맞는  학생의id,name,pawssword를 추출 -->
-	<select id="loginChk" resultType="java.util.HashMap" parameterType="LoginDto">
-	SELECT student_id , student_name , student_password
+	<select id="loginChk" resultType="LoginChkDto" parameterType="String">
+	SELECT student_id  , student_password
 	FROM student
-	WHERE student_id = #{studentId} 
+	WHERE student_id = #{val} 
 	UNION
-	SELECT professor_id , professor_name ,professor_password
+	SELECT professor_id ,professor_password
 	FROM professor
-	WHERE professor_id = #{professorId} 
+	WHERE professor_id = #{val} 
 	</select>
 	
 	<!-- id와이메일을 이용해 학생의 비밀번호 반환 -->

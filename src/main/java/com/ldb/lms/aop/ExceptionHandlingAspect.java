@@ -20,6 +20,10 @@ public class ExceptionHandlingAspect {
 	public void logCourseRegistrationException(CourseRegistrationException ex) {
         log.error("CourseRegistrationException 발생: {}", ex.getMessage());
     }
+	
+	/*public void logNotStuException(NotStuException ex) {
+        log.error("CourseRegistrationException 발생: {}", ex.getMessage());
+    }*/
 }
 
 

@@ -21,5 +21,19 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/mypage/deleteUser")
                 .addPathPatterns("/mypage/getCourseTimetable")
                 .excludePathPatterns("/", "/login", "/css/**", "/js/**");
+        
+        /*
+        //학생이 아니라면 false반환(학생만 접근가능)
+        registry.addInterceptor(new StuCheckInterceptor())
+        .addPathPatterns("/mypage/getCourseTimetable")
+        .addPathPatterns("/learning_support/**")
+        .addPathPatterns("/api/learning_support/**")
+        .excludePathPatterns("/", "/login", "/css/**", "/js/**");
+        
+        //교수가 아니라면 false반환(교수만 접근가능)
+        registry.addInterceptor(new ProCheckInterceptor())
+        .addPathPatterns("/professors/**")
+        .addPathPatterns("/notice/createNotice");
+        */
     }
 }

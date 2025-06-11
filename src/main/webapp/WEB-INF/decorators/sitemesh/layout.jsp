@@ -229,6 +229,7 @@ body {
 									class="nav-link active"> <i class="nav-icon bi bi-circle"></i>
 										<p>개인정보</p>
 								</a></li>
+								<%-- <c:if test="${fn:contains(sessionScope.login, 'S')}">--%>
 								<li class="nav-item"><a
 									href="${path}/mypage/getCourseScores" class="nav-link"> <i
 										class="nav-icon bi bi-circle"></i>
@@ -239,6 +240,7 @@ body {
 										<i class="nav-icon bi bi-circle"></i>
 										<p>시간표조회</p>
 								</a></li>
+								<%--</c:if> --%>
 							</ul></li>
 						<%-- <c:if test="${fn:contains(sessionScope.login, 'S')}"> --%>
 						<li class="nav-item"><a href="#" class="nav-link"> <i
