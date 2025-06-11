@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
+import org.springframework.ui.Model; 
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -36,36 +37,46 @@ public class NoticeService {
 
     private final NoticeMapper noticeMapper;
 
-    private String getCurrentUserId(HttpSession session) {
+    public String getCurrentUserId(HttpSession session) {
         return (String) session.getAttribute("login");
     }
 
-    private String getUploadDir(HttpServletRequest request) {
+    private Path getUploadDirPath(HttpServletRequest request) {
         String realPath = request.getServletContext().getRealPath("");
-        return realPath + "/dist/assets/upload/";
+        Path uploadDirPath = Paths.get(realPath, "dist", "assets", "upload");
+        if (!Files.exists(uploadDirPath)) {
+            try {
+                Files.createDirectories(uploadDirPath);
+            } catch (IOException e) {
+                log.error("업로드 디렉토리 생성 실패", e);
+                throw new RuntimeException("업로드 디렉토리 생성 불가", e);
+            }
+        }
+        return uploadDirPath;
     }
 
-    private String uploadFileAndGetPath(MultipartFile file, HttpServletRequest request) throws Exception {
+    private String uploadFileAndGetPath(MultipartFile file, HttpServletRequest request) throws IOException { 
         if (file == null || file.isEmpty()) {
             return null;
         }
-        String uploadDir = getUploadDir(request);
-        File dir = new File(uploadDir);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
+        Path uploadDirPath = getUploadDirPath(request);
         String storedFileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-        Path destPath = Paths.get(uploadDir, storedFileName);
+        Path destPath = uploadDirPath.resolve(storedFileName);
         file.transferTo(destPath);
         return "/dist/assets/upload/" + storedFileName;
     }
 
-    private void deleteFile(String filePath, HttpServletRequest request) throws Exception {
-        if (StringUtils.hasText(filePath)) {
-            String uploadDir = getUploadDir(request);
+    private void deleteFile(String filePath, HttpServletRequest request) { 
+        if (!StringUtils.hasText(filePath)) {
+            return;
+        }
+        try {
+            Path uploadDirPath = getUploadDirPath(request);
             String actualFileName = filePath.substring(filePath.lastIndexOf("/") + 1);
-            Path fileToDelete = Paths.get(uploadDir, actualFileName);
+            Path fileToDelete = uploadDirPath.resolve(actualFileName);
             Files.deleteIfExists(fileToDelete);
+        } catch (IOException e) {
+            log.error("파일 삭제 실패: {}", filePath, e); 
         }
     }
     
@@ -85,7 +96,7 @@ public class NoticeService {
             String filePath = uploadFileAndGetPath(file, request);
             response.put("url", filePath);
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        } catch (IOException e) { 
             log.error("handleImageUpload: 이미지 업로드 실패", e);
             response.put("error", "이미지 업로드 중 오류 발생");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -151,9 +162,17 @@ public class NoticeService {
             response.put("redirectUrl", "/notice/getNotices");
             return ResponseEntity.ok(response);
 
-        } catch (Exception e) {
-            log.error("handleWriteNotice: 공지사항 저장 실패", e);
+        } catch (IOException e) { 
+            log.error("handleWriteNotice: 공지사항 저장 실패 (파일 처리 오류)", e); 
+            response.put("error", "파일 처리 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        } catch (SecurityException | IllegalArgumentException e) { 
+            log.warn("handleWriteNotice: 공지사항 저장 실패 (권한/유효성)", e);
             response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            log.error("handleWriteNotice: 공지사항 저장 실패 (서버 내부 오류)", e);
+            response.put("error", "서버 오류로 인해 공지사항 저장에 실패했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -185,9 +204,17 @@ public class NoticeService {
             
             response.put("redirectUrl", "/notice/getNoticeDetail?noticeId=" + noticeDto.getNoticeId());
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            log.error("handleUpdateNotice: 공지사항 수정 실패", e);
+        } catch (IOException e) { 
+            log.error("handleUpdateNotice: 공지사항 수정 실패 (파일 처리 오류)", e);
+            response.put("error", "파일 처리 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        } catch (SecurityException | IllegalArgumentException e) { 
+            log.warn("handleUpdateNotice: 공지사항 수정 실패 (권한/유효성)", e);
             response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response); 
+        } catch (Exception e) { 
+            log.error("handleUpdateNotice: 공지사항 수정 실패 (서버 내부 오류)", e);
+            response.put("error", "서버 오류로 인해 공지사항 수정에 실패했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -219,8 +246,8 @@ public class NoticeService {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid file path");
             return;
         }
-        String uploadDir = getUploadDir(request);
-        String fullPath = uploadDir + filePath.substring("/dist/assets/upload/".length());
+        Path uploadDirPath = getUploadDirPath(request); 
+        String fullPath = uploadDirPath.toString() + filePath.substring("/dist/assets/upload/".length());
         File file = new File(fullPath);
 
         if (!file.exists() || !file.canRead()) {

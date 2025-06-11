@@ -45,12 +45,12 @@
                     url: url,
                     type: 'POST',
                     success: function(response) {
-                        if (response.redirectUrl) {
-                            window.location.href = response.redirectUrl;
+                        if (response.data) {
+                            window.location.href = response.data;
                         }
                     },
-                    error: function(xhr) {
-                        const errorMsg = xhr.responseJSON ? xhr.responseJSON.error : "서버 오류";
+                    error: function(xhr) {                        
+                        const errorMsg = xhr.responseJSON ? xhr.responseJSON.message : "서버 오류";
                         alert('삭제 실패: ' + errorMsg);
                     }
                 });

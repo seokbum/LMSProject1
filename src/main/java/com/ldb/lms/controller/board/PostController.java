@@ -44,7 +44,7 @@ public class PostController {
         return "board/post/getPosts";
     }
 
-    @GetMapping("/getPostDetail")
+    @GetMapping("getPostDetail")
     public String getPostDetail(
             @RequestParam("postId") String postId, 
             Model model, 

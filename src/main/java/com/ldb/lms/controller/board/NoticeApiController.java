@@ -30,7 +30,7 @@ public class NoticeApiController {
         return ResponseEntity.badRequest().body(new ApiResponseDto<>(false, "입력 값을 확인해주세요.", errors));
     }
 
-    @PostMapping("/write")
+    @PostMapping("write")
     public ResponseEntity<?> writeNotice(
             @Valid @RequestPart("notice") NoticeDto noticeDto,
             BindingResult bindingResult,
@@ -44,7 +44,7 @@ public class NoticeApiController {
         return noticeService.handleWriteNotice(noticeDto, file, request, session);
     }
     
-    @PostMapping("/update")
+    @PostMapping("update")
     public ResponseEntity<?> updateNotice(
             @Valid @RequestPart("notice") NoticeDto noticeDto,
             BindingResult bindingResult,
@@ -56,5 +56,19 @@ public class NoticeApiController {
             return createValidationErrorResponse(bindingResult);
         }
         return noticeService.handleUpdateNotice(noticeDto, file, request, session);
+    }
+    
+    @PostMapping("delete/{noticeId}") 
+    public ResponseEntity<ApiResponseDto<String>> deleteNotice(
+            @PathVariable String noticeId,
+            @RequestParam("password") String password,
+            HttpServletRequest request,
+            HttpSession session) {
+        try {
+            noticeService.deleteNotice(noticeId, noticeService.getCurrentUserId(session), password, request);
+            return ResponseEntity.ok(new ApiResponseDto<>(true, "공지사항이 삭제되었습니다.", "/notice/getNotices"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponseDto<>(false, e.getMessage(), null));
+        }
     }
 }

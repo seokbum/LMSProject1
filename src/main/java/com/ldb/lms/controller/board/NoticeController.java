@@ -18,7 +18,7 @@ public class NoticeController {
 
     private final NoticeService noticeService;
 
-    @GetMapping("/getNotices")
+    @GetMapping("getNotices")
     public String getNotices(
             @ModelAttribute NoticeSearchDto searchDto,
             @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
@@ -31,7 +31,7 @@ public class NoticeController {
         return "board/notice/getNotices";
     }
 
-    @GetMapping("/getNoticeDetail")
+    @GetMapping("getNoticeDetail")
     public String getNoticeDetail(
             @RequestParam("noticeId") String noticeId,
             Model model,
@@ -41,13 +41,13 @@ public class NoticeController {
         return "board/notice/getNoticeDetail";
     }
     
-    @GetMapping("/createNotice")
+    @GetMapping("createNotice")
     public String showCreateNotice(Model model, HttpSession session) {
         noticeService.prepareCreateNotice(session, model);
         return "board/notice/createNotice";
     }
 
-    @GetMapping("/updateNotice")
+    @GetMapping("updateNotice")
     public String showUpdateNotice(
             @RequestParam("noticeId") String noticeId,
             Model model,
@@ -57,7 +57,7 @@ public class NoticeController {
         return "board/notice/updateNotice";
     }
 
-    @GetMapping("/deleteNotice")
+    @GetMapping("deleteNotice")
     public String showDeleteNotice(
             @RequestParam("noticeId") String noticeId,
             Model model,
@@ -67,7 +67,7 @@ public class NoticeController {
         return "board/notice/deleteNotice";
     }
     
-    @GetMapping("/download")
+    @GetMapping("download")
     public void downloadFile(
             @RequestParam("filePath") String filePath,
             HttpServletResponse response,
