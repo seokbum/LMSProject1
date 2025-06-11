@@ -2,29 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ldb.lms.mapper.mybatis.board.PostMapper">
 
-    <sql id="postSearchCondition">
-        <where>
-            <if test="searchKeyword != null and searchKeyword != '' and searchType != null and searchType != ''">
-                AND (
-                <trim prefixOverrides="OR">
-                    <if test="searchType.contains('postTitle')">
-                        p.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
-                    </if>
-                    <if test="searchType.contains('postContent')">
-                        OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%')
-                    </if>
-                    <if test="searchType.contains('userName')">
-                        OR COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchKeyword}, '%')
-                    </if>
-                </trim>
-                )
-            </if>
-            <if test="postNotice != null">
-                AND p.post_notice = #{postNotice}
-            </if>
-        </where>
-    </sql>
-
     <select id="listPosts" parameterType="map" resultType="PostDto">
         SELECT
             p.post_id,
@@ -40,11 +17,26 @@
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
         LEFT JOIN professor pr ON p.author_id = pr.professor_id
-        <include refid="postSearchCondition">
-            <property name="searchType" value="${searchDto.searchType}"/>
-            <property name="searchKeyword" value="${searchDto.searchKeyword}"/>
-            <property name="postNotice" value="${searchDto.postNotice}"/>
-        </include>
+        <where>
+            <if test="searchDto.searchKeyword != null and searchDto.searchKeyword != '' and searchDto.searchType != null and searchDto.searchType != ''">
+                AND (
+                <trim prefixOverrides="OR">
+                    <if test="searchDto.searchType.contains('postTitle')">
+                        p.post_title LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                    </if>
+                    <if test="searchDto.searchType.contains('postContent')">
+                        OR p.post_content LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                    </if>
+                    <if test="searchDto.searchType.contains('userName')">
+                        OR COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchDto.searchKeyword}, '%')
+                    </if>
+                </trim>
+                )
+            </if>
+            <if test="searchDto.postNotice != null">
+                AND p.post_notice = #{searchDto.postNotice}
+            </if>
+        </where>
         ORDER BY
             p.post_group DESC,
             p.post_group_step ASC
@@ -69,11 +61,30 @@
     
     <select id="countPosts" parameterType="PostSearchDto" resultType="int">
         SELECT
-            COUNT(*)+1
+            COUNT(*)
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
         LEFT JOIN professor pr ON p.author_id = pr.professor_id
-        <include refid="postSearchCondition"/>
+        <where>
+            <if test="searchKeyword != null and searchKeyword != '' and searchType != null and searchType != ''">
+                AND (
+                <trim prefixOverrides="OR">
+                    <if test="searchType.contains('postTitle')">
+                        p.post_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </if>
+                    <if test="searchType.contains('postContent')">
+                        OR p.post_content LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </if>
+                    <if test="searchType.contains('userName')">
+                        OR COALESCE(s.student_name, pr.professor_name) LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </if>
+                </trim>
+                )
+            </if>
+            <if test="postNotice != null">
+                AND p.post_notice = #{postNotice}
+            </if>
+        </where>
     </select>
 
     <select id="getPost" parameterType="String" resultType="PostDto">
@@ -95,8 +106,7 @@
         FROM post p
         LEFT JOIN student s ON p.author_id = s.student_id
         LEFT JOIN professor pr ON p.author_id = pr.professor_id
-        WHERE
-            p.post_id = #{postId}
+        WHERE p.post_id = #{postId}
     </select>
 
     <insert id="insertPost" parameterType="PostDto">
@@ -128,18 +138,14 @@
 
     <update id="updateGroupStep" parameterType="map">
         UPDATE post
-        SET
-            post_group_step = post_group_step + 1
-        WHERE
-            post_group = #{postGroup} AND post_group_step > #{postGroupStep}
+        SET post_group_step = post_group_step + 1
+        WHERE post_group = #{postGroup} AND post_group_step > #{postGroupStep}
     </update>
 
     <update id="incrementReadCount" parameterType="String">
         UPDATE post
-        SET
-            post_read_count = post_read_count + 1
-        WHERE
-            post_id = #{postId}
+        SET post_read_count = post_read_count + 1
+        WHERE post_id = #{postId}
     </update>
     
     <delete id="deletePost" parameterType="String">

@@ -1,12 +1,10 @@
 package com.ldb.lms.mapper.mybatis.mypage;
 
-import java.util.Map;
-
 import org.apache.ibatis.annotations.Mapper;
 
 import com.ldb.lms.dto.mypage.FindIdDto;
 import com.ldb.lms.dto.mypage.FindPwDto;
-import com.ldb.lms.dto.mypage.LoginDto;
+import com.ldb.lms.dto.mypage.LoginChkDto;
 import com.ldb.lms.dto.mypage.UpdateInfoDto;
 import com.ldb.lms.dto.mypage.UpdatePwDto;
 
@@ -16,8 +14,8 @@ public interface ProStuMapper {
 	//이름과 이메일로 교수 또는 학생의 id를 조회(union을 이용해 두개의select문을 한번에) 
 	String findId(FindIdDto findIdDto);
 	
-	//넘어온 id와 맞는  학생의id,name,pawssword를 추출
-	Map<String,String> loginChk(LoginDto loginDto);
+	//넘어온 id와 맞는  학생의id,pawssword를 추출
+	LoginChkDto loginChk(String id);
 	
 	//id와이메일을 이용해 학생의 비밀번호 반환
 	String findPw(FindPwDto findPwDto);

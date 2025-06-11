@@ -1,118 +1,61 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c"%>
-<%@ taglib uri="jakarta.tags.fmt" prefix="fmt"%>           
-<%@ taglib uri="jakarta.tags.functions" prefix="fn"%> 
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>공지 게시물 삭제</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .container {
-            width: 100%;
-            max-width: none;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e9ecef;
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .form-group label {
-            font-weight: bold;
-            color: #495057;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-        .form-control {
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
-            width: 100%;
-        }
-        .btn {
-            border-radius: 0.25rem;
-            padding: 0.75rem 1.25rem;
-            font-size: 1rem;
-            font-weight: 500;
-        }
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-            color: #fff;
-        }
-        .btn-danger:hover {
-            background-color: #c82333;
-            border-color: #bd2130;
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-            color: #fff;
-        }
-        .btn-secondary:hover {
-            background-color: #5a6268;
-            border-color: #545b62;
-        }
-        .text-center {
-            color: #343a40;
-            margin-bottom: 2rem;
-        }
-        .fs-1 {
-            font-size: 2.2rem !important;
-            color: #343a40;
-            margin-bottom: 1.5rem;
-            font-weight: bold;
-        }
-        .font-weight-bold {
-            color: #007bff;
-        }
-        .ml-2 {
-            margin-left: 0.5rem;
-            color: #6c757d;
-        }
-        .mt-4 {
-            margin-top: 2rem !important;
-        }
-        .btn-group {
-            margin-top: 1rem;
-        }
-        .btn-group > .btn {
-            margin-right: 0.5rem;
-        }
-        .btn-group > .btn:last-child {
-            margin-right: 0;
-        }
-    </style>
+    <title>공지사항 삭제</title>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2 class="text-center fs-1">게시물 삭제</h2>
-        <form action="delete" method="post" class="mt-4">
-            <input type="hidden" name="noticeId" value="${notice.noticeId}">
-            <div class="form-group">
-                <label class="font-weight-bold">작성자:</label>
-                <span class="ml-2">${notice.userName}</span>
+    <div class="container-fluid">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6">
+                <div class="card card-danger shadow-sm">
+                    <div class="card-header"><h3 class="card-title">공지사항 삭제</h3></div>
+                    <form id="deleteForm">
+                        <div class="card-body">
+                            <p>공지사항을 삭제하시려면 비밀번호를 입력해주세요.</p>
+                            <p><strong>제목:</strong> ${notice.noticeTitle}</p>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">비밀번호</label>
+                                <input type="password" id="password" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="card-footer text-end">
+                            <a href="/notice/getNoticeDetail?noticeId=${notice.noticeId}" class="btn btn-secondary">취소</a>
+                            <button type="submit" class="btn btn-danger">삭제 확인</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label class="font-weight-bold">제목:</label>
-                <span class="ml-2">${notice.noticeTitle}</span>
-            </div>
-            <div class="form-group">
-                <label for="pass">비밀번호:</label>
-                <input type="password" name="pass" id="pass" class="form-control" required>
-            </div>
-            <div class="btn-group mt-1">
-                <button type="submit" class="btn btn-danger">삭제</button>
-                <a href="getNotices" class="btn btn-secondary">취소</a>
-            </div>
-        </form>
+        </div>
     </div>
+    <script>
+        $(document).ready(function() {
+            $('#deleteForm').on('submit', function(e) {
+                e.preventDefault();
+                const password = $('#password').val();
+                if (!password) {
+                    alert("비밀번호를 입력해주세요.");
+                    return;
+                }
+                const url = "/api/notice/delete/" + "${notice.noticeId}" + "?password=" + encodeURIComponent(password);
+                
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    success: function(response) {
+                        if (response.data) {
+                            window.location.href = response.data;
+                        }
+                    },
+                    error: function(xhr) {                        
+                        const errorMsg = xhr.responseJSON ? xhr.responseJSON.message : "서버 오류";
+                        alert('삭제 실패: ' + errorMsg);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

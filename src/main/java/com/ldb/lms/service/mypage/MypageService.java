@@ -6,10 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -21,12 +18,17 @@ import com.ldb.lms.dto.mypage.DeleteUserDto;
 import com.ldb.lms.dto.mypage.Dept;
 import com.ldb.lms.dto.mypage.FindIdDto;
 import com.ldb.lms.dto.mypage.FindPwDto;
-import com.ldb.lms.dto.mypage.LoginDto;
+import com.ldb.lms.dto.mypage.LoginChkDto;
 import com.ldb.lms.dto.mypage.Professor;
 import com.ldb.lms.dto.mypage.RegisterUserDto;
 import com.ldb.lms.dto.mypage.Student;
 import com.ldb.lms.dto.mypage.UpdateInfoDto;
 import com.ldb.lms.dto.mypage.UpdatePwDto;
+import com.ldb.lms.interceptor.StuCheckInterceptor;
+import com.ldb.lms.mapper.mypage.DeptMapper;
+import com.ldb.lms.mapper.mypage.ProStuMapper;
+import com.ldb.lms.mapper.mypage.ProfessorMapper;
+import com.ldb.lms.mapper.mypage.StudentMapper;
 import com.ldb.lms.mapper.mybatis.mypage.DeptMapper;
 import com.ldb.lms.mapper.mybatis.mypage.ProStuMapper;
 import com.ldb.lms.mapper.mybatis.mypage.ProfessorMapper;
@@ -35,13 +37,13 @@ import com.ldb.lms.mapper.mybatis.mypage.StudentMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-;
-
 
 
 @Service
 @RequiredArgsConstructor
 public class MypageService {
+
+    private final StuCheckInterceptor stuCheckInterceptor;
 
 
 	private final StudentMapper studentMapper;
@@ -51,6 +53,8 @@ public class MypageService {
 	private final ProStuMapper proStuMapper;
 
 	private final DeptMapper deptMapper;
+
+    
 
 	public boolean loginChk(HttpServletRequest request) {
 		String login = (String)request.getSession().getAttribute("login");
@@ -65,52 +69,35 @@ public class MypageService {
 	}
 
 
-	public Map<String,String> login(String id , String password , HttpServletRequest request) {
-		LoginDto dto = new LoginDto();
-		dto.setProfessorId(id);
-		dto.setStudentId(id);
-		Map<String, String> map = proStuMapper.loginChk(dto);
-
-		if(map == null) {
+	public boolean login(String id , String password , HttpServletRequest request) {
+		LoginChkDto loginChkDto = proStuMapper.loginChk(id);
+		if(loginChkDto == null) {
 			request.setAttribute("error", "존재하지않는 정보");
-			return null;
+			return false;
 		}
 		else {
-
-			String dbId="";
-			String dbPw="";
-			String dbName="";
-			Set<Entry<String,String>> entrySet = map.entrySet();
-			for (Entry<String, String> entry : entrySet) {
-				if(entry.getKey().contains("id")) {
-					dbId = entry.getValue();
-				}
-				else if(entry.getKey().contains("password")) {
-					dbPw = entry.getValue();
-				}
-				else {
-					dbName = entry.getValue();
-				}
-			} //dbId,dbPw,dbName 꺼내기종료
-
+			//loginChkDto코드를 보면이해가능 studentId가존재 시 studentId를 반환
+			//professorId가 존재한다면 professorId가 반환되게 getId를 튜닝함
+			String dbId = loginChkDto.getId();			
+			String dbPw = loginChkDto.getPassword();
+			
 			//Bcrypt.checkpw(입력,검증) : 입력과 검증(암호화된비번) 을 비교할수있음
 			if(BCrypt.checkpw(password, dbPw) ){
-
 				if(dbId.contains("S")) { //학생 중 퇴학상태인 학생을 검증하는 단계
 					if(studentMapper.selectStatus(dbId).equals("퇴학")) { 
 						request.setAttribute("error", "퇴학한사람은 로그인 할 수 없어요");
-						return null;
+						return false;
 					}
 				}
 				//모든정보가 일치한다면
 				request.getSession().setAttribute("login", dbId);
 				request.setAttribute("out",null);
-				return map;
-
+				return true;
 			}
+			
 			else{
 				request.setAttribute("error", "아이디혹은비밀번호를 확인해주세요");
-				return null;
+				return false;
 			}
 		}
 	}
@@ -397,14 +384,16 @@ public class MypageService {
 			request.setAttribute("msg", "아이디를 찾을 수 없어요");
 		}
 		else {
-			request.setAttribute("msg", dto.getName()+"님의 id : "+id);
+			EmailUtil.sendIdEmail(dto.getEmail(), dto.getName(), id);
+			request.setAttribute("msg", dto.getName()+"님의 id : "+id.substring(0,id.length()-2)+"**");
+			request.setAttribute("detailMsg", "이메일로 아이디 전송완료");
 		}
 	}
 
 
 	public void findPwProcess(FindPwDto dto, HttpServletRequest request) {
 		String pass = proStuMapper.findPw(dto);
-		String id = dto.getId();
+		String id = dto.getId().toUpperCase();
 		String email = dto.getEmail();
 		if(pass==null) {
 			request.setAttribute("msg", "입력하신정보가 맞지않아요");
