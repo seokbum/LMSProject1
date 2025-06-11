@@ -288,6 +288,9 @@
 						},
                         dataType: 'json',
                         success: function (data) {
+							if (!data.success) {
+								alert(data.message);
+							}
                         	gradeDetails = data; 
                         	loadGradeDetails(courseId); // 성적 상세 정보 로드
                         },
@@ -334,11 +337,11 @@
                 $('#gradeDetails').removeClass('show'); // 상세 섹션 숨김
                 $('#gradeLoading').show(); // 로딩 스피너 표시
                 $('#gradeList').empty(); // 기존 목록 비우기
-                var data = gradeDetails[courseId]; // 과목 데이터 가져오기
+                var data = gradeDetails.data; // 과목 데이터 가져오기
                 
                 if (data) {
                     gradesData = data.grades; // 성적 데이터 저장
-                    
+
                     // 과목 제목 업데이트
                     var currentYear = new Date().getFullYear();
 					$('#courseTitle').text('과목: ' + data.courseName + ' (' + currentYear + '-' + (data.coursePeriod ? data.coursePeriod : '') + ') | 교수:' + "${professorName}");
@@ -348,7 +351,7 @@
                     // 성적 데이터 순회하며 테이블 행 추가
                     for (var i = 0; i < gradesData.length; i++) {
                         var grade = gradesData[i];
-
+					
                         gradeList.append(
                             '<tr data-student-id="' + grade.studentId + '" data-course-id="' + courseId + '">' +
                             '<td>' + grade.studentName + '</td>' +
@@ -451,7 +454,7 @@
                 var params = [];
                 
                 $("#gradeList tr[data-student-id]").each(function() {
-					console.log('this: ', $(this));
+					
                 	var studentId = $(this).attr("data-student-id");
                 	var courseId = $(this).attr("data-course-id");
                 	var scoreMid = $(this).find("td .midterm-score").val();
@@ -469,18 +472,21 @@
                 	});
                 	
                 });
-				console.log('params: ', params);
+				
                 $.ajax({
-            	url: '${path}/professor_support/score/updateScore', 
+            	url: '/professors/courses/score/updateScore', 
                 type: 'post',
                 contentType: "application/json",
                 data: JSON.stringify(params),
                 dataType: 'json',
                 success: function (data) {
+					if (!data.success) {
+						alert(data.message);
+					}
                 	alertMessage.addClass('alert-success').text('성적이 성공적으로 등록되었습니다.').show();
                 },
                 error: function (xhr, status, error) {
-                    alert('성적 수정작업에 실패했습니다.', error);
+                    alert('성적 수정작업에 실패했습니다.' + error);
                 }
             	});                
             });  

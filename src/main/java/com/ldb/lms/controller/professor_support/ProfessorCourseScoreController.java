@@ -2,10 +2,13 @@ package com.ldb.lms.controller.professor_support;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -15,6 +18,7 @@ import com.ldb.lms.dto.ApiResponseDto;
 import com.ldb.lms.dto.professor_support.CourseScoreDto;
 import com.ldb.lms.dto.professor_support.ProfessorCourseDto;
 import com.ldb.lms.dto.professor_support.ProfessorInfoDto;
+import com.ldb.lms.dto.professor_support.ScoreUpdateDto;
 import com.ldb.lms.exception.NoDataFoundException;
 import com.ldb.lms.service.professor_support.ProfessorCourseScoreService;
 
@@ -77,6 +81,22 @@ public class ProfessorCourseScoreController {
 	        return ApiResponseDto.error("성적 정보 조회 중 오류 발생: " + e.getMessage());
 	    }
 	    
+	}
+	
+	@PostMapping("/updateScore")
+	@ResponseBody
+	public ResponseEntity<ApiResponseDto<Void>> updateScore(
+			@RequestBody List<ScoreUpdateDto> scoreList,
+            @SessionAttribute("login") String professorId) {
+	
+		try {
+			professorCourseScoreService.updateScores(scoreList);
+            return ApiResponseDto.ok(null);
+        } catch (IllegalArgumentException e) {
+        	return ApiResponseDto.fail(e.getMessage()); // 200 OK + 실패 메시지
+        } catch (Exception e) {
+        	return ApiResponseDto.error("성적정보 수정 오류 발생: " + e.getMessage());
+        }
 	}
 	
 }

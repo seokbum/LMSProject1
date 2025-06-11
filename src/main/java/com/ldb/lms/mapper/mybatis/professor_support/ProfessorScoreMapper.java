@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.ldb.lms.dto.professor_support.ProfessorCourseDto;
 import com.ldb.lms.dto.professor_support.ProfessorInfoDto;
 import com.ldb.lms.dto.professor_support.ScoreMngDto;
+import com.ldb.lms.dto.professor_support.ScoreUpdateDto;
 
 @Mapper
 public interface ProfessorScoreMapper {
@@ -17,5 +18,7 @@ public interface ProfessorScoreMapper {
 	List<ProfessorCourseDto> getCoursesInfo(String professorId);
 
 	List<ScoreMngDto> getScoreInfo(Map<String, String> of);
+
+	int updateScore(ScoreUpdateDto score);
 	
 }
