@@ -1,4 +1,4 @@
-package com.ldb.lms.mapper.schedule;
+package com.ldb.lms.mapper.mybatis.schedule;
 
 import java.util.List;
 

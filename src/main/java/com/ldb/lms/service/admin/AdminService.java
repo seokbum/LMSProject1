@@ -1,8 +1,8 @@
 package com.ldb.lms.service.admin;
 
 import com.ldb.lms.dto.ApiResponseDto;
-import com.ldb.lms.dto.schedule.ScheduleDto; // ScheduleDto 임포트
-import com.ldb.lms.mapper.schedule.ScheduleMapper; // ScheduleMapper 임포트
+import com.ldb.lms.dto.schedule.ScheduleDto;
+import com.ldb.lms.mapper.mybatis.schedule.ScheduleMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
