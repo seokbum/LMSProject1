@@ -1,134 +1,86 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c"%>
-<%@ taglib uri="jakarta.tags.fmt" prefix="fmt"%>           
-<%@ taglib uri="jakarta.tags.functions" prefix="fn"%> 
+<%@ taglib uri="jakarta.tags.functions" prefix="fn"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>공지사항 수정</title>
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
-    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-        .notice-container {
-            width: 100%;
-            margin: 0 auto;
-            padding: 20px;
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-        .form-label {
-            font-weight: 500;
-            margin-bottom: 5px;
-            font-size: 16px;
-        }
-        .form-control, .form-select {
-            padding: 10px;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            width: 100%;
-            font-size: 16px;
-        }
-        .notice-btn-primary {
-            padding: 10px 20px;
-            background: #3182ce;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .notice-btn-primary:hover {
-            background: #2b6cb0;
-        }
-        .toast-editor {
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            width: 100%;
-        }
-        #editor {
-            width: 100%;
-        }
-    </style>
 </head>
 <body>
-<div class="notice-container mt-5">
-    <h2 class="text-center h2">공지사항 수정</h2>
-    <form id="noticeForm" action="update" method="post" enctype="multipart/form-data">
-        <input type="hidden" id="noticeId" name="noticeId"  value="${notice.noticeId}">
-        <div class="mb-3">
-            <label for="noticeTitle" class="form-label">제목</label>
-            <input type="text" class="form-control" id="noticeTitle" name="noticeTitle" value="${notice.noticeTitle}" required>
-        </div>
-        <div class="mb-3">
-            <label for="content" class="form-label">내용</label>
-            <textarea id="content" name="noticeContent" style="display: none;"></textarea>
-            <div id="editor" class="toast-editor">${notice.noticeContent}</div>
-        </div>
-        <div class="mb-3">
-            <label for="noticePassword" class="form-label">비밀번호</label>
-            <input type="password" class="form-control" id="noticePassword" name="noticePassword" required>
-        </div>
-        <div class="mb-3">
-            <label for="noticeFile" class="form-label">첨부파일</label>
-            <input type="file" class="form-control" id="noticeFile" name="noticeFile">
-            <c:if test="${not empty notice.existingFilePath}">
-                <p>현재 첨부파일: <a href="${notice.existingFilePath}" target="_blank">${fn:substringAfter(notice.existingFilePath, '/dist/assets/upload/')}</a></p>
-            </c:if>
-        </div>
-        <div class="text-end">
-            <button type="submit" class="notice-btn-primary">수정</button>
-            <a href="getNoticeDetail?noticeId=${notice.noticeId}" class="btn btn-secondary">취소</a>
-        </div>
-    </form>
+<div class="container-fluid">
+     <div class="card shadow-sm">
+        <div class="card-header"><h3 class="card-title fw-bold">공지사항 수정</h3></div>
+        <form id="noticeForm">
+            <input type="hidden" id="noticeId" value="${notice.noticeId}">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="noticeTitle" class="form-label">제목</label>
+                    <input type="text" class="form-control" id="noticeTitle" value="${notice.noticeTitle}">
+                    <div class="invalid-feedback" id="noticeTitle-error"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">내용</label>
+                    <div id="noticeContentSource" style="display: none;"><c:out value="${notice.noticeContent}" escapeXml="false"/></div>
+                    <div id="editor"></div>
+                    <div class="invalid-feedback d-block" id="noticeContent-error"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="noticePassword" class="form-label">비밀번호</label>
+                    <input type="password" class="form-control" id="noticePassword" placeholder="수정을 위해 비밀번호를 다시 입력하세요">
+                    <div class="invalid-feedback" id="noticePassword-error"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="noticeFile" class="form-label">첨부파일</label>
+                    <c:if test="${not empty notice.existingFilePath}">
+                        <p class="form-text">현재 파일: <a href="/notice/download?filePath=${notice.existingFilePath}">${fn:substringAfter(notice.existingFilePath, '_')}</a></p>
+                    </c:if>
+                    <input type="file" class="form-control" id="noticeFile">
+                </div>
+            </div>
+            <div class="card-footer text-end">
+                <a href="/notice/getNoticeDetail?noticeId=${notice.noticeId}" class="btn btn-secondary">취소</a>
+                <button type="submit" class="btn btn-primary">수정</button>
+            </div>
+        </form>
+    </div>
 </div>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0.min.js"></script>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <script>
-    let editor;
     $(document).ready(function () {
-        editor = new toastui.Editor({
+        const initialContent = $('#noticeContentSource').html();
+        const editor = new toastui.Editor({
             el: document.querySelector('#editor'),
             height: '400px',
             initialEditType: 'wysiwyg',
-            initialValue: $('#editor').html(), 
-            previewStyle: 'vertical',
-            hooks: {
-                addImageBlobHook: (blob, callback) => {
-                    const formData = new FormData();
-                    formData.append('file', blob);
-                    $.ajax({
-                        url: '/api/notice/uploadImage',
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        success: (response) => {
-                        	if (response.url) {
-                                callback(response.url, 'image');
-                            } else {
-                                console.error('Upload failed:', response.error);
-                                alert('이미지 업로드 실패: ' + response.error);
-                            }
-                        },
-                        error: (err) => {
-                            console.error('Image upload failed:', err);
-                        }
-                    });
-                    return false;
-                }
-            }
+            initialValue: initialContent
         });
 
+        function clearErrors() {
+            $(".form-control").removeClass("is-invalid");
+            $(".invalid-feedback").text("");
+        }
+
+        function displayErrors(errors) {
+            clearErrors();
+            for (const field in errors) {
+                $("#" + field).addClass("is-invalid");
+                $("#" + field + "-error").text(errors[field]);
+            }
+        }
+
         $('#noticeForm').on('submit', function (e) {
-        	e.preventDefault();
-        	const formData = new FormData();
+            e.preventDefault();
+            clearErrors();
+            
+            const formData = new FormData();
             const noticeData = {
                 noticeId: $('#noticeId').val(),
                 noticeTitle: $('#noticeTitle').val(),
                 noticeContent: editor.getHTML(),
-                noticePassword: $('#noticePassword').val(),
-                existingFilePath: '${notice.existingFilePath}'
+                noticePassword: $('#noticePassword').val()
             };
             formData.append('notice', new Blob([JSON.stringify(noticeData)], { type: 'application/json' }));
             
@@ -143,17 +95,17 @@
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: (response) => {
-                    if (response.message) {
-                        alert(response.message);
-                        window.location.href = response.redirectUrl;
-                    } else {
-                        alert('공지사항 수정 실패: ' + response.error);
+                success: function (response) {
+                    if(response.redirectUrl) {
+                       window.location.href = response.redirectUrl;
                     }
                 },
-                error: (err) => {
-                    console.error('Update notice failed:', err);
-                    alert('공지사항 수정 중 오류 발생');
+                error: function (xhr) {
+                    if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.data) {
+                        displayErrors(xhr.responseJSON.data);
+                    } else {
+                        alert('수정 실패: ' + (xhr.responseJSON ? xhr.responseJSON.error : "서버 오류"));
+                    }
                 }
             });
         });

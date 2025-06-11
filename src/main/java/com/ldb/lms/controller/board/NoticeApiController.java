@@ -1,22 +1,20 @@
 package com.ldb.lms.controller.board;
 
-import java.util.Map;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
+import com.ldb.lms.dto.ApiResponseDto;
 import com.ldb.lms.dto.board.notice.NoticeDto;
-import com.ldb.lms.dto.board.notice.NoticePaginationDto;
-import com.ldb.lms.dto.board.notice.NoticeSearchDto;
 import com.ldb.lms.service.board.NoticeService;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.util.HashMap;
+import java.util.Map;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/notice")
 @RequiredArgsConstructor
@@ -24,35 +22,39 @@ public class NoticeApiController {
 
     private final NoticeService noticeService;
 
-    @GetMapping
-    public ResponseEntity<Map<String, Object>> getNotices(
-            @ModelAttribute NoticeSearchDto searchDto,
-            @ModelAttribute NoticePaginationDto pageDto) {
-        return ResponseEntity.ok(noticeService.listNotice(searchDto, pageDto));
-    }
-    
-    @PostMapping("uploadImage")
-    public ResponseEntity<Map<String, String>> uploadImage(
-            @RequestParam("file") MultipartFile file,
-            HttpServletRequest request) {
-        return noticeService.handleImageUpload(file, request);
+    private ResponseEntity<ApiResponseDto<Object>> createValidationErrorResponse(BindingResult bindingResult) {
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError error : bindingResult.getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+        return ResponseEntity.badRequest().body(new ApiResponseDto<>(false, "입력 값을 확인해주세요.", errors));
     }
 
-    @PostMapping("write")
-    public ResponseEntity<Map<String, String>> writeNotice(
-            @RequestPart("notice") NoticeDto noticeDto,
+    @PostMapping("/write")
+    public ResponseEntity<?> writeNotice(
+            @Valid @RequestPart("notice") NoticeDto noticeDto,
+            BindingResult bindingResult,
             @RequestPart(value = "file", required = false) MultipartFile file,
             HttpServletRequest request,
             HttpSession session) {
+        
+        if (bindingResult.hasErrors()) {
+            return createValidationErrorResponse(bindingResult);
+        }
         return noticeService.handleWriteNotice(noticeDto, file, request, session);
     }
     
-    @PostMapping("update")
-    public ResponseEntity<Map<String, String>> updateNotice(
-            @RequestPart("notice") NoticeDto noticeDto,
+    @PostMapping("/update")
+    public ResponseEntity<?> updateNotice(
+            @Valid @RequestPart("notice") NoticeDto noticeDto,
+            BindingResult bindingResult,
             @RequestPart(value = "file", required = false) MultipartFile file,
             HttpServletRequest request,
             HttpSession session) {
+        
+        if (bindingResult.hasErrors()) {
+            return createValidationErrorResponse(bindingResult);
+        }
         return noticeService.handleUpdateNotice(noticeDto, file, request, session);
     }
 }

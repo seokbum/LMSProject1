@@ -1,156 +1,109 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c"%>
-<%@ taglib uri="jakarta.tags.fmt" prefix="fmt"%>           
-<%@ taglib uri="jakarta.tags.functions" prefix="fn"%> 
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>공지사항 등록</title>
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
-    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-        .notice-container {
-            width: 100%;
-            margin: 0 auto;
-            padding: 20px;
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-        .form-label {
-            font-weight: 500;
-            margin-bottom: 5px;
-            font-size: 16px;
-        }
-        .form-control, .form-select {
-            padding: 10px;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            width: 100%;
-            font-size: 16px;
-        }
-        .notice-btn-primary {
-            padding: 10px 20px;
-            background: #3182ce;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .notice-btn-primary:hover {
-            background: #2b6cb0;
-        }
-        .toast-editor {
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            width: 100%;
-        }
-        #editor {
-            width: 100%;
-        }
-    </style>
 </head>
 <body>
-<div class="notice-container mt-5">
-    <h2 class="text-center h2">공지사항 등록</h2>
-    <form id="noticeForm" action="write" method="post" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="noticeTitle" class="form-label">제목</label>
-            <input type="text" class="form-control" id="noticeTitle" name="noticeTitle" required>
+    <div class="container-fluid">
+        <div class="card shadow-sm">
+            <div class="card-header"><h3 class="card-title fw-bold">공지사항 등록</h3></div>
+            <form id="noticeForm">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="noticeTitle" class="form-label">제목</label>
+                        <input type="text" class="form-control" id="noticeTitle">
+                        <div class="invalid-feedback" id="noticeTitle-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">내용</label>
+                        <div id="editor"></div>
+                        <div class="invalid-feedback d-block" id="noticeContent-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="noticePassword" class="form-label">비밀번호</label>
+                        <input type="password" class="form-control" id="noticePassword">
+                        <div class="invalid-feedback" id="noticePassword-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="noticeFile" class="form-label">첨부파일</label>
+                        <input type="file" class="form-control" id="noticeFile">
+                    </div>
+                </div>
+                <div class="card-footer text-end">
+                    <a href="/notice/getNotices" class="btn btn-secondary">취소</a>
+                    <button type="submit" class="btn btn-primary">등록</button>
+                </div>
+            </form>
         </div>
-        <div class="mb-3">
-            <label for="content" class="form-label">내용</label>
-            <textarea id="content" name="noticeContent" style="display: none;"></textarea>
-            <div id="editor" class="toast-editor"></div>
-        </div>
-        <div class="mb-3">
-            <label for="noticePassword" class="form-label">비밀번호</label>
-            <input type="password" class="form-control" id="noticePassword" name="noticePassword" required>
-        </div>
-        <div class="mb-3">
-            <label for="noticeFile" class="form-label">첨부파일</label>
-            <input type="file" class="form-control" id="noticeFile" name="noticeFile">
-        </div>
-        <div class="text-end">
-            <button type="submit" class="notice-btn-primary">등록</button>
-            <a href="getNotices" class="btn btn-secondary">취소</a>
-        </div>
-    </form>
-</div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0.min.js"></script>
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const editor = new toastui.Editor({
+                el: document.querySelector('#editor'),
+                height: '400px',
+                initialEditType: 'wysiwyg',
+                previewStyle: 'vertical'
+            });
 
-<script>
-    let editor;
-    $(document).ready(function () {
-        editor = new toastui.Editor({
-            el: document.querySelector('#editor'),
-            height: '400px',
-            initialEditType: 'wysiwyg',
-            previewStyle: 'vertical',
-            hooks: {
-                addImageBlobHook: (blob, callback) => {
-                    const formData = new FormData();
-                    formData.append('file', blob);
-                    $.ajax({
-                        url: '/api/notice/uploadImage',
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        success: (response) => {
-							if(response.url){
-                            callback(response.url, 'image');
-							} else {
-								console.error('Upload failed:', response.error);
-                                alert('이미지 업로드 실패: ' + response.error);
-							}
-                        },
-                        error: (err) => {
-                            console.error('Image upload failed:', err);
+            function clearErrors() {
+                $(".form-control").removeClass("is-invalid");
+                $(".invalid-feedback").text("");
+            }
+
+            function displayErrors(errors) {
+                clearErrors();
+                for (const field in errors) {
+                    $("#" + field).addClass("is-invalid");
+                    $("#" + field + "-error").text(errors[field]).show();
+                }
+            }
+
+            $('#noticeForm').on('submit', function (e) {
+                e.preventDefault();
+                clearErrors();
+                
+                const formData = new FormData();
+                const noticeData = {
+                    noticeTitle: $('#noticeTitle').val(),
+                    noticeContent: editor.getHTML(),
+                    noticePassword: $('#noticePassword').val()
+                };
+
+                formData.append('notice', new Blob([JSON.stringify(noticeData)], { type: 'application/json' }));
+                
+                const fileInput = $('#noticeFile')[0];
+                if (fileInput.files.length > 0) {
+                    formData.append('file', fileInput.files[0]);
+                }
+
+                $.ajax({
+                    url: '/api/notice/write',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.redirectUrl) {
+                            window.location.href = response.redirectUrl;
                         }
-                    });
-                    return false;
-                }
-            }
-        });
-
-        $('#noticeForm').on('submit', function (e) {
-        	e.preventDefault();
-            const formData = new FormData();
-            const noticeData = {
-                noticeTitle: $('#noticeTitle').val(),
-                noticeContent: editor.getHTML(),
-                noticePassword: $('#noticePassword').val()
-            };
-            formData.append('notice', new Blob([JSON.stringify(noticeData)], { type: 'application/json' }));
-            
-            const fileInput = $('#noticeFile')[0];
-            if (fileInput.files.length > 0) {
-                formData.append('file', fileInput.files[0]);
-            }
-
-            $.ajax({
-                url: '/api/notice/write',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: (response) => {
-                    if (response.message) {
-                        alert(response.message);
-                        window.location.href = response.redirectUrl;
-                    } else {
-                        alert('공지사항 저장 실패: ' + response.error);
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.data) {
+                            displayErrors(xhr.responseJSON.data);
+                        } else {
+                            const errorMsg = xhr.responseJSON ? xhr.responseJSON.error : "서버 오류";
+                            alert('저장 실패: ' + errorMsg);
+                        }
                     }
-                },
-                error: (err) => {
-                    console.error('Write notice failed:', err);
-                    alert('공지사항 저장 중 오류 발생');
-                }
+                });
             });
         });
-    });
-</script>
+    </script>
 </body>
 </html>

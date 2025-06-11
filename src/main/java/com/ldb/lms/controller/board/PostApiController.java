@@ -1,28 +1,21 @@
 package com.ldb.lms.controller.board;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+import com.ldb.lms.dto.ApiResponseDto;
+import com.ldb.lms.dto.board.post.CommentDto;
+import com.ldb.lms.dto.board.post.PostDto;
+import com.ldb.lms.service.board.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import com.ldb.lms.dto.ApiResponseDto;
-import com.ldb.lms.dto.board.post.PostDto;
-import com.ldb.lms.dto.board.post.CommentDto;
-import com.ldb.lms.service.board.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/post")
 @RequiredArgsConstructor
@@ -30,28 +23,42 @@ public class PostApiController {
 
     private final PostService postService;
 
+    private ResponseEntity<ApiResponseDto<Object>> createValidationErrorResponse(BindingResult bindingResult) {
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError error : bindingResult.getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+        return ResponseEntity.badRequest().body(new ApiResponseDto<>(false, "입력 값을 확인해주세요.", errors));
+    }
+
     @PostMapping("createPost")
-    public ResponseEntity<ApiResponseDto<String>> createPost(
-            @RequestPart("postDto") PostDto postDto,
+    public ResponseEntity<?> createPost(
+            @Valid @RequestPart("postDto") PostDto postDto,
+            BindingResult bindingResult,
             @RequestPart(value = "postFile", required = false) MultipartFile postFile,
             HttpServletRequest request,
             HttpSession session) {
         
+        if (bindingResult.hasErrors()) {
+            return createValidationErrorResponse(bindingResult);
+        }
         postDto.setPostFile(postFile);
-        log.info("createPost API 호출: postTitle={}", postDto.getPostTitle());
         return postService.handleCreatePostApi(postDto, request, session);
     }
-
+    
     @PostMapping("updatePost")
-    public ResponseEntity<ApiResponseDto<String>> updatePost(
-            @RequestPart("postDto") PostDto postDto,
+    public ResponseEntity<?> updatePost(
+            @Valid @RequestPart("postDto") PostDto postDto,
+            BindingResult bindingResult,
             @RequestPart(value = "postFile", required = false) MultipartFile postFile,
             @RequestParam(value = "removeFile", required = false) Boolean removeFile,
             HttpServletRequest request,
             HttpSession session) {
-        
+
+        if (bindingResult.hasErrors()) {
+            return createValidationErrorResponse(bindingResult);
+        }
         postDto.setPostFile(postFile);
-        log.info("updatePost API 호출: postId={}", postDto.getPostId());
         return postService.handleUpdatePostApi(postDto, removeFile, request, session);
     }
 
@@ -62,54 +69,42 @@ public class PostApiController {
             HttpServletRequest request,
             HttpSession session) {
         
-        log.info("deletePost API (POST) 호출: postId={}", postId);
         return postService.handleDeletePostApi(postId, postPassword, request, session);
     }
 
-    @PostMapping("imageUpload")
-    public ResponseEntity<ApiResponseDto<Map<String, String>>> imageUpload(
-            @RequestParam("file") MultipartFile file,
-            HttpServletRequest request) {
-        
-        log.info("imageUpload API 호출: fileName={}", file.getOriginalFilename());
-        return postService.handleImageUploadApi(file, request);
-    }
-
     @PostMapping("comments/write")
-    public ResponseEntity<ApiResponseDto<String>> writeComment(
-            @RequestBody CommentDto commentDto,
+    public ResponseEntity<ApiResponseDto<CommentDto>> writeComment(
+            @Valid @RequestBody CommentDto commentDto,
+            BindingResult bindingResult,
             HttpSession session) {
         
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getFieldError().getDefaultMessage();
+            return ResponseEntity.badRequest().body(new ApiResponseDto<>(false, errorMessage, null));
+        }
+
         try {
-            postService.saveComment(commentDto, session);
-            ApiResponseDto<String> response = new ApiResponseDto<>(true, "댓글이 성공적으로 등록되었습니다.", null);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            ApiResponseDto<String> response = new ApiResponseDto<>(false, e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            CommentDto savedComment = postService.saveComment(commentDto, session);
+            return ResponseEntity.ok(new ApiResponseDto<>(true, "댓글이 등록되었습니다.", savedComment));
         } catch (Exception e) {
-            log.error("댓글 등록 중 서버 오류:", e);
-            ApiResponseDto<String> response = new ApiResponseDto<>(false, "댓글 등록 중 오류가 발생했습니다.", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.badRequest().body(new ApiResponseDto<>(false, e.getMessage(), null));
         }
     }
 
     @PutMapping("comments/update")
     public ResponseEntity<ApiResponseDto<String>> updateComment(
-            @RequestBody CommentDto commentDto,
+            @Valid @RequestBody CommentDto commentDto,
+            BindingResult bindingResult,
             HttpSession session) {
         
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new ApiResponseDto<>(false, bindingResult.getFieldError().getDefaultMessage(), null));
+        }
         try {
             postService.updateComment(commentDto, session);
-            ApiResponseDto<String> response = new ApiResponseDto<>(true, "댓글이 성공적으로 수정되었습니다.", null);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            ApiResponseDto<String> response = new ApiResponseDto<>(false, e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.ok(new ApiResponseDto<>(true, "댓글이 수정되었습니다.", null));
         } catch (Exception e) {
-            log.error("댓글 수정 중 서버 오류:", e);
-            ApiResponseDto<String> response = new ApiResponseDto<>(false, "댓글 수정 중 오류가 발생했습니다.", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.badRequest().body(new ApiResponseDto<>(false, e.getMessage(), null));
         }
     }
 
@@ -117,18 +112,11 @@ public class PostApiController {
     public ResponseEntity<ApiResponseDto<String>> deleteComment(
             @PathVariable String commentId,
             HttpSession session) {
-        
         try {
             postService.deleteComment(commentId, session);
-            ApiResponseDto<String> response = new ApiResponseDto<>(true, "댓글이 성공적으로 삭제되었습니다.", null);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            ApiResponseDto<String> response = new ApiResponseDto<>(false, e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.ok(new ApiResponseDto<>(true, "댓글이 삭제되었습니다.", null));
         } catch (Exception e) {
-            log.error("댓글 삭제 중 서버 오류:", e);
-            ApiResponseDto<String> response = new ApiResponseDto<>(false, "댓글 삭제 중 오류가 발생했습니다.", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.badRequest().body(new ApiResponseDto<>(false, e.getMessage(), null));
         }
     }
 }

@@ -1,19 +1,6 @@
 package com.ldb.lms.service.board;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ldb.lms.dto.ApiResponseDto;
 import com.ldb.lms.dto.board.post.CommentDto;
 import com.ldb.lms.dto.board.post.PostDto;
@@ -21,9 +8,31 @@ import com.ldb.lms.dto.board.post.PostPaginationDto;
 import com.ldb.lms.dto.board.post.PostSearchDto;
 import com.ldb.lms.mapper.board.PostMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -31,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PostService {
 
     private final PostMapper postMapper;
+    private final ObjectMapper objectMapper;
 
     public String getCurrentUserId(HttpSession session) {
         return (String) session.getAttribute("login");
@@ -43,26 +53,25 @@ public class PostService {
             try {
                 Files.createDirectories(uploadDirPath);
             } catch (IOException e) {
-                log.error("업로드 디렉토리 생성 실패: {}", uploadDirPath, e);
-                throw new RuntimeException("업로드 디렉토리를 생성할 수 없습니다.", e);
+                log.error("업로드 디렉토리 생성 실패", e);
+                throw new RuntimeException("업로드 디렉토리 생성 불가", e);
             }
         }
         return uploadDirPath;
     }
 
-    public String uploadFileAndGetPath(MultipartFile file, HttpServletRequest request) throws IOException {
+    private String uploadFileAndGetPath(MultipartFile file, HttpServletRequest request) throws IOException {
         if (file == null || file.isEmpty()) {
             return null;
         }
         Path uploadDirPath = getUploadDirPath(request);
-        String originalFilename = file.getOriginalFilename();
-        String storedFileName = UUID.randomUUID().toString() + "_" + originalFilename;
+        String storedFileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
         Path destPath = uploadDirPath.resolve(storedFileName);
         file.transferTo(destPath);
         return "/dist/assets/upload/" + storedFileName;
     }
 
-    public void deleteFile(String filePath, HttpServletRequest request) {
+    private void deleteFile(String filePath, HttpServletRequest request) {
         if (!StringUtils.hasText(filePath)) {
             return;
         }
@@ -72,28 +81,23 @@ public class PostService {
             Path fileToDelete = uploadDirPath.resolve(actualFileName);
             Files.deleteIfExists(fileToDelete);
         } catch (IOException e) {
-            log.error("파일 삭제 실패: {}", filePath, e);
+            log.error("파일 삭제 실패", e);
         }
     }
 
     @Transactional
     public ResponseEntity<ApiResponseDto<String>> handleCreatePostApi(PostDto postDto, HttpServletRequest request, HttpSession session) {
         try {
-            if (!StringUtils.hasText(postDto.getPostTitle()) || !StringUtils.hasText(postDto.getPostContent()) || !StringUtils.hasText(postDto.getPostPassword())) {
-                ApiResponseDto<String> response = new ApiResponseDto<>(false, "제목, 내용, 비밀번호는 필수 입력값입니다.", null);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
             String authorId = getCurrentUserId(session);
             if (!StringUtils.hasText(authorId)) {
-                ApiResponseDto<String> response = new ApiResponseDto<>(false, "로그인이 필요합니다.", null);
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponseDto<>(false, "로그인이 필요합니다.", null));
             }
-            
+
             postDto.setAuthorId(authorId);
             postDto.setPostId(generateNewPostId());
             postDto.setPostNotice(postDto.getPostNotice() == null ? 0 : postDto.getPostNotice());
-            postDto.setPostCreatedAt(new Date());
             postDto.setPostReadCount(0);
+
             String parentPostId = postDto.getParentPostId();
             if (StringUtils.hasText(parentPostId)) {
                 PostDto parentPost = postMapper.getPost(parentPostId);
@@ -117,8 +121,8 @@ public class PostService {
             String filePath = uploadFileAndGetPath(postDto.getPostFile(), request);
             postDto.setExistingFilePath(filePath);
             postMapper.insertPost(postDto);
-            
-            String redirectUrl = "/post/getPostDetail?postId=" + postDto.getPostId();
+
+            String redirectUrl = "/post/getPosts";
             return ResponseEntity.ok(new ApiResponseDto<>(true, "게시물이 성공적으로 등록되었습니다.", redirectUrl));
         } catch (Exception e) {
             log.error("게시물 작성 실패", e);
@@ -129,42 +133,34 @@ public class PostService {
     @Transactional
     public ResponseEntity<ApiResponseDto<String>> handleUpdatePostApi(PostDto postDto, Boolean removeFile, HttpServletRequest request, HttpSession session) {
         try {
-            if (!StringUtils.hasText(postDto.getPostTitle()) || !StringUtils.hasText(postDto.getPostContent()) || !StringUtils.hasText(postDto.getPostPassword())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto<>(false, "제목, 내용, 비밀번호는 필수 입력값입니다.", null));
-            }
-
+            String currentUserId = getCurrentUserId(session);
             PostDto existingPost = postMapper.getPost(postDto.getPostId());
+
             if (existingPost == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDto<>(false, "수정할 게시물이 존재하지 않습니다.", null));
+            }
+            if (!existingPost.getAuthorId().equals(currentUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponseDto<>(false, "수정 권한이 없습니다.", null));
             }
             if (!existingPost.getPostPassword().equals(postDto.getPostPassword())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto<>(false, "비밀번호가 일치하지 않습니다.", null));
             }
-            String currentUserId = getCurrentUserId(session);
-            if (!existingPost.getAuthorId().equals(currentUserId)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponseDto<>(false, "게시물을 수정할 권한이 없습니다.", null));
-            }
 
-            postDto.setPostUpdatedAt(new Date());
-            String currentFilePath = existingPost.getExistingFilePath();
-            String finalFilePath = currentFilePath;
-
+            String filePath = existingPost.getExistingFilePath();
             if (Boolean.TRUE.equals(removeFile)) {
-                deleteFile(currentFilePath, request);
-                finalFilePath = null;
+                deleteFile(filePath, request);
+                filePath = null;
             }
-
             MultipartFile newFile = postDto.getPostFile();
             if (newFile != null && !newFile.isEmpty()) {
-                if (StringUtils.hasText(currentFilePath)) {
-                    deleteFile(currentFilePath, request);
+                if (StringUtils.hasText(filePath)) {
+                    deleteFile(filePath, request);
                 }
-                finalFilePath = uploadFileAndGetPath(newFile, request);
+                filePath = uploadFileAndGetPath(newFile, request);
             }
-
-            postDto.setExistingFilePath(finalFilePath);
+            postDto.setExistingFilePath(filePath);
             postMapper.updatePost(postDto);
-            
+
             String redirectUrl = "/post/getPostDetail?postId=" + postDto.getPostId();
             return ResponseEntity.ok(new ApiResponseDto<>(true, "게시물이 성공적으로 수정되었습니다.", redirectUrl));
         } catch (Exception e) {
@@ -172,43 +168,31 @@ public class PostService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto<>(false, "서버 오류로 인해 게시물 수정에 실패했습니다.", null));
         }
     }
-    
+
     @Transactional
     public ResponseEntity<ApiResponseDto<String>> handleDeletePostApi(String postId, String postPassword, HttpServletRequest request, HttpSession session) {
         try {
+            String currentUserId = getCurrentUserId(session);
             PostDto existingPost = postMapper.getPost(postId);
+
             if (existingPost == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDto<>(false, "삭제할 게시물이 존재하지 않습니다.", null));
             }
+            if (!existingPost.getAuthorId().equals(currentUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponseDto<>(false, "삭제 권한이 없습니다.", null));
+            }
             if (!existingPost.getPostPassword().equals(postPassword)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseDto<>(false, "비밀번호가 일치하지 않습니다.", null));
-            }
-            String currentUserId = getCurrentUserId(session);
-            if (!existingPost.getAuthorId().equals(currentUserId)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponseDto<>(false, "게시물을 삭제할 권한이 없습니다.", null));
             }
 
             deleteFile(existingPost.getExistingFilePath(), request);
             postMapper.deleteCommentsByPostId(postId);
             postMapper.deletePost(postId);
-            
-            return ResponseEntity.ok(new ApiResponseDto<>(true, "게시물이 성공적으로 삭제되었습니다.", "/post/getPosts"));
+
+            return ResponseEntity.ok(new ApiResponseDto<>(true, "게시물이 삭제되었습니다.", "/post/getPosts"));
         } catch (Exception e) {
             log.error("게시물 삭제 실패", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto<>(false, "서버 오류로 인해 게시물 삭제에 실패했습니다.", null));
-        }
-    }
-
-    public ResponseEntity<ApiResponseDto<Map<String, String>>> handleImageUploadApi(MultipartFile file, HttpServletRequest request) {
-        try {
-            String filePath = uploadFileAndGetPath(file, request);
-            Map<String, String> data = new HashMap<>();
-            data.put("url", filePath);
-            data.put("fileName", file.getOriginalFilename());
-            return ResponseEntity.ok(new ApiResponseDto<>(true, "이미지 업로드 성공", data));
-        } catch (Exception e) {
-            log.error("이미지 업로드 실패", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseDto<>(false, "이미지 업로드 실패: " + e.getMessage(), null));
         }
     }
 
@@ -217,42 +201,68 @@ public class PostService {
         PostSearchDto noticeSearchDto = new PostSearchDto();
         noticeSearchDto.setPostNotice(1);
         modelData.put("noticeList", postMapper.listNotices(noticeSearchDto));
+
         searchDto.setPostNotice(0);
         int totalCount = postMapper.countPosts(searchDto);
         pageDto.setTotalRows(totalCount);
         pageDto.calculatePagination();
+
         Map<String, Object> params = new HashMap<>();
         params.put("searchDto", searchDto);
         params.put("pageDto", pageDto);
+
         modelData.put("postList", postMapper.listPosts(params));
         modelData.put("pagination", pageDto);
         modelData.put("search", searchDto);
         return modelData;
     }
 
+    @Transactional
+    public Map<String, Object> getPostDetailData(String postId) {
+        Map<String, Object> modelData = new HashMap<>();
+        postMapper.incrementReadCount(postId);
+        PostDto post = postMapper.getPost(postId);
+        if (post != null) {
+            modelData.put("post", post);
+            modelData.put("comments", postMapper.selectCommentList(postId));
+        }
+        return modelData;
+    }
+
+    @Transactional
+    public Map<String, Object> getPostDetailDataWithCommentsJson(String postId) {
+        Map<String, Object> postData = getPostDetailData(postId);
+
+        try {
+            Object commentsObj = postData.get("comments");
+            String commentsJsonString = "[]";
+            if (commentsObj instanceof List<?>) {
+                @SuppressWarnings("unchecked")
+                List<CommentDto> comments = (List<CommentDto>) commentsObj;
+                if (comments != null) {
+                    commentsJsonString = objectMapper.writeValueAsString(comments);
+                }
+            }
+            log.info("commentsJsonString from Service: {}", commentsJsonString);
+            postData.put("commentsJsonString", commentsJsonString);
+        } catch (Exception e) {
+            log.error("댓글 목록 JSON 변환 실패 (Service)", e);
+            postData.put("commentsJsonString", "[]");
+        }
+        return postData;
+    }
+
+
     public Map<String, Object> getCreatePostFormData(HttpSession session) {
         Map<String, Object> modelData = new HashMap<>();
-        modelData.put("currentAuthorId", getCurrentUserId(session)); 
+        modelData.put("currentAuthorId", getCurrentUserId(session));
         return modelData;
     }
 
     public Map<String, Object> getUpdatePostFormData(String postId, HttpSession session) {
         Map<String, Object> modelData = new HashMap<>();
-        PostDto post = postMapper.getPost(postId);
-        modelData.put("post", post);
-        modelData.put("existingFileUrl", post.getExistingFilePath());
-        return modelData;
-    }
-
-    @Transactional
-    public Map<String, Object> getPostDetailData(String postId) {
-        Map<String, Object> modelData = new HashMap<>();
-        PostDto post = postMapper.getPost(postId);
-        if (post != null) {
-            postMapper.incrementReadCount(postId);
-            modelData.put("post", post);
-            modelData.put("comments", postMapper.selectCommentList(postId));
-        }
+        modelData.put("post", postMapper.getPost(postId));
+        modelData.put("currentAuthorId", getCurrentUserId(session));
         return modelData;
     }
 
@@ -271,41 +281,47 @@ public class PostService {
 
     private synchronized String generateNewPostId() {
         String maxPostId = postMapper.getLastPostId();
-        if (maxPostId == null || maxPostId.isEmpty()) return "PO001";
+        if (maxPostId == null || maxPostId.isEmpty()) {
+            return "PO001";
+        }
         int number = Integer.parseInt(maxPostId.substring(2)) + 1;
         return "PO" + String.format("%03d", number);
     }
 
-    @Transactional
-    public void saveComment(CommentDto commentDto, HttpSession session) {
-        String writerId = getCurrentUserId(session);
-        if (!StringUtils.hasText(writerId)) { 
-            throw new IllegalArgumentException("로그인 후에 댓글을 작성할 수 있습니다.");
+    private synchronized String generateNewCommentId() {
+        String maxCommentId = postMapper.getLastCommentId();
+        if (maxCommentId == null || maxCommentId.isEmpty()) {
+            return "CM001";
         }
-        if (!StringUtils.hasText(commentDto.getCommentContent())) {
-            throw new IllegalArgumentException("댓글 내용은 필수 입력값입니다.");
+        int number = Integer.parseInt(maxCommentId.substring(2)) + 1;
+        return "CM" + String.format("%03d", number);
+    }
+
+    @Transactional
+    public CommentDto saveComment(CommentDto commentDto, HttpSession session) {
+        String writerId = getCurrentUserId(session);
+        if (!StringUtils.hasText(writerId)) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
         }
         commentDto.setWriterId(writerId);
         commentDto.setCommentId(generateNewCommentId());
-        commentDto.setCreatedAt(new Date());
-        commentDto.setUpdatedAt(new Date());
         postMapper.insertComment(commentDto);
+        return postMapper.selectComment(commentDto.getCommentId());
     }
 
     @Transactional
     public void updateComment(CommentDto commentDto, HttpSession session) {
         String currentUserId = getCurrentUserId(session);
         if (!StringUtils.hasText(currentUserId)) {
-            throw new IllegalArgumentException("댓글을 수정하려면 로그인이 필요합니다.");
+            throw new IllegalArgumentException("로그인이 필요합니다.");
         }
         CommentDto existingComment = postMapper.selectComment(commentDto.getCommentId());
         if (existingComment == null) {
-            throw new IllegalArgumentException("수정할 댓글이 존재하지 않습니다.");
+            throw new IllegalArgumentException("댓글이 존재하지 않습니다.");
         }
         if (!existingComment.getWriterId().equals(currentUserId)) {
-            throw new IllegalArgumentException("댓글을 수정할 권한이 없습니다.");
+            throw new IllegalArgumentException("수정 권한이 없습니다.");
         }
-        commentDto.setUpdatedAt(new Date());
         postMapper.updateComment(commentDto);
     }
 
@@ -313,22 +329,43 @@ public class PostService {
     public void deleteComment(String commentId, HttpSession session) {
         String currentUserId = getCurrentUserId(session);
         if (!StringUtils.hasText(currentUserId)) {
-            throw new IllegalArgumentException("댓글을 삭제하려면 로그인이 필요합니다.");
+            throw new IllegalArgumentException("로그인이 필요합니다.");
         }
         CommentDto existingComment = postMapper.selectComment(commentId);
         if (existingComment == null) {
-            throw new IllegalArgumentException("삭제할 댓글이 존재하지 않습니다.");
+            throw new IllegalArgumentException("댓글이 존재하지 않습니다.");
         }
         if (!existingComment.getWriterId().equals(currentUserId)) {
-            throw new IllegalArgumentException("댓글을 삭제할 권한이 없습니다.");
+            throw new IllegalArgumentException("삭제 권한이 없습니다.");
         }
         postMapper.deleteComment(commentId);
     }
 
-    private synchronized String generateNewCommentId() {
-        String maxCommentId = postMapper.getLastCommentId();
-        if (maxCommentId == null || maxCommentId.isEmpty()) return "CM001";
-        int number = Integer.parseInt(maxCommentId.substring(2)) + 1;
-        return "CM" + String.format("%03d", number);
+    public void handleFileDownload(String filePath, HttpServletResponse response, HttpServletRequest request) throws Exception {
+        if (!StringUtils.hasText(filePath) || !filePath.startsWith("/dist/assets/upload/")) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid file path");
+            return;
+        }
+        Path uploadDirPath = getUploadDirPath(request);
+        String fullPath = uploadDirPath.toString() + filePath.substring("/dist/assets/upload/".length());
+        File file = new File(fullPath);
+        if (!file.exists() || !file.canRead()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found");
+            return;
+        }
+        String originalFileName = filePath.substring(filePath.lastIndexOf("_") + 1);
+        String encodedFileName = URLEncoder.encode(originalFileName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"");
+        response.setContentLengthLong(file.length());
+        try (FileInputStream fis = new FileInputStream(file); OutputStream os = response.getOutputStream()) {
+            byte[] buffer = new byte[4096];
+            int length;
+            while ((length = fis.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+            os.flush();
+        }
     }
 }

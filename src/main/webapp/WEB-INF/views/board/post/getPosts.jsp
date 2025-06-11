@@ -18,7 +18,7 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-4 p-3 bg-light rounded border">
-                            <form id="searchForm" action="/post/searchPosts" method="post" class="row gx-2 gy-2 align-items-center">
+                            <form id="searchForm" action="/post/getPosts" method="get" class="row gx-2 gy-2 align-items-center">
                                 <div class="col-md-3">
                                     <select name="searchType" class="form-select form-select-sm">
                                         <option value="postTitle,userName,postContent" ${empty search.searchType or search.searchType == 'postTitle,userName,postContent' ? 'selected' : ''}>전체</option>
@@ -54,7 +54,19 @@
                                             <a href="/post/getPostDetail?postId=${post.postId}" class="text-dark text-decoration-none fw-bold">${fn:escapeXml(post.postTitle)}</a>
                                         </td>
                                         <td>${fn:escapeXml(post.userName)}</td>
-                                        <td><fmt:formatDate value="${post.postCreatedAt}" pattern="yyyy-MM-dd"/></td>
+                                        <td>
+                                            <c:set var="todayDate" value="<%= new java.util.Date() %>" />
+                                            <fmt:formatDate var="todayFormatted" value="${todayDate}" pattern="yyyy-MM-dd" />
+                                            <fmt:formatDate var="postDateFormatted" value="${post.postCreatedAt}" pattern="yyyy-MM-dd" />
+                                            <c:choose>
+                                                <c:when test="${todayFormatted == postDateFormatted}">
+                                                    <fmt:formatDate value="${post.postCreatedAt}" pattern="HH:mm" />
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <fmt:formatDate value="${post.postCreatedAt}" pattern="yyyy-MM-dd" />
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
                                         <td>${post.postReadCount}</td>
                                     </tr>
                                 </c:forEach>
@@ -71,7 +83,19 @@
                                                     <a href="/post/getPostDetail?postId=${post.postId}" class="text-dark text-decoration-none">${fn:escapeXml(post.postTitle)}</a>
                                                 </td>
                                                 <td>${fn:escapeXml(post.userName)}</td>
-                                                <td><fmt:formatDate value="${post.postCreatedAt}" pattern="yyyy-MM-dd"/></td>
+                                                <td>
+                                                    <c:set var="todayDate" value="<%= new java.util.Date() %>" />
+                                                    <fmt:formatDate var="todayFormatted" value="${todayDate}" pattern="yyyy-MM-dd" />
+                                                    <fmt:formatDate var="postDateFormatted" value="${post.postCreatedAt}" pattern="yyyy-MM-dd" />
+                                                    <c:choose>
+                                                        <c:when test="${todayFormatted == postDateFormatted}">
+                                                            <fmt:formatDate value="${post.postCreatedAt}" pattern="HH:mm" />
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <fmt:formatDate value="${post.postCreatedAt}" pattern="yyyy-MM-dd" />
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
                                                 <td>${post.postReadCount}</td>
                                             </tr>
                                         </c:forEach>
@@ -89,9 +113,9 @@
                         <a href="/post/createPost" class="btn btn-primary float-end">글쓰기</a>
                         <nav class="d-flex justify-content-center">
                             <ul class="pagination m-0">
-                                <c:if test="${pagination.startPage > 1}">
+                                <c:if test="${pagination.prev}">
                                     <li class="page-item">
-                                        <a class="page-link" href="?currentPage=${pagination.startPage - 1}&searchType=${fn:escapeXml(search.searchType)}&searchKeyword=${fn:escapeXml(search.searchKeyword)}">&laquo;</a>
+                                        <a class="page-link" href="?currentPage=${pagination.currentPage - 1}&searchType=${fn:escapeXml(search.searchType)}&searchKeyword=${fn:escapeXml(search.searchKeyword)}">이전</a>
                                     </li>
                                 </c:if>
                                 <c:forEach var="i" begin="${pagination.startPage}" end="${pagination.endPage}">
@@ -99,9 +123,9 @@
                                         <a class="page-link" href="?currentPage=${i}&searchType=${fn:escapeXml(search.searchType)}&searchKeyword=${fn:escapeXml(search.searchKeyword)}">${i}</a>
                                     </li>
                                 </c:forEach>
-                                <c:if test="${pagination.endPage < pagination.totalPages}">
+                                <c:if test="${pagination.next}">
                                     <li class="page-item">
-                                        <a class="page-link" href="?currentPage=${pagination.endPage + 1}&searchType=${fn:escapeXml(search.searchType)}&searchKeyword=${fn:escapeXml(search.searchKeyword)}">&raquo;</a>
+                                        <a class="page-link" href="?currentPage=${pagination.currentPage + 1}&searchType=${fn:escapeXml(search.searchType)}&searchKeyword=${fn:escapeXml(search.searchKeyword)}">다음</a>
                                     </li>
                                 </c:if>
                             </ul>
