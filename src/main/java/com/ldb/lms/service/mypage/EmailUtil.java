@@ -47,7 +47,8 @@ public class EmailUtil {
             message.setFrom(new InternetAddress(from));
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
             message.setSubject("ID 안내(LDB학사관리부)");
-            message.setText(userName + "님, \n\n  ID: " + id + "\n\n로그인 페이지에서 사용하세요.\n \n "
+            message.setText(userName + "님, \n\n  ID: " + id + "\n\n"
+            		+ "로그인 페이지에서 사용하세요\n \n "
             		+ "-LDB 학사관리부	-");
             
 

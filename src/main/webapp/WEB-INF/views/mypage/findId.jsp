@@ -66,6 +66,7 @@
 <div class="card">
     <div>
         <h2 style="text-align: center">${msg}</h2>
+        <h2 style="text-align: center; color: green" >${detailMsg}</h2>     
         <button class="btn btn-custom w-100 mb-3" onclick="c()">홈화면으로 돌아가기</button>
     </div>
 </div>
@@ -75,6 +76,8 @@
     <script type="text/javascript">
     	function c(){
                 window.close();
+                /*const msg = document.querySelector("#findId").value;
+                opener.document.f.id.value = msg;*/
             
     	}
     </script>
