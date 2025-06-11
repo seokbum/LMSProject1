@@ -244,4 +244,18 @@ public class NoticeService {
             os.flush();
         }
     }
+    
+    public List<NoticeDto> getRecentNotices() {
+        NoticeSearchDto searchDto = new NoticeSearchDto();
+        
+        NoticePaginationDto pageDto = new NoticePaginationDto();
+        pageDto.setItemsPerPage(5); 
+        pageDto.setOffset(0); 
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("searchDto", searchDto); 
+        params.put("pageDto", pageDto);
+
+        return noticeMapper.listNotice(params);
+    }
 }

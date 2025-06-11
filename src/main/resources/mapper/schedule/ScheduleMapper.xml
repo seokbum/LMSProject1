@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ldb.lms.mapper.schedule.ScheduleMapper">
+
+    <select id="listSchedules" resultType="ScheduleDto">
+        SELECT
+            schedule_id,
+            schedule_title,
+            schedule_description,
+            schedule_date
+        FROM schedule
+        ORDER BY schedule_date ASC, schedule_id ASC
+        LIMIT 5
+    </select>
+
+    </mapper>

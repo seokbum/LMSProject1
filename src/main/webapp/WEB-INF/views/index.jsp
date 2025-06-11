@@ -15,7 +15,6 @@ pageContext.setAttribute("randomImageNumber", randomImageNumber);
     <title>메인화면</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-    /* 기본 배경 스타일 */
     body::before {
         content: '';
         position: fixed;
@@ -32,74 +31,75 @@ pageContext.setAttribute("randomImageNumber", randomImageNumber);
         z-index: -1;
     }
 
-    /* 컨테이너 위치 */
     .container-custom {
         margin-top: 50px;
         margin-left: 55px;
     }
 
-    /* 카드 스타일 */
     .card-custom {
-        padding: 15px; /* 여백 줄임 */
-        min-height: 250px; /* 높이 낮춤 */
+        padding: 15px;
+        min-height: 250px;
         margin-bottom: 50px;
         display: flex;
         flex-direction: column;
-        justify-content: center; /* 수직 중앙 */
-        max-width: 400px; /* 너비 제한 */
-        margin-left: 20px; /* 왼쪽으로 더 붙임 */
+        justify-content: center;
+        max-width: 400px;
+        margin-left: 20px;
     }
 
-    /* 카드 바디 중앙 정렬 */
     .card-body {
         display: flex;
         flex-direction: column;
-        justify-content: center; /* 수직 중앙 */
-        align-items: stretch; /* 수평은 채우기 */
-        flex-grow: 1; /* 바디가 카드 높이 채우도록 */
+        justify-content: center;
+        align-items: stretch;
+        flex-grow: 1;
     }
 
-    /* 환영 메시지 텍스트 스타일 */
     .welcome-text {
-        margin-bottom: 15px; /* 텍스트 간 간격 */
-        font-size: 1.1rem; /* 살짝 큰 폰트 */
+        margin-bottom: 15px;
+        font-size: 1.1rem;
     }
 
-    /* 빠른 액세스 버튼 */
     .quick-access .btn {
-        font-size: 1rem; /* 버튼 텍스트 크기 */
-        padding: 10px 20px; /* 버튼 패딩 */
-        margin: 5px; /* 버튼 간 간격 */
+        font-size: 1rem;
+        padding: 10px 20px;
+        margin: 5px;
     }
 
-    /* 공지사항 리스트 */
     .list-group-item {
         display: flex;
         justify-content: space-between;
-        align-items: center; /* 수직 중앙 */
-        padding: 10px 15px; /* 패딩 조정 */
-        margin-bottom: 5px; /* 항목 간 간격 */
+        align-items: center;
+        padding: 10px 15px;
+        margin-bottom: 5px;
     }
 
-    /* 타임라인 스타일 */
     .timeline-item {
-        padding: 10px 15px; /* 패딩 조정 */
-        margin-bottom: 15px; /* 항목 간 간격 */
+        padding: 10px 15px;
+        margin-bottom: 15px;
     }
     .timeline-item .time {
-        margin-bottom: 5px; /* 날짜와 제목 간격 */
+        margin-bottom: 5px;
     }
     .timeline-item h3 {
-        font-size: 1.1rem; /* 제목 크기 */
+        font-size: 1.1rem;
     }
     .timeline-body {
-        font-size: 0.95rem; /* 본문 크기 */
+        font-size: 0.95rem;
     }
-    /* 타임라인 빈 경우 */
     .timeline-empty {
         text-align: center;
-        color: #6c757d; /* 회색 텍스트 */
+        color: #6c757d;
         margin-top: 20px;
+    }
+    .season-info {
+        text-align: center;
+        font-weight: bold;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        background-color: #e9ecef;
+        color: #343a40;
     }
 </style>
 </head>
@@ -126,7 +126,7 @@ pageContext.setAttribute("randomImageNumber", randomImageNumber);
                                             </c:choose>
                                         </strong>
                                     </c:if>
-                                </h5>
+                                <h5>
                             </div>
                             <div class="card-body">
                                 <p class="welcome-text">
@@ -185,7 +185,7 @@ pageContext.setAttribute("randomImageNumber", randomImageNumber);
                             </div>
                             <div class="card-body">
                                 <ul class="list-group">
-                                    <c:forEach var="notice" items="${recentNotices}" begin="0" end="2">
+                                    <c:forEach var="notice" items="${recentNotices}">
                                         <li class="list-group-item">
                                             <a href="/notice/getNoticeDetail?noticeId=${notice.noticeId}">${fn:escapeXml(notice.noticeTitle)}</a>
                                             <span class="text-muted">
@@ -203,6 +203,7 @@ pageContext.setAttribute("randomImageNumber", randomImageNumber);
                                 <h5 class="card-title">학사 일정</h5>
                             </div>
                             <div class="card-body">
+                                <div id="seasonInfo" class="season-info"></div>
                                 <ul class="timeline timeline-inverse" id="scheduleTimeline">
                                 </ul>
                             </div>
@@ -212,52 +213,71 @@ pageContext.setAttribute("randomImageNumber", randomImageNumber);
             </div>
         </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
     $(document).ready(function() {
-        var path = "${pageContext.request.contextPath}";
+        function displaySeasonInfo() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth() + 1;
+            const day = today.getDate();
 
-        const iconClasses = [
-            "bi bi-calendar-event",
-            "bi bi-bell",
-            "bi bi-bookmark",
-            "bi bi-check-circle",
-            "bi bi-star"
-        ];
-        
-        const bgClasses = [
-            "bg-primary",
-            "bg-success",
-            "bg-info",
-            "bg-warning",
-            "bg-danger"
-        ];
-        
-        function getRandomIndex(arr) {
-            return Math.floor(Math.random() * arr.length);
+            let seasonMessage = "현재 기간 정보 없음";
+
+            if (month >= 3 && month <= 6) {
+                if (month === 3 || month === 4 || month === 5) {
+                    seasonMessage = "현재 LDB대학교는 1학기 중입니다.";
+                } else if (month === 6 && day <= 20) {
+                    seasonMessage = "현재 LDB대학교는 1학기 중입니다.";
+                }
+            }
+            if (month >= 6 && month <= 8) {
+                if (month === 6 && day >= 21) {
+                    seasonMessage = "현재 LDB대학교는 여름방학 기간 입니다.";
+                } else if (month === 7) {
+                    seasonMessage = "현재 LDB대학교는 여름방학 기간 입니다.";
+                } else if (month === 8 && day <= 28) {
+                    seasonMessage = "현재 LDB대학교는 여름방학 기간입니다.";
+                }
+            }
+            if (month >= 8 && month <= 12) {
+                if (month === 8 && day >= 29) {
+                    seasonMessage = "현재 LDB대학교는 2학기 중입니다.";
+                } else if (month === 9 || month === 10 || month === 11) {
+                    seasonMessage = "현재 LDB대학교는 2학기 중입니다.";
+                } else if (month === 12 && day <= 10) {
+                    seasonMessage = "현재 LDB대학교는 2학기 중입니다.";
+                }
+            }
+            if (month === 12 && day >= 11) {
+                seasonMessage = "현재 LDB대학교는 겨울방학 기간 입니다.";
+            } else if (month === 1 || month === 2) {
+                 seasonMessage = "현재 LDB대학교는 겨울방학 기간 입니다.";
+            }
+
+            $("#seasonInfo").html(seasonMessage);
         }
+
+        displaySeasonInfo();
         
         $.ajax({
-            url: path + "/mypage/schedule",
+            url: "/api/admin/schedule",
             type: "GET",
             dataType: "json",
             cache: false,
-            success: function(data) {
+            success: function(response) { 
                 let timeline = $("#scheduleTimeline");
                 timeline.empty();
                 
-                if (!data.success || !data.schedules || data.schedules.length === 0) {
-                    console.log("No schedules found or success is false");
-                    timeline.append('<li><div class="timeline-item timeline-empty">스케줄 데이터가 없습니다.</div></li>');
+                if (!response.success || !response.data || !response.data.schedules || response.data.schedules.length === 0) {
+                    console.log("스케줄 데이터가 없거나 조회에 실패했습니다. (API 응답 없음)");
                     return;
                 }
                 
-                $.each(data.schedules, function(index, schedule) {
+                $.each(response.data.schedules, function(index, schedule) {
                     let formattedDate = schedule.scheduleDateFormatted || "날짜 없음";
-                    let randomIcon = iconClasses[getRandomIndex(iconClasses)];
-                    let randomBg = bgClasses[getRandomIndex(bgClasses)];
                     
                     let timelineItem = '<li>' +
-                        '<i class="' + randomIcon + ' ' + randomBg + '"></i>' +
                         '<div class="timeline-item">' +
                             '<span class="time"><i class="bi bi-clock"></i> ' + formattedDate + '</span>' +
                             '<h3 class="timeline-header">' + schedule.scheduleTitle + '</h3>' +
@@ -266,13 +286,11 @@ pageContext.setAttribute("randomImageNumber", randomImageNumber);
                     '</li>';
                     timeline.append(timelineItem);
                 });
-                timeline.append('<li><i class="fas fa-clock bg-gray"></i></li>');
             },
             error: function(xhr, status, error) {
-                console.error("Error fetching schedule:", status, error);
-                console.error("Response Status:", xhr.status);
-                console.error("Full Response:", xhr.responseText);
-                $("#scheduleTimeline").html('<li><div class="timeline-item timeline-empty">데이터를 불러오는데 실패했습니다: ' + error + ' (Status: ' + xhr.status + ')</div></li>');
+                console.error("스케줄 불러오기 오류:", status, error);
+                console.error("응답 상태:", xhr.status);
+                console.error("전체 응답:", xhr.responseText);
             }
         });
     });
