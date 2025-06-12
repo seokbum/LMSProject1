@@ -18,6 +18,7 @@ import com.ldb.lms.dto.mypage.DeleteUserDto;
 import com.ldb.lms.dto.mypage.Dept;
 import com.ldb.lms.dto.mypage.FindIdDto;
 import com.ldb.lms.dto.mypage.FindPwDto;
+import com.ldb.lms.dto.mypage.GetScoresDto;
 import com.ldb.lms.dto.mypage.LoginChkDto;
 import com.ldb.lms.dto.mypage.Professor;
 import com.ldb.lms.dto.mypage.RegisterUserDto;
@@ -28,6 +29,7 @@ import com.ldb.lms.interceptor.StuCheckInterceptor;
 import com.ldb.lms.mapper.mybatis.mypage.DeptMapper;
 import com.ldb.lms.mapper.mybatis.mypage.ProStuMapper;
 import com.ldb.lms.mapper.mybatis.mypage.ProfessorMapper;
+import com.ldb.lms.mapper.mybatis.mypage.ScoreMapper;
 import com.ldb.lms.mapper.mybatis.mypage.StudentMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,6 +51,8 @@ public class MypageService {
 	private final ProStuMapper proStuMapper;
 
 	private final DeptMapper deptMapper;
+	
+	private final ScoreMapper scoreMapper;
 
     
 
@@ -524,5 +528,19 @@ public class MypageService {
 		}
 			request.setAttribute("msg", "입력오류");
 			return;	
+	}
+
+
+	public boolean getScore(String id, HttpServletRequest request) {
+	 List<GetScoresDto> score = scoreMapper.getScore(id);
+		if(score==null) {
+			return false;
+		}
+		else {
+			request.getSession().setAttribute("score", score);
+			return true;
+		}
+		
+		
 	}
 }
