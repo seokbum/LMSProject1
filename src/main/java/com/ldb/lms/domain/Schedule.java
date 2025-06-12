@@ -10,8 +10,10 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Schedule {
-    private Integer scheduleId; 
-    private Date scheduleDate; 
+    private Integer scheduleId;
     private String scheduleTitle;
-    private String scheduleDescription; 
+    private String scheduleDescription;
+    private Date scheduleStartDate; 
+    private Date scheduleEndDate;   
+    private String semesterType;    
 }
