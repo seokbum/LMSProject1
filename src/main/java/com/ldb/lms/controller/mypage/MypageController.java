@@ -1,5 +1,11 @@
 package com.ldb.lms.controller.mypage;
 
+import java.util.List;
+
+
+
+
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -17,6 +23,7 @@ import com.ldb.lms.service.mypage.MypageService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+
 
 @Controller
 @RequestMapping("/mypage")
@@ -168,5 +175,18 @@ public class MypageController {
 	public String postDeleteUser() {
 		return "mypage/getCourseTimetable";
 	}
+	
+	@GetMapping("getCourseScores")
+	public String getCourseScores (HttpServletRequest request) {
+		String id = (String)request.getSession().getAttribute("login");
+		if(mypageService.getScore(id,request)) {
+			return "mypage/getCourseScores";	
+		}
+		else {
+			return "error";
+		}
+		
+	}
+	
 
 }
