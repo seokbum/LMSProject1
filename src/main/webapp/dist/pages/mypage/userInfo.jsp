@@ -218,10 +218,8 @@
         <!-- Personal Information -->
         <div class="card">
             <h2>개인 정보</h2>
-
             <form action="userUpdate" class="form-section" name="f" method="post">
-                <div class="profile-section">
-                    
+                <div class="profile-section">                 
                     <input type="hidden" name="picture" value="${m.img}">
                     <img src="${path}/dist/assets/picture/${m.img}" id="pic" class="profile-img" alt="Profile Image">
                     <button type="button" class="btn btn-secondary" onclick="win_upload()">이미지 변경</button>
@@ -269,6 +267,17 @@
                             <input type="text" readonly="readonly" value="${deptName}" name="deptName">
                         </div>
                     </c:when>
+                    <c:when test="${fn:contains(sessionScope.login, 'a')}">
+                        <!-- Professor Information -->
+                        <div>
+                            <strong>이름:</strong>
+                            <input type="text" readonly="readonly" value="${m.adminName}" name="name">
+                        </div>                        
+                        <div>
+                            <strong>학과:</strong>
+                            <input type="text" readonly="readonly" value="학사관리과" name="deptName">
+                        </div>
+                    </c:when>
                 </c:choose>
 
                 <div>
@@ -282,6 +291,10 @@
                             <strong>연락처:</strong>
                             <input type="text" readonly="readonly" value="${m.professorPhone}" name="phone" id="phone">
                             <button class="btn btn-secondary" type="button" onclick="updatePhone()">수정</button>
+                        </c:when>
+                        <c:when test="${fn:contains(sessionScope.login, 'a')}">
+                            <strong>연락처:</strong>
+                            <input type="text" readonly="readonly" value="${m.adminPhone}" name="phone" id="phone">                            
                         </c:when>
                     </c:choose>
                 </div>
@@ -297,9 +310,14 @@
                             <input type="email" readonly="readonly" value="${m.professorEmail}" name="email" id="email">
                             <button class="btn btn-secondary" type="button" onclick="updateEmail()">수정</button>
                         </c:when>
+                        <c:when test="${fn:contains(sessionScope.login, 'a')}">
+                            <strong>이메일:</strong>
+                            <input type="email" readonly="readonly" value="${m.adminEmail}" name="email" id="email">
+                        </c:when>
                     </c:choose>
                 </div>
-                <div class="action-buttons">
+                <c:if test="${not fn:contains(sessionScope.login, 'a')}">
+                 <div class="action-buttons">
                     <button class="btn btn-primary" type="submit">수정완료</button>
                     <button class="btn btn-primary" type="button" onclick="updatePw()">비밀번호 변경</button>
                     <c:if test="${fn:contains(sessionScope.login, 'S')}"> <%--학생만선택가능 --%>
@@ -311,6 +329,8 @@
                 <input type="hidden" name="id" value="${sessionScope.login}">
                 <input type="hidden" name="email" value="${fn:contains(sessionScope.login, 'S') ? m.studentEmail : m.professorEmail}">
             </form>
+                </c:if>
+               
         </div>
     </div>
 

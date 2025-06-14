@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
+import com.ldb.lms.dto.mypage.AdminDto;
 import com.ldb.lms.dto.mypage.DeleteUserDto;
 import com.ldb.lms.dto.mypage.Dept;
 import com.ldb.lms.dto.mypage.FindIdDto;
@@ -26,6 +27,7 @@ import com.ldb.lms.dto.mypage.Student;
 import com.ldb.lms.dto.mypage.UpdateInfoDto;
 import com.ldb.lms.dto.mypage.UpdatePwDto;
 import com.ldb.lms.interceptor.StuCheckInterceptor;
+import com.ldb.lms.mapper.mybatis.mypage.AdminMapper;
 import com.ldb.lms.mapper.mybatis.mypage.DeptMapper;
 import com.ldb.lms.mapper.mybatis.mypage.ProStuMapper;
 import com.ldb.lms.mapper.mybatis.mypage.ProfessorMapper;
@@ -53,6 +55,8 @@ public class MypageService {
 	private final DeptMapper deptMapper;
 	
 	private final ScoreMapper scoreMapper;
+	
+	private final AdminMapper adminMapper;
 
     
 
@@ -69,7 +73,7 @@ public class MypageService {
 	}
 
 
-	public boolean login(String id , String password , HttpServletRequest request) {
+	public boolean login(String id , String password , HttpServletRequest request) {		
 		LoginChkDto loginChkDto = proStuMapper.loginChk(id);
 		if(loginChkDto == null) {
 			request.setAttribute("error", "존재하지않는 정보");
@@ -80,6 +84,8 @@ public class MypageService {
 			//professorId가 존재한다면 professorId가 반환되게 getId를 튜닝함
 			String dbId = loginChkDto.getId();			
 			String dbPw = loginChkDto.getPassword();
+			System.out.println(dbId);
+			System.out.println(dbPw);
 			
 			//Bcrypt.checkpw(입력,검증) : 입력과 검증(암호화된비번) 을 비교할수있음
 			if(BCrypt.checkpw(password, dbPw) ){
@@ -249,12 +255,10 @@ public class MypageService {
 		return tempNum;
 	}
 
+	
 
 
-	public void registerNumChk(RegisterUserDto dto, HttpServletRequest request) {
-		//LocalDate -> Date
-		//LocalDate birth = dto.getBirth();
-		//Date date = Date.from(birth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	public void registerNumChk(RegisterUserDto dto, HttpServletRequest request) {	
 
 		//position에 따른 id를 만들어줌(중복방지 로직추가)
 		String id = IdChk(dto.getPosition());
@@ -342,6 +346,7 @@ public class MypageService {
 		}
 
 	}
+	
 
 
 	public boolean index(HttpServletRequest request) {
@@ -364,10 +369,15 @@ public class MypageService {
 			session.setAttribute("m", professor);	
 			return true;
 		}
-		return false;
-
+		else  if(dbId.contains("a")){
+			AdminDto admin = adminMapper.selectOne(dbId);			
+			session.setAttribute("m", admin);
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
-
 
 	public void logout(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
