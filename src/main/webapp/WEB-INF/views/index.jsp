@@ -122,6 +122,9 @@
                                                 <c:when test="${user['class'].simpleName eq 'Professor' and not empty user.professorName}">
                                                     ${user.professorName}님
                                                 </c:when>
+                                                <c:otherwise>
+									                관리자님
+									            </c:otherwise>
                                             </c:choose>
                                         </strong>
                                     </c:if>
@@ -138,6 +141,9 @@
                                             <c:when test="${user['class'].simpleName eq 'Professor' and not empty user.professorName}">
                                                 교수
                                             </c:when>
+                                            <c:otherwise>
+								                관리자
+								            </c:otherwise>
                                         </c:choose>
                                     </c:if>
                                 </p>
@@ -151,6 +157,9 @@
                                             <c:when test="${user['class'].simpleName eq 'Professor' and not empty user.professorName}">
                                                 LDB 학사관리시스템에서 강의등록, 강의관리, 성적관리 등을 편리하게 이용하세요.
                                             </c:when>
+                                            <c:otherwise>
+                                                 LDB 학사관리시스템의 원활한 운영을 위해 항상 최선을 다하겠습니다.
+                                            </c:otherwise>
                                         </c:choose>
                                     </c:if>
                                 </p>

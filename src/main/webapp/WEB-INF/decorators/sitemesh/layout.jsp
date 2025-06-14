@@ -332,6 +332,27 @@ body {
 							class="nav-link"> <i class="nav-icon bi bi-pencil-square"></i>
 								<p>문의게시판</p>
 						</a></li>
+						<li class="nav-item">
+							<a href="#" class="nav-link">
+								<i class="nav-icon bi bi-collection-fill"></i>
+								<p>
+									관리자
+									<i class="nav-arrow bi bi-chevron-right"></i>
+								</p>
+							</a>
+							<ul class="nav nav-treeview">
+								<li class="nav-item">
+									<a href="/admin/schedules" class="nav-link">
+										<i class="nav-icon bi bi-calendar-event"></i>
+										<p>학사일정 관리</p>
+									</a>
+								</li>
+								<li class="nav-item"><a href="#" class="nav-link"> <i
+										class="nav-icon bi bi-circle"></i>
+										<p>미정</p>
+								</a></li>
+							</ul>
+						</li>
 					</ul>
 					<!--end::Sidebar Menu-->
 				</nav>
