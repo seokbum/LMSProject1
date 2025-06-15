@@ -285,10 +285,10 @@ body {
 									class="nav-link"> <i class="nav-icon bi bi-circle"></i>
 										<p>수강신청 현황</p>
 								</a></li>
-								<li class="nav-item"><a href="#" class="nav-link"> <i
+								<!-- <li class="nav-item"><a href="#" class="nav-link"> <i
 										class="nav-icon bi bi-circle"></i>
 										<p>미정</p>
-								</a></li>
+								</a></li> -->
 							</ul></li>
 						<%-- </c:if> --%>
 
