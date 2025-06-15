@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
-<c:set var="path" value="${pageContext.request.contextPath}" scope="application" />
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
+
 
 <!DOCTYPE html>
 <html>
@@ -80,12 +80,12 @@
 	            <c:forEach var="course" items="${courses}" varStatus="idx">
 	            	<tr>
 	            		<td>${idx.count}</td>
-	            		<td>${course.course_id}</td>
-	            		<td>${course.course_period}</td>
-	            		<td>${course.course_current_enrollment}</td>
-	            		<td>${course.course_name}</td>
+	            		<td>${course.courseId}</td>
+	            		<td>${course.coursePeriod}</td>
+	            		<td>${course.courseCurrentEnrollment}</td>
+	            		<td>${course.courseName}</td>
 	            		<td>
-	           				<button class="btn btn-primary manage-btn" data-course-id="${course.course_id}">출석 관리</button>
+	           				<button class="btn btn-primary manage-btn" data-course-id="${course.courseId}">출석 관리</button>
 	           			</td>
 	           		</tr>
 	            </c:forEach>
@@ -140,16 +140,16 @@
 	function createAttendanceRow(index, item) {  
 	    return (
 	        '<tr>' +
-	        '<td data-attendance-id="'+ item.attendance_id +'">' + (index + 1) + '</td>' +
-	        '<td>' + item.student_id + '</td>' +
-	        '<td>' + item.student_name + '</td>' +
-	        '<td class="late-count">' + item.attendance_late + '</td>' +
-	        '<td class="absent-count">' + item.attendance_absent + '</td>' +
+	        '<td data-attendance-id="'+ item.attendanceId +'">' + (index + 1) + '</td>' +
+	        '<td>' + item.studentId + '</td>' +
+	        '<td>' + item.studentName + '</td>' +
+	        '<td class="late-count">' + item.attendanceLate + '</td>' +
+	        '<td class="absent-count">' + item.attendanceAbsent + '</td>' +
 	        '<td>' +
 	        '<select class="attendance-select form-control">' +
-	        '<option value="present"' + (item.attendance_history_status === "출석" ? " selected" : "") + '>출석</option>' +
-	        '<option value="absent"' + (item.attendance_history_status === "결석" ? " selected" : "") + '>결석</option>' +
-	        '<option value="late"' + (item.attendance_history_status === "지각" ? " selected" : "") + '>지각</option>' +
+	        '<option value="present"' + (item.attendanceHistoryStatus === "present" ? " selected" : "") + '>출석</option>' +
+	        '<option value="absent"' + (item.attendanceHistoryStatus === "absent" ? " selected" : "") + '>결석</option>' +
+	        '<option value="late"' + (item.attendanceHistoryStatus === "late" ? " selected" : "") + '>지각</option>' +
 	        '</select>' +
 	        '</td>' +
 	        '</tr>'
@@ -204,23 +204,19 @@
 	        $('#attendanceRate').text('0%');
 	
 	        var attendanceList = $('#attendanceList');
-	        attendanceList.empty();
-			var params = {
-							courseId: courseId,
-							attendanceDate: $("#datePicker").val(),
-			}
+	        attendanceList.empty(); 
 
 	        $.ajax({
-				url : "${path}/professor_support/attendance/getAttendance",
+				url : "/professors/courses/attendance/" + courseId,
 				type : "get",
-				data : params,
+				data : {attendanceDate: $("#datePicker").val()},
 				dataType : "json",
 				success : function(data) {
-					if (data.errorMsg) {
-						alert(data.errorMsg);
+					if (!data.success) {
+						alert(data.message);
 						return;
 					}
-					attendanceData = data;
+					attendanceData = data.data;
 					// 서버에서 데이터를 받은 후 출석 목록을 생성
 					$.each(attendanceData, function(index, item) {
 					    attendanceList.append(createAttendanceRow(index, item));
@@ -280,14 +276,14 @@
 	        console.log('attendanceData저장 데이터:', attendanceData);
 	        
 	        $.ajax({
-				url : "${path}/professor_support/attendance/updateAttendance",
+				url : "/professors/courses/attendance/" + $('#modalCourseId').text(),
 				type : "post",
 				contentType: "application/json",
                 data: JSON.stringify(attendanceData),
 				dataType : "json",
 				success : function(data) {
-					if (data.errorMsg) {
-						alert(data.errorMsg);
+					if (!data.success) {
+						alert(data.message);
 					} else {
 						$('#saveMessage').show().delay(2000).fadeOut();
 						setTimeout(function() {

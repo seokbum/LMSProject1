@@ -21,6 +21,7 @@ public interface ConvertDtoMapper {
 	PaginationDto toPageDto(PaginationDto paginationDto);
 	ScoreDto toScoreDto(ScoreMngDto scoreMngDto);
 	List<ScoreDto> toScoreDtoList(List<ScoreMngDto> scoreMngDtos);
+	
 
 	
 	default Time map(String timeStr) {

@@ -316,7 +316,7 @@ body {
 										<p>성적관리</p>
 								</a></li>
 								<li class="nav-item"><a
-									href="/professors/attendance/attendance" class="nav-link">
+									href="/professors/courses/attendance" class="nav-link">
 										<i class="nav-icon bi bi-circle"></i>
 										<p>출석관리</p>
 								</a></li>
