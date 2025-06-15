@@ -2,6 +2,7 @@ package com.ldb.lms.mapper.mybatis.mypage;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.ldb.lms.dto.mypage.AdminDto;
 import com.ldb.lms.dto.mypage.FindIdDto;
 import com.ldb.lms.dto.mypage.FindPwDto;
 import com.ldb.lms.dto.mypage.LoginChkDto;
@@ -33,6 +34,8 @@ public interface ProStuMapper {
 	
 	//넘겨받은 id에 해당하는 학생의 img , email , phone 업데이트
 	int updateStuInfo(UpdateInfoDto dto);
+	
+	int insert(AdminDto dto);
 	
 	
 	

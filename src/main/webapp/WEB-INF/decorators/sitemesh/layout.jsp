@@ -155,39 +155,65 @@ body {
 					<!--begin::User Menu Dropdown-->
 					<li class="nav-item dropdown user-menu"><a href="#"
 						class="nav-link dropdown-toggle d-flex align-items-center"
-						data-bs-toggle="dropdown">  
-						<c:set var="img" value="${fn:contains(sessionScope.login, 'S') ? m.studentImg : m.professorImg}" />
-						 <img src="/dist/assets/picture/${img}"
+						data-bs-toggle="dropdown"> <c:choose>
+								<c:when
+									test="${not empty sessionScope.login and fn:startsWith(sessionScope.login, 'S')}">
+									<c:set var="img" value="${m.studentImg}" />
+								</c:when>
+								<c:when
+									test="${not empty sessionScope.login and fn:startsWith(sessionScope.login, 'P')}">
+									<c:set var="img" value="${m.professorImg}" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="img" value="adminImg.png" />
+								</c:otherwise>
+							</c:choose> <img src="/dist/assets/picture/${img}"
 							class="user-image rounded-circle shadow" alt="User Image"
 							style="width: 60px; height: 60px; margin-top: 3px" /> <span
 							class="d-none d-md-inline">${sessionScope.login}님 반갑습니다</span>
 					</a>
 						<ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
 							<!--begin::User Image-->
-							<c:set var="img" value="${fn:contains(sessionScope.login, 'S') ? m.studentImg : m.professorImg}" />
+							<c:choose>
+								<c:when
+									test="${not empty sessionScope.login and fn:startsWith(sessionScope.login, 'S')}">
+									<c:set var="img" value="${m.studentImg}" />
+								</c:when>
+								<c:when
+									test="${not empty sessionScope.login and fn:startsWith(sessionScope.login, 'P')}">
+									<c:set var="img" value="${m.professorImg}" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="img" value="adminImg.png" />
+								</c:otherwise>
+							</c:choose>
 							<li class="user-header text-bg-primary"><img
 								src="/dist/assets/picture/${img}" class="rounded-circle shadow"
-								alt="User Image" style="width: 100px; height: 100px;" /> <c:if
+								alt="User Image" style="width: 100px; height: 100px;" /> 
+								<c:if
 									test="${fn:contains(sessionScope.login, 'S')}">
 									<fmt:formatDate value="${m.studentBirthday}"
 										pattern="YYYY-MM-dd" var="birth" />
 									<p>${m.studentName}<small>${birth}</small>
 									</p>
-								</c:if> <c:if test="${not fn:contains(sessionScope.login, 'S')}">
+								</c:if> 
+								<c:if test="${fn:contains(sessionScope.login, 'P')}">
 									<fmt:formatDate value="${m.professorBirthday}"
 										pattern="YYYY-MM-dd" var="birth" />
 									<p>${m.professorName}<small>${birth}</small>
 									</p>
+								</c:if>
+								<c:if test="${fn:contains(sessionScope.login, 'a')}">
+								<p>${m.adminName}</p>
 								</c:if>
 								<p>${deptName}</p></li>
 							<!--end::User Image-->
 
 							<!--begin::Menu Footer-->
 							<li class="user-footer"><a href="/mypage/userInfo"
-								class="btn btn-default btn-flat">Profile</a> 
-								<a
-								href="/mypage/logout"
-								class="btn btn-default btn-flat float-end">Sign out</a></li>
+								class="btn btn-default btn-flat">Profile</a> <a
+								href="/mypage/logout" class="btn btn-default btn-flat float-end">Sign
+									out</a></li>
 							<!--end::Menu Footer-->
 						</ul></li>
 					<!--end::User Menu Dropdown-->
@@ -203,8 +229,8 @@ body {
 			<!--begin::Sidebar Brand-->
 			<div class="sidebar-brand">
 				<!--begin::Brand Link-->
-				<a href="/" class="brand-link"> <!--begin::Brand Image-->
-					<img src="/dist/assets/img/AdminLTELogo.png"
+				<a href="/" class="brand-link"> <!--begin::Brand Image--> <img
+					src="/dist/assets/img/AdminLTELogo.png"
 					class="brand-image opacity-75 shadow" /> <!--end::Brand Image--> <!--begin::Brand Text-->
 					<span class="brand-text fw-light">LDB학사관리시스템</span> <!--end::Brand Text-->
 				</a>
@@ -250,8 +276,9 @@ body {
 								</p>
 						</a>
 							<ul class="nav nav-treeview">
-								<li class="nav-item"><a href="/learning_support/registerCourse"
-									class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+								<li class="nav-item"><a
+									href="/learning_support/registerCourse" class="nav-link"> <i
+										class="nav-icon bi bi-circle"></i>
 										<p>수강신청</p>
 								</a></li>
 								<li class="nav-item"><a href="/learning_support/viewCourse"
@@ -275,24 +302,22 @@ body {
 								</p>
 						</a>
 							<ul class="nav nav-treeview">
-								<li class="nav-item">
-								<a href="/professors/courses/register" class="nav-link">
-										<i class="nav-icon bi bi-circle"></i>
+								<li class="nav-item"><a href="/professors/courses/register"
+									class="nav-link"> <i class="nav-icon bi bi-circle"></i>
 										<p>강의등록</p>
 								</a></li>
 								<li class="nav-item"><a
-									href="/professors/courses/management"
-									class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+									href="/professors/courses/management" class="nav-link"> <i
+										class="nav-icon bi bi-circle"></i>
 										<p>강의관리</p>
 								</a></li>
-								<li class="nav-item"><a
-									href="/professors/courses/score"
+								<li class="nav-item"><a href="/professors/courses/score"
 									class="nav-link"> <i class="nav-icon bi bi-circle"></i>
 										<p>성적관리</p>
 								</a></li>
 								<li class="nav-item"><a
-									href="/professors/attendance/attendance"
-									class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+									href="/professors/attendance/attendance" class="nav-link">
+										<i class="nav-icon bi bi-circle"></i>
 										<p>출석관리</p>
 								</a></li>
 							</ul></li>
@@ -307,6 +332,27 @@ body {
 							class="nav-link"> <i class="nav-icon bi bi-pencil-square"></i>
 								<p>문의게시판</p>
 						</a></li>
+						<li class="nav-item">
+							<a href="#" class="nav-link">
+								<i class="nav-icon bi bi-collection-fill"></i>
+								<p>
+									관리자
+									<i class="nav-arrow bi bi-chevron-right"></i>
+								</p>
+							</a>
+							<ul class="nav nav-treeview">
+								<li class="nav-item">
+									<a href="/admin/schedules" class="nav-link">
+										<i class="nav-icon bi bi-calendar-event"></i>
+										<p>학사일정 관리</p>
+									</a>
+								</li>
+								<li class="nav-item"><a href="#" class="nav-link"> <i
+										class="nav-icon bi bi-circle"></i>
+										<p>미정</p>
+								</a></li>
+							</ul>
+						</li>
 					</ul>
 					<!--end::Sidebar Menu-->
 				</nav>

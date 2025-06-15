@@ -4,104 +4,103 @@
 <%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 
 <%
-int imageCount = 15;
-int randomImageNumber = (int)(Math.random() * imageCount) + 1;
-pageContext.setAttribute("randomImageNumber", randomImageNumber);
+    int imageCount = 15;
+    int randomImageNumber = (int)(Math.random() * imageCount) + 1;
+    pageContext.setAttribute("randomImageNumber", randomImageNumber);
+
+    java.util.Date currentDate = new java.util.Date();
+    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+    sdf.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Seoul"));
+    String currentDateStr = sdf.format(currentDate);
+    pageContext.setAttribute("currentDateStr", currentDateStr);
 %>
 
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
     <title>메인화면</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<style>
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('/dist/assets/picture/backWon${randomImageNumber}.jpg');
-        background-size: 510px 900px;
-        background-position: 100% 25%;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        filter: brightness(0.7);
-        z-index: -1;
-    }
-
-    .container-custom {
-        margin-top: 50px;
-        margin-left: 55px;
-    }
-
-    .card-custom {
-        padding: 15px;
-        min-height: 250px;
-        margin-bottom: 50px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        max-width: 400px;
-        margin-left: 20px;
-    }
-
-    .card-body {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: stretch;
-        flex-grow: 1;
-    }
-
-    .welcome-text {
-        margin-bottom: 15px;
-        font-size: 1.1rem;
-    }
-
-    .quick-access .btn {
-        font-size: 1rem;
-        padding: 10px 20px;
-        margin: 5px;
-    }
-
-    .list-group-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 15px;
-        margin-bottom: 5px;
-    }
-
-    .timeline-item {
-        padding: 10px 15px;
-        margin-bottom: 15px;
-    }
-    .timeline-item .time {
-        margin-bottom: 5px;
-    }
-    .timeline-item h3 {
-        font-size: 1.1rem;
-    }
-    .timeline-body {
-        font-size: 0.95rem;
-    }
-    .timeline-empty {
-        text-align: center;
-        color: #6c757d;
-        margin-top: 20px;
-    }
-    .season-info {
-        text-align: center;
-        font-weight: bold;
-        padding: 10px;
-        margin-bottom: 15px;
-        border-radius: 5px;
-        background-color: #e9ecef;
-        color: #343a40;
-    }
-</style>
+    <style>
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("/dist/assets/picture/backWon${randomImageNumber}.jpg");
+            background-size: 510px 900px;
+            background-position: 100% 25%;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            filter: brightness(0.7);
+            z-index: -1;
+        }
+        .container-custom {
+            margin-top: 50px;
+            margin-left: 55px;
+        }
+        .card-custom {
+            padding: 15px;
+            min-height: 250px;
+            margin-bottom: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-width: 400px;
+            margin-left: 20px;
+        }
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: stretch;
+            flex-grow: 1;
+        }
+        .welcome-text {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        .quick-access .btn {
+            font-size: 1rem;
+            padding: 10px 20px;
+            margin: 5px;
+        }
+        .list-group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            margin-bottom: 5px;
+        }
+        .timeline-item {
+            padding: 10px 15px;
+            margin-bottom: 15px;
+        }
+        .timeline-item .time {
+            margin-bottom: 5px;
+        }
+        .timeline-item h3 {
+            font-size: 1.1rem;
+        }
+        .timeline-body {
+            font-size: 0.95rem;
+        }
+        .timeline-empty {
+            text-align: center;
+            color: #6c757d;
+            margin-top: 20px;
+        }
+        .season-info {
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            color: #343a40;
+        }
+    </style>
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
     <div class="app-wrapper">
@@ -123,10 +122,13 @@ pageContext.setAttribute("randomImageNumber", randomImageNumber);
                                                 <c:when test="${user['class'].simpleName eq 'Professor' and not empty user.professorName}">
                                                     ${user.professorName}님
                                                 </c:when>
+                                                <c:otherwise>
+									                관리자님
+									            </c:otherwise>
                                             </c:choose>
                                         </strong>
                                     </c:if>
-                                <h5>
+                                </h5>
                             </div>
                             <div class="card-body">
                                 <p class="welcome-text">
@@ -139,10 +141,13 @@ pageContext.setAttribute("randomImageNumber", randomImageNumber);
                                             <c:when test="${user['class'].simpleName eq 'Professor' and not empty user.professorName}">
                                                 교수
                                             </c:when>
+                                            <c:otherwise>
+								                관리자
+								            </c:otherwise>
                                         </c:choose>
                                     </c:if>
                                 </p>
-                                <p class="welcome-text"><strong>현재 학기:</strong> 2025년 1학기</p>
+                                <p class="welcome-text"><strong>현재 학기:</strong> <span id="currentSemesterText">정보 없음</span></p>
                                 <p class="welcome-text">
                                     <c:if test="${not empty sessionScope.m}">
                                         <c:choose>
@@ -152,6 +157,9 @@ pageContext.setAttribute("randomImageNumber", randomImageNumber);
                                             <c:when test="${user['class'].simpleName eq 'Professor' and not empty user.professorName}">
                                                 LDB 학사관리시스템에서 강의등록, 강의관리, 성적관리 등을 편리하게 이용하세요.
                                             </c:when>
+                                            <c:otherwise>
+                                                 LDB 학사관리시스템의 원활한 운영을 위해 항상 최선을 다하겠습니다.
+                                            </c:otherwise>
                                         </c:choose>
                                     </c:if>
                                 </p>
@@ -216,81 +224,78 @@ pageContext.setAttribute("randomImageNumber", randomImageNumber);
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
     $(document).ready(function() {
-        function displaySeasonInfo() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = today.getMonth() + 1;
-            const day = today.getDate();
+        const serverCurrentDateStr = "${currentDateStr}";
+        const today = new Date(serverCurrentDateStr);
+        today.setHours(0, 0, 0, 0);
 
-            let seasonMessage = "현재 기간 정보 없음";
+        function determineCurrentSemesterTypeByMonth(date) {
+            const month = date.getMonth() + 1;
 
             if (month >= 3 && month <= 6) {
-                if (month === 3 || month === 4 || month === 5) {
-                    seasonMessage = "현재 LDB대학교는 1학기 중입니다.";
-                } else if (month === 6 && day <= 20) {
-                    seasonMessage = "현재 LDB대학교는 1학기 중입니다.";
-                }
+                return "1학기";
+            } else if (month >= 7 && month <= 8) {
+                return "여름방학";
+            } else if (month >= 9 && month <= 12) {
+                return "2학기";
+            } else if (month >= 1 && month <= 2) {
+                return "겨울방학";
             }
-            if (month >= 6 && month <= 8) {
-                if (month === 6 && day >= 21) {
-                    seasonMessage = "현재 LDB대학교는 여름방학 기간 입니다.";
-                } else if (month === 7) {
-                    seasonMessage = "현재 LDB대학교는 여름방학 기간 입니다.";
-                } else if (month === 8 && day <= 28) {
-                    seasonMessage = "현재 LDB대학교는 여름방학 기간입니다.";
-                }
-            }
-            if (month >= 8 && month <= 12) {
-                if (month === 8 && day >= 29) {
-                    seasonMessage = "현재 LDB대학교는 2학기 중입니다.";
-                } else if (month === 9 || month === 10 || month === 11) {
-                    seasonMessage = "현재 LDB대학교는 2학기 중입니다.";
-                } else if (month === 12 && day <= 10) {
-                    seasonMessage = "현재 LDB대학교는 2학기 중입니다.";
-                }
-            }
-            if (month === 12 && day >= 11) {
-                seasonMessage = "현재 LDB대학교는 겨울방학 기간 입니다.";
-            } else if (month === 1 || month === 2) {
-                 seasonMessage = "현재 LDB대학교는 겨울방학 기간 입니다.";
-            }
-
-            $("#seasonInfo").html(seasonMessage);
+            return "미분류";
         }
 
-        displaySeasonInfo();
-        
+        const currentSemesterType = determineCurrentSemesterTypeByMonth(today);
+
+        $("#seasonInfo").html("현재 LDB대학교는 " + currentSemesterType + " 중입니다.");
+        $("#currentSemesterText").html(currentSemesterType);
+
         $.ajax({
             url: "/api/admin/schedule",
             type: "GET",
             dataType: "json",
             cache: false,
-            success: function(response) { 
+            data: { semesterType: currentSemesterType },
+            success: function(response) {
                 let timeline = $("#scheduleTimeline");
                 timeline.empty();
-                
+
                 if (!response.success || !response.data || !response.data.schedules || response.data.schedules.length === 0) {
-                    console.log("스케줄 데이터가 없거나 조회에 실패했습니다. (API 응답 없음)");
+                    timeline.append("<li class='timeline-empty'>현재 학기/방학 기간의 학사 일정이 없습니다.</li>");
                     return;
                 }
-                
-                $.each(response.data.schedules, function(index, schedule) {
-                    let formattedDate = schedule.scheduleDateFormatted || "날짜 없음";
-                    
-                    let timelineItem = '<li>' +
-                        '<div class="timeline-item">' +
-                            '<span class="time"><i class="bi bi-clock"></i> ' + formattedDate + '</span>' +
-                            '<h3 class="timeline-header">' + schedule.scheduleTitle + '</h3>' +
-                            '<div class="timeline-body">' + schedule.scheduleDescription + '</div>' +
-                        '</div>' +
-                    '</li>';
+
+                const schedules = response.data.schedules;
+
+                $.each(schedules, function(index, schedule) {
+                    let dateRange = "";
+                    if (schedule.scheduleStartDate && schedule.scheduleEndDate) {
+                        const start = new Date(schedule.scheduleStartDate);
+                        const end = new Date(schedule.scheduleEndDate);
+                        const formatOptions = { year: "numeric", month: "2-digit", day: "2-digit" };
+                        dateRange = start.toLocaleDateString("ko-KR", formatOptions) + " ~ " + end.toLocaleDateString("ko-KR", formatOptions);
+                    } else if (schedule.scheduleStartDate) {
+                        const formatOptions = { year: "numeric", month: "2-digit", day: "2-digit" };
+                        dateRange = new Date(schedule.scheduleStartDate).toLocaleDateString("ko-KR", formatOptions);
+                    } else {
+                        dateRange = "날짜 없음";
+                    }
+
+                    let semesterInfo = schedule.semesterType ? " <span class='badge badge-info'>" + schedule.semesterType + "</span>" : "";
+
+                    let timelineItem = "<li>" +
+                        "<div class='timeline-item'>" +
+                        "<span class='time'><i class='bi bi-clock'></i> " + dateRange + "</span>" +
+                        "<h3 class='timeline-header'>" + schedule.scheduleTitle + semesterInfo + "</h3>" +
+                        "<div class='timeline-body'>" + (schedule.scheduleDescription || "설명 없음") + "</div>" +
+                        "</div>" +
+                        "</li>";
                     timeline.append(timelineItem);
                 });
             },
             error: function(xhr, status, error) {
-                console.error("스케줄 불러오기 오류:", status, error);
-                console.error("응답 상태:", xhr.status);
-                console.error("전체 응답:", xhr.responseText);
+                console.error("일정 불러오기 오류:", status, error);
+                $("#scheduleTimeline").append("<li class='timeline-empty'>학사 일정을 불러오는 데 실패했습니다.</li>");
+                $("#seasonInfo").html("학기 정보 불러오기 실패");
+                $("#currentSemesterText").html("불러오기 실패");
             }
         });
     });

@@ -222,7 +222,19 @@
             <h2>개인 정보</h2>
     <form action="userUpdate" class="form-section" name="f" method="post">
                 <div class="profile-section">
-                    <c:set var="img" value="${fn:contains(sessionScope.login, 'S') ? m.studentImg : m.professorImg}" />
+                    	<c:choose>
+								<c:when
+									test="${not empty sessionScope.login and fn:startsWith(sessionScope.login, 'S')}">
+									<c:set var="img" value="${m.studentImg}" />
+								</c:when>
+								<c:when
+									test="${not empty sessionScope.login and fn:startsWith(sessionScope.login, 'P')}">
+									<c:set var="img" value="${m.professorImg}" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="img" value="${m.adminImg}" />
+								</c:otherwise>
+							</c:choose>
                     <input type="hidden" name="picture" value="${img}">
                     <img src="/dist/assets/picture/${img}" id="pic" class="profile-img" alt="Profile Image">
                     <button type="button" class="btn btn-secondary" onclick="win_upload()">이미지 변경</button>
@@ -270,6 +282,7 @@
                             <input type="text" readonly="readonly" value="${deptName}" name="deptName">
                         </div>
                     </c:when>
+                    
                 </c:choose>
 
                 <div>
@@ -284,6 +297,7 @@
                             <input type="text" readonly="readonly" value="${m.professorPhone}" name="phone" id="phone">
                             <button class="btn btn-secondary" type="button" onclick="updatePhone()">수정</button>
                         </c:when>
+                        
                     </c:choose>
                 </div>
                 <div>
@@ -298,6 +312,7 @@
                             <input type="email" readonly="readonly" value="${m.professorEmail}" name="email" id="email">
                             <button class="btn btn-secondary" type="button" onclick="updateEmail()">수정</button>
                         </c:when>
+                        
                     </c:choose>
                 </div>
                 <div class="action-buttons">
@@ -306,12 +321,14 @@
                     <c:if test="${fn:contains(sessionScope.login, 'S')}"> <%--학생만선택가능 --%>
 						<button class="btn btn-danger" type="button" onclick="deleteUser()">자퇴신청</button>                    
                     </c:if>                  
-                </div>
+                </div>             
             </form>
             <form id="pwForm" action="updatePw" method="post" target="pwUpdateWindow" name="c">
                 <input type="hidden" name="id" value="${sessionScope.login}">
                 <input type="hidden" name="email" value="${fn:contains(sessionScope.login, 'S') ? m.studentEmail : m.professorEmail}">
             </form>
+              
+                
             </c:if> 
             <c:if test="${msg!=null}">
             <h2>${msg}</h2>
