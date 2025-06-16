@@ -332,7 +332,8 @@ body {
 							class="nav-link"> <i class="nav-icon bi bi-pencil-square"></i>
 								<p>문의게시판</p>
 						</a></li>
-						<li class="nav-item">
+						<c:if test="${login=='admin'}">
+							<li class="nav-item">
 							<a href="#" class="nav-link">
 								<i class="nav-icon bi bi-collection-fill"></i>
 								<p>
@@ -353,6 +354,8 @@ body {
 								</a></li>
 							</ul>
 						</li>
+						</c:if>
+					
 					</ul>
 					<!--end::Sidebar Menu-->
 				</nav>
