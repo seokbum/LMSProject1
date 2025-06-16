@@ -28,6 +28,11 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		
+		<!--<dependency>
+	        <groupId>org.springframework.boot</groupId>
+	        <artifactId>spring-boot-starter-logging</artifactId>
+	    </dependency>-->
+		
 		<!-- Spring Boot Security -->
 		<!--<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -65,19 +70,6 @@
 	        <artifactId>aspectjweaver</artifactId>
 	        <version>1.9.7</version>
 	    </dependency>
-		
-		<!-- Slf4j/Logback 설정 -->
-		<!--<dependency>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-api</artifactId>
-		    <version>2.0.9</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>ch.qos.logback</groupId>
-		    <artifactId>logback-classic</artifactId>
-		    <version>1.4.11</version>
-		</dependency>-->
 		
 		<!-- JSP 지원 -->
 		<dependency>

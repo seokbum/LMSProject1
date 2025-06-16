@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <!-- 콘솔 로깅 설정 -->
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <conversionRule conversionWord="clr" class="org.springframework.boot.logging.logback.ColorConverter" />
+
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:-}){magenta} %clr(---){faint} %clr([%t]){faint} %clr(%-40logger{39}){cyan} %clr(:){faint} %m%n%ex{full}"/>
+              <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %cyan(%logger{36}) - %msg%n</pattern>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
 
-    <!-- 이 라인은 주석처리하거나 삭제 -->
-    <!-- <include resource="org/springframework/boot/logging/logback/base.xml"/> -->
-
-    <!-- 로깅 수준 설정 -->
     <logger name="com.ldb.lms.mapper" level="DEBUG"/>
-    <logger name="org.apache.ibatis.logging.jdbc.ResultSetLogger" level="TRACE"/>
-    <logger name="org.apache.ibatis.logging.jdbc.StatementLogger" level="DEBUG"/>
-    <logger name="org.apache.ibatis.logging.jdbc.PreparedStatementLogger" level="DEBUG"/>
-    <logger name="org.apache.ibatis.logging.jdbc.CallableStatementLogger" level="DEBUG"/>
+    <logger name="org.apache.ibatis.logging.jdbc.ResultSetLogger" level="INFO"/>
+    <logger name="org.apache.ibatis.logging.jdbc.StatementLogger" level="INFO"/>
+    <logger name="org.apache.ibatis.logging.jdbc.PreparedStatementLogger" level="INFO"/>
+    <logger name="org.apache.ibatis.logging.jdbc.CallableStatementLogger" level="INFO"/>
 
-    <!-- 루트 로거에 STDOUT appender 연결 -->
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
