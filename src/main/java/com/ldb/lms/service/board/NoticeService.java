@@ -288,7 +288,7 @@ public class NoticeService {
         NoticeSearchDto searchDto = new NoticeSearchDto();
         
         NoticePaginationDto pageDto = new NoticePaginationDto();
-        pageDto.setItemsPerPage(5); 
+        pageDto.setItemsPerPage(7); 
         pageDto.setOffset(0); 
 
         Map<String, Object> params = new HashMap<>();

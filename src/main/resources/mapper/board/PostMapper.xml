@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ldb.lms.mapper.mybatis.board.PostMapper">
 
+    <!-- 게시글 목록 조회 -->
     <select id="listPosts" parameterType="map" resultType="PostDto">
         SELECT
             p.post_id,
@@ -42,7 +43,8 @@
             p.post_group_step ASC
         LIMIT #{pageDto.itemsPerPage} OFFSET #{pageDto.offset}
     </select>
-    
+
+    <!-- 공지사항 목록 조회 -->
     <select id="listNotices" parameterType="PostSearchDto" resultType="PostDto">
         SELECT
             p.post_id,
@@ -58,7 +60,8 @@
         WHERE p.post_notice = 1
         ORDER BY p.post_id DESC
     </select>
-    
+
+    <!-- 게시글 수 조회 -->
     <select id="countPosts" parameterType="PostSearchDto" resultType="int">
         SELECT
             COUNT(*)
@@ -87,6 +90,7 @@
         </where>
     </select>
 
+    <!-- 특정 게시글 조회 -->
     <select id="getPost" parameterType="String" resultType="PostDto">
         SELECT
             p.post_id,
@@ -109,6 +113,7 @@
         WHERE p.post_id = #{postId}
     </select>
 
+    <!-- 게시글 등록 -->
     <insert id="insertPost" parameterType="PostDto">
         INSERT INTO post (
             post_id, author_id, post_title,
@@ -123,6 +128,7 @@
         )
     </insert>
 
+    <!-- 게시글 수정 -->
     <update id="updatePost" parameterType="PostDto">
         UPDATE post
         SET
@@ -136,31 +142,37 @@
             post_id = #{postId}
     </update>
 
+    <!-- 게시글 그룹 스텝 업데이트 -->
     <update id="updateGroupStep" parameterType="map">
         UPDATE post
         SET post_group_step = post_group_step + 1
         WHERE post_group = #{postGroup} AND post_group_step > #{postGroupStep}
     </update>
 
+    <!-- 게시글 조회수 증가 -->
     <update id="incrementReadCount" parameterType="String">
         UPDATE post
         SET post_read_count = post_read_count + 1
         WHERE post_id = #{postId}
     </update>
-    
+
+    <!-- 게시글 삭제 -->
     <delete id="deletePost" parameterType="String">
         DELETE FROM post
         WHERE post_id = #{postId}
     </delete>
 
+    <!-- 마지막 게시글 ID 조회 -->
     <select id="getLastPostId" resultType="String">
         SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1
     </select>
 
+    <!-- 최대 게시글 그룹 번호 조회 -->
     <select id="getMaxGroup" resultType="Integer">
         SELECT MAX(post_group) FROM post
     </select>
-    
+
+    <!-- 게시글 댓글 목록 조회 -->
     <select id="selectCommentList" parameterType="String" resultType="CommentDto">
         SELECT
             c.comment_id, c.post_id, c.writer_id,
@@ -173,14 +185,16 @@
         WHERE c.post_id = #{postId}
         ORDER BY c.created_at ASC
     </select>
-    
+
+    <!-- 특정 댓글 조회 -->
     <select id="selectComment" parameterType="String" resultType="CommentDto">
         SELECT
             comment_id, post_id, writer_id, comment_content
         FROM post_comment
         WHERE comment_id = #{commentId}
     </select>
-    
+
+    <!-- 댓글 등록 -->
     <insert id="insertComment" parameterType="CommentDto">
         INSERT INTO post_comment (
             comment_id, post_id, writer_id,
@@ -192,7 +206,8 @@
             NOW(), NOW()
         )
     </insert>
-    
+
+    <!-- 댓글 수정 -->
     <update id="updateComment" parameterType="CommentDto">
         UPDATE post_comment
         SET
@@ -201,17 +216,20 @@
         WHERE
             comment_id = #{commentId}
     </update>
-    
+
+    <!-- 댓글 삭제 -->
     <delete id="deleteComment" parameterType="String">
         DELETE FROM post_comment WHERE comment_id = #{commentId}
     </delete>
-    
+
+    <!-- 게시글에 연결된 모든 댓글 삭제 -->
     <delete id="deleteCommentsByPostId" parameterType="String">
         DELETE FROM post_comment WHERE post_id = #{postId}
     </delete>
-    
+
+    <!-- 마지막 댓글 ID 조회 -->
     <select id="getLastCommentId" resultType="String">
         SELECT comment_id FROM post_comment ORDER BY comment_id DESC LIMIT 1
     </select>
-    
+
 </mapper>

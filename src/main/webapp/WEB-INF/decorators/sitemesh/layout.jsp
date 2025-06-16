@@ -324,11 +324,11 @@ body {
 						<%-- </c:if> --%>
 						<!--  교수지원쪽부분을 교수가아니면 아예 뜨지않게 막아놓을거임-->
 
-						<li class="nav-item"><a href="${path}/notice/getNotices"
+						<li class="nav-item"><a href="/notice/getNotices"
 							class="nav-link"> <i class="nav-icon bi bi-tree-fill"></i>
 								<p>공지사항</p>
 						</a></li>
-						<li class="nav-item"><a href="${path}/post/getPosts"
+						<li class="nav-item"><a href="/post/getPosts"
 							class="nav-link"> <i class="nav-icon bi bi-pencil-square"></i>
 								<p>문의게시판</p>
 						</a></li>
@@ -348,9 +348,9 @@ body {
 										<p>학사일정 관리</p>
 									</a>
 								</li>
-								<li class="nav-item"><a href="#" class="nav-link"> <i
-										class="nav-icon bi bi-circle"></i>
-										<p>미정</p>
+								<li class="nav-item"><a href="/admin/members" class="nav-link"> 
+								<i class="nav-icon bi bi-person-lines-fill"></i> 
+										<p>회원 관리</p>
 								</a></li>
 							</ul>
 						</li>

@@ -1,13 +1,15 @@
 package com.ldb.lms.service.admin;
 
 import com.ldb.lms.dto.ApiResponseDto;
+import com.ldb.lms.dto.admin.MemberDto;
+import com.ldb.lms.dto.admin.MemberSearchDto;
 import com.ldb.lms.dto.schedule.ScheduleDto;
+import com.ldb.lms.mapper.mybatis.mypage.AdminMapper;
 import com.ldb.lms.mapper.mybatis.schedule.ScheduleMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +21,8 @@ import java.util.Map;
 public class AdminService {
 
     private final ScheduleMapper scheduleMapper;
+    
+    private final AdminMapper adminMapper;
 
     public ApiResponseDto<Map<String, Object>> getSchedulesForApi(String semesterType) {
         try {
@@ -99,6 +103,49 @@ public class AdminService {
         } catch (Exception e) {
             log.error("학사일정 상세 조회 실패", e);
             return new ApiResponseDto<>(false, "학사일정 상세 조회 실패: " + e.getMessage(), null);
+        }
+    }
+
+    public ApiResponseDto<Map<String, Object>> getMembersForApi(MemberSearchDto searchDto) {
+        try {
+
+            int totalRows = adminMapper.getTotalMembersCount(searchDto);
+            searchDto.setTotalRows(totalRows);
+            searchDto.calculatePagination();
+
+            List<MemberDto> members = adminMapper.getMemberList(searchDto);
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("members", members);
+            data.put("pagination", searchDto); 
+
+            return new ApiResponseDto<>(true, "회원 목록 조회 성공", data);
+        } catch (Exception e) {
+            log.error("회원 목록 조회 실패", e);
+            return new ApiResponseDto<>(false, "회원 목록 조회 실패: " + e.getMessage(), null);
+        }
+    }
+
+    @Transactional
+    public ApiResponseDto<Void> deleteMember(String id, String type) {
+        try {
+            int deletedRows = 0;
+            if ("STUDENT".equalsIgnoreCase(type)) {
+                deletedRows = adminMapper.deleteStudent(id);
+            } else if ("PROFESSOR".equalsIgnoreCase(type)) {
+                deletedRows = adminMapper.deleteProfessor(id);
+            } else {
+                return new ApiResponseDto<>(false, "유효하지 않은 회원 타입입니다.", null);
+            }
+
+            if (deletedRows > 0) {
+                return new ApiResponseDto<>(true, "회원 삭제 성공", null);
+            } else {
+                return new ApiResponseDto<>(false, "회원을 찾을 수 없거나 삭제에 실패했습니다.", null);
+            }
+        } catch (Exception e) {
+            log.error("회원 삭제 실패", e);
+            return new ApiResponseDto<>(false, "회원 삭제 실패: " + e.getMessage(), null);
         }
     }
 }
