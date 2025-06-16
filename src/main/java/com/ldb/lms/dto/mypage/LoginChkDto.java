@@ -1,5 +1,7 @@
 package com.ldb.lms.dto.mypage;
 
+import org.springframework.util.StringUtils;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -17,21 +19,30 @@ public class LoginChkDto {
     private String professorId;
     private String professorPassword;
     
+    private String adminId;
+    private String adminPassword;
+    
 	public String getId() {
-		if(this.studentId==null) {
+		if(StringUtils.hasText(this.professorId)) {
 			return getProfessorId();
 		}
-		else {
+		else if(StringUtils.hasText(this.studentId)){
 			return getStudentId();
+		}
+		else {
+			return getAdminId();
 		}
 	}
 	
 	public String getPassword() {
-		if(this.studentPassword==null) {
-			return getProfessorPassword();
+		if(this.studentPassword!=null) {
+			return this.studentPassword;
+		}
+		else if(this.professorPassword!=null) {
+			return this.professorPassword;
 		}
 		else {
-			return getStudentPassword();
+			return getAdminPassword();
 		}
 	}
 	

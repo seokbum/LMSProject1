@@ -18,6 +18,7 @@ import com.ldb.lms.service.mypage.MypageService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
+
 @Controller
 @RequestMapping("/mypage")
 @RequiredArgsConstructor // final이 붙은 필드이용 생성자 자동생성
@@ -115,12 +116,7 @@ public class MypageController {
 	}
 
 	@PostMapping("registerSuccess")
-	public String registerSuccess(HttpServletRequest request) {
-		// 어차피 회원가입성공 시 모든세션정보를 서비스 내에서 날림
-		/*
-		 * if(mypageService.registerSuccess(request)) { return "mypage/doLogin";} return
-		 * "mypage/registerUser";
-		 */
+	public String registerSuccess(HttpServletRequest request) {	
 		mypageService.registerSuccess(request);
 		return "mypage/registerUser";
 	}
@@ -168,5 +164,18 @@ public class MypageController {
 	public String postDeleteUser() {
 		return "mypage/getCourseTimetable";
 	}
+	
+	@GetMapping("getCourseScores")
+	public String getCourseScores (HttpServletRequest request) {
+		String id = (String)request.getSession().getAttribute("login");
+		if(mypageService.getScore(id,request)) {
+			return "mypage/getCourseScores";	
+		}
+		else {
+			return "error";
+		}
+		
+	}
+	
 
 }

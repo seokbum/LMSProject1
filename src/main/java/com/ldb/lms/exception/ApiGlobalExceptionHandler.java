@@ -27,7 +27,7 @@ public class ApiGlobalExceptionHandler {
 	@ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, Object> handleGeneral(Exception ex) {
-		
+
         Map<String, Object> error = new HashMap<>();
         error.put("success", false);
         error.put("message", "서버 오류가 발생했습니다.");

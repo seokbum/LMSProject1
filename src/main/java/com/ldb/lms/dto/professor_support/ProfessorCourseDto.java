@@ -11,5 +11,6 @@ public class ProfessorCourseDto {
 	
 	private String courseName;
 	private String courseId;
+	private String coursePeriod;
 	private String courseCurrentEnrollment;
 }

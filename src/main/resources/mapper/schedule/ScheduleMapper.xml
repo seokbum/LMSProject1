@@ -7,10 +7,59 @@
             schedule_id,
             schedule_title,
             schedule_description,
-            schedule_date
+            schedule_start_date,
+            schedule_end_date,
+            semester_type
         FROM schedule
-        ORDER BY schedule_date ASC, schedule_id ASC
-        LIMIT 5
+        <where>
+            <if test="semesterType != null and semesterType != '' and semesterType != '전체'">
+                semester_type = #{semesterType}
+            </if>
+        </where>
+        ORDER BY schedule_start_date ASC, schedule_id ASC
     </select>
 
-    </mapper>
+    <insert id="insertSchedule" parameterType="ScheduleDto" useGeneratedKeys="true" keyProperty="scheduleId">
+        INSERT INTO schedule (
+            schedule_title,
+            schedule_description,
+            schedule_start_date,
+            schedule_end_date,
+            semester_type
+        ) VALUES (
+            #{scheduleTitle},
+            #{scheduleDescription},
+            #{scheduleStartDate},
+            #{scheduleEndDate},
+            #{semesterType}
+        )
+    </insert>
+
+    <update id="updateSchedule" parameterType="ScheduleDto">
+        UPDATE schedule
+        SET
+            schedule_title = #{scheduleTitle},
+            schedule_description = #{scheduleDescription},
+            schedule_start_date = #{scheduleStartDate},
+            schedule_end_date = #{scheduleEndDate},
+            semester_type = #{semesterType}
+        WHERE schedule_id = #{scheduleId}
+    </update>
+
+    <delete id="deleteSchedule">
+        DELETE FROM schedule
+        WHERE schedule_id = #{scheduleId}
+    </delete>
+
+    <select id="getScheduleById" resultType="ScheduleDto">
+        SELECT
+            schedule_id,
+            schedule_title,
+            schedule_description,
+            schedule_start_date,
+            schedule_end_date,
+            semester_type
+        FROM schedule
+        WHERE schedule_id = #{scheduleId}
+    </select>
+</mapper>

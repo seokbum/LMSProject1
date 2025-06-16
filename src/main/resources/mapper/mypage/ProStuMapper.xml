@@ -17,6 +17,8 @@
 	WHERE professor_name = #{professorName} AND professor_email=#{professorEmail};
 	</select>
 	
+	
+	
 	<!-- 넘어온 id와 맞는  학생의id,name,pawssword를 추출 -->
 	<select id="loginChk" resultType="LoginChkDto" parameterType="String">
 	SELECT student_id  , student_password
@@ -26,6 +28,10 @@
 	SELECT professor_id ,professor_password
 	FROM professor
 	WHERE professor_id = #{val} 
+	UNION
+	SELECT admin_id ,admin_password
+	FROM admin
+	WHERE admin_id = #{val} 
 	</select>
 	
 	<!-- id와이메일을 이용해 학생의 비밀번호 반환 -->

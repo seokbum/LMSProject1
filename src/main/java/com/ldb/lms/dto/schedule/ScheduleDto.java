@@ -10,17 +10,26 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ScheduleDto {
-    private Integer scheduleId; 
-
+    private Integer scheduleId;
     private String scheduleTitle;
     private String scheduleDescription;
-    private Date scheduleDate;
+    private Date scheduleStartDate; 
+    private Date scheduleEndDate;  
+    private String semesterType;    
 
-    public String getScheduleDateFormatted() {
-        if (this.scheduleDate == null) {
+    public String getScheduleStartDateFormatted() {
+        if (this.scheduleStartDate == null) {
             return null;
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
-        return sdf.format(this.scheduleDate);
+        return sdf.format(this.scheduleStartDate);
+    }
+
+    public String getScheduleEndDateFormatted() { 
+        if (this.scheduleEndDate == null) {
+            return null;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+        return sdf.format(this.scheduleEndDate);
     }
 }
