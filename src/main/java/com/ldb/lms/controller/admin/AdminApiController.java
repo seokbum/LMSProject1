@@ -29,7 +29,7 @@ public class AdminApiController {
     private final AdminService adminService;
 
     // 학사일정 전체 조회
-    @GetMapping("/schedule")
+    @GetMapping("schedule")
     public ResponseEntity<ApiResponseDto<Map<String, Object>>> getSchedules(
         @RequestParam(required = false) String semesterType
     ) {
@@ -38,7 +38,7 @@ public class AdminApiController {
     }
 
     // 학사일정 상세 조회
-    @GetMapping("/schedule/{scheduleId}")
+    @GetMapping("schedule/{scheduleId}")
     public ResponseEntity<ApiResponseDto<ScheduleDto>> getScheduleDetail(@PathVariable Integer scheduleId) {
         ApiResponseDto<ScheduleDto> response = adminService.getScheduleDetail(scheduleId);
         if (response.isSuccess()) {
@@ -49,7 +49,7 @@ public class AdminApiController {
     }
 
     // 학사일정 추가
-    @PostMapping("/schedule")
+    @PostMapping("schedule")
     public ResponseEntity<ApiResponseDto<Void>> addSchedule(@RequestBody ScheduleDto scheduleDto) {
         ApiResponseDto<Void> response = adminService.addSchedule(scheduleDto);
         if (response.isSuccess()) {
@@ -60,7 +60,7 @@ public class AdminApiController {
     }
 
     // 학사일정 수정
-    @PutMapping("/schedule/{scheduleId}")
+    @PutMapping("schedule/{scheduleId}")
     public ResponseEntity<ApiResponseDto<Void>> updateSchedule(@PathVariable Integer scheduleId, @RequestBody ScheduleDto scheduleDto) {
         scheduleDto.setScheduleId(scheduleId);
         ApiResponseDto<Void> response = adminService.updateSchedule(scheduleDto);
@@ -72,7 +72,7 @@ public class AdminApiController {
     }
 
     // 학사일정 삭제
-    @DeleteMapping("/schedule/{scheduleId}")
+    @DeleteMapping("schedule/{scheduleId}")
     public ResponseEntity<ApiResponseDto<Void>> deleteSchedule(@PathVariable Integer scheduleId) {
         ApiResponseDto<Void> response = adminService.deleteSchedule(scheduleId);
         if (response.isSuccess()) {
@@ -83,7 +83,7 @@ public class AdminApiController {
     }
 
     // 회원 목록 조회 API
-    @GetMapping("/members")
+    @GetMapping("members")
     public ResponseEntity<ApiResponseDto<Map<String, Object>>> getMembers(
             MemberSearchDto searchDto
     ) {
@@ -92,7 +92,7 @@ public class AdminApiController {
     }
 
     // 회원 삭제 API
-    @DeleteMapping("/members/{type}/{id}")
+    @DeleteMapping("members/{type}/{id}")
     public ResponseEntity<ApiResponseDto<Void>> deleteMember(
             @PathVariable String id,
             @PathVariable String type

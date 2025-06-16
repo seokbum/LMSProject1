@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AdminController {
 
     // 학사일정 관리 페이지로 이동
-    @GetMapping("/schedules")
+    @GetMapping("schedules")
     public String showScheduleManagementPage() {
         return "admin/schedules";
     }
 
     // 회원 관리 페이지로 이동
-    @GetMapping("/members")
+    @GetMapping("members")
     public String showMemberManagementPage() {
         return "admin/members";
     }
