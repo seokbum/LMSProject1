@@ -7,6 +7,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>학사일정 관리</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <style>
@@ -16,6 +17,7 @@
 
         body {
             font-family: "Noto Sans KR", sans-serif;
+            margin: 20px;
             background-color: #f7fafc;
         }
 
@@ -259,29 +261,39 @@
     </style>
 </head>
 <body>
-    <div class="app-content-header">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-sm-6">
-                    <h3 class="mb-0">학사일정 관리</h3>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-end">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">학사일정</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="app-content">
         <div class="container-fluid">
             <div class="schedule-container">
                 <div id="message" class="message"></div>
 
-                <div class="form-section card">
-                    <h2>일정 추가/수정</h2>
+                <div class="list-section card"> <h2>일정 목록</h2>
+                    <div class="form-group" style="width: 200px; margin-bottom: 20px;">
+                        <label for="filterSemesterType">학기/방학 필터:</label>
+                        <select id="filterSemesterType" class="form-control">
+                            <option value="전체">전체</option>
+                            <option value="1학기">1학기</option>
+                            <option value="여름방학">여름방학</option>
+                            <option value="2학기">2학기</option>
+                            <option value="겨울방학">겨울방학</option>
+                        </select>
+                    </div>
+                    <table id="scheduleTable" class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>제목</th>
+                                <th>설명</th>
+                                <th>시작일</th>
+                                <th>종료일</th>
+                                <th>학기/방학</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="form-section card"> <h2>일정 추가/수정</h2>
                     <form id="scheduleForm">
                         <input type="hidden" id="scheduleId" name="scheduleId">
                         <div class="form-group">
@@ -311,36 +323,8 @@
                             </select>
                         </div>
                         <button type="submit" id="saveButton" class="btn btn-primary">저장</button>
-                        <button type="type" id="resetButton" class="btn btn-secondary">초기화</button>
+                        <button type="button" id="resetButton" class="btn btn-secondary">초기화</button>
                     </form>
-                </div>
-
-                <div class="list-section card">
-                    <h2>일정 목록</h2>
-                    <div class="form-group" style="width: 200px; margin-bottom: 20px;">
-                        <label for="filterSemesterType">학기/방학 필터:</label>
-                        <select id="filterSemesterType" class="form-control">
-                            <option value="전체">전체</option>
-                            <option value="1학기">1학기</option>
-                            <option value="여름방학">여름방학</option>
-                            <option value="2학기">2학기</option>
-                            <option value="겨울방학">겨울방학</option>
-                        </select>
-                    </div>
-                    <table id="scheduleTable" class="table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>제목</th>
-                                <th>설명</th>
-                                <th>시작일</th>
-                                <th>종료일</th>
-                                <th>학기/방학</th>
-                                <th>관리</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
                 </div>
             </div>
         </div>

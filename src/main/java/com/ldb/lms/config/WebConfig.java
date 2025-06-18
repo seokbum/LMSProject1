@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.ldb.lms.interceptor.AdminCheckInterceptor;
 import com.ldb.lms.interceptor.LoginCheckInterceptor;
 import com.ldb.lms.interceptor.ProCheckInterceptor;
 import com.ldb.lms.interceptor.StuCheckInterceptor;
@@ -35,7 +36,17 @@ public class WebConfig implements WebMvcConfigurer {
         //교수가 아니라면 false반환(교수만 접근가능)
         registry.addInterceptor(new ProCheckInterceptor())
         .addPathPatterns("/professors/**")
-        .addPathPatterns("/notice/createNotice");
+        .addPathPatterns("/notice/createNotice*")
+        .addPathPatterns("/notice/updateNotice*")
+        .addPathPatterns("/notice/deleteNotice*")
+        .excludePathPatterns("/", "/login", "/css/**", "/js/**");
+        
+        registry.addInterceptor(new AdminCheckInterceptor())
+        .addPathPatterns("/admin/**")  
+        .addPathPatterns("/admin/schedules*")
+        .addPathPatterns("/admin/members*")
+        .excludePathPatterns("/", "/login", "/css/**", "/js/**");
+        
         
     }
 }

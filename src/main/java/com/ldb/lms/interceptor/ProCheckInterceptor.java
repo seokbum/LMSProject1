@@ -23,7 +23,7 @@ public class ProCheckInterceptor implements HandlerInterceptor{
        //세션null검증은 LogincheckInterceptor에서 진행하므로 굳이 로그인세션이 존재하는지 검증하지않는다
        
        String position = (String)session.getAttribute("login");
-       if(!position.contains("P")) {    	   
+       if(!position.contains("P") ) {    	   
     	   String msg = "교수만 접근 가능합니다";
     	   
     	   //한국어메시지를get방식으로 그냥넘기려하면 문제가생김! URLEncoder를 이용해 UTF-8로 인코딩

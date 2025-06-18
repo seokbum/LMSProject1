@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ldb.lms.mapper.mybatis.schedule.ScheduleMapper">
 
+    <!-- 학사일정 목록 조회 -->
     <select id="listSchedules" resultType="ScheduleDto">
         SELECT
             schedule_id,
@@ -19,6 +20,7 @@
         ORDER BY schedule_start_date ASC, schedule_id ASC
     </select>
 
+    <!-- 학사일정 등록 -->
     <insert id="insertSchedule" parameterType="ScheduleDto" useGeneratedKeys="true" keyProperty="scheduleId">
         INSERT INTO schedule (
             schedule_title,
@@ -35,6 +37,7 @@
         )
     </insert>
 
+    <!-- 학사일정 수정 -->
     <update id="updateSchedule" parameterType="ScheduleDto">
         UPDATE schedule
         SET
@@ -46,11 +49,13 @@
         WHERE schedule_id = #{scheduleId}
     </update>
 
+    <!-- 학사일정 삭제 -->
     <delete id="deleteSchedule">
         DELETE FROM schedule
         WHERE schedule_id = #{scheduleId}
     </delete>
 
+    <!-- 특정 학사일정 조회 -->
     <select id="getScheduleById" resultType="ScheduleDto">
         SELECT
             schedule_id,
@@ -62,4 +67,5 @@
         FROM schedule
         WHERE schedule_id = #{scheduleId}
     </select>
+
 </mapper>
