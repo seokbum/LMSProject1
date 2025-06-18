@@ -71,7 +71,7 @@
 
 ---
 
-- **📂 개발 환경**
+### 📂 개발 환경
   - IDE: Eclipse (Dynamic Web Project)
   - Java 17
   - Spring Boot + Embedded Tomcat
