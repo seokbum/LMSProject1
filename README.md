@@ -4,8 +4,9 @@
 ![license](https://img.shields.io/badge/license-MIT-green.svg)
 ![status](https://img.shields.io/badge/status-ongoing-important)
 ![tech](https://img.shields.io/badge/tech-JSP%20%7C%20MyBatis%20%7C%20Bootstrap5-blueviolet)
+![boot](https://img.shields.io/badge/boot-Spring%20Boot-green.svg)
 
-> JSP + Servlet + MyBatis 기반의 Model2 MVC 패턴 웹 프로젝트</br>
+> JSP + SpringBoot + MyBatis 기반의 Model2 MVC 패턴 웹 프로젝트</br>
 > Bootstrap5 및 AdminLTE4 템플릿 기반 반응형 UI 학사관리 시스템</br>
 > 시연영상 링크: https://youtu.be/ACZ_0ZXrgKQ</br>
 > ppt다운로드: https://github.com/Limjuhan/LMS-Project/blob/main/LMS.pptx
@@ -70,15 +71,13 @@
 
 ---
 
-## ⚙️ 사용 기술 스택
-
-| 분류           | 기술 내용 |
-|----------------|-----------|
-| **백엔드**     | Java, JSP, Servlet, MyBatis |
-| **프론트엔드** | HTML5, CSS3, JavaScript, Bootstrap 5, AdminLTE 4 |
-| **템플릿 엔진**| JSP (Java Server Pages) |
-| **데이터베이스** | MariaDB |
-| **라이브러리** | jackson, taglibs-standard, cos.jar, javax.mail-1.6.2.jar ,activation-1.1.1.jar ,jbcrypt-0.4.jar , sitemesh-3.0.1.jar|
+- **📂 개발 환경**
+  - IDE: Eclipse (Dynamic Web Project)
+  - Java 17
+  - Spring Boot + Embedded Tomcat
+  - View: JSP + JSTL + Bootstrap 5
+  - ORM: MyBatis (XML Mapper)
+  - DBMS: MariaDB
 | **아키텍처**    | Model2 (MVC 패턴) 방식 |
 
 ---
@@ -139,19 +138,19 @@ LMS-Project/
 > 마이그레이션 완료 후에는 보안 강화, UI 개선, 확장성을 위한 **고도화** 작업을 계획하고 있습니다.  
 > 아래는 마이그레이션 및 고도화 과정에서의 고민과 향후 계획입니다.
 ---
-### 🚀 Spring Boot 3 마이그레이션
+### 🚀 Spring Boot 3 마이그레이션✅(완료)
 현재 JSP + Servlet 기반의 Model2 아키텍처를 Spring Boot 3와 Maven으로 전환 중입니다.  
 이 과정은 기존 기능을 유지하면서 코드 구조와 빌드 환경을 현대화하는 데 초점을 맞추고 있습니다.
 
-#### 📋 마이그레이션 계획
+#### 📋 마이그레이션 계획(완료)
 - **기술 스택 전환**:
-  - Servlet → Spring MVC `@Controller`로 전환 (JSP 렌더링 및 AJAX 통합).
-  - 수동 JAR 관리 → Maven `pom.xml`로 의존성 관리.
-  - `web.xml` 제거, Spring Boot 자동 설정 도입.
+  - ✅ Servlet → Spring MVC `@Controller`로 전환 (JSP 렌더링 및 AJAX 통합).
+  - ✅ 수동 JAR 관리 → Maven `pom.xml`로 의존성 관리.
+  - ✅ `web.xml` 제거, Spring Boot 자동 설정 도입.
 - **계층 구조 개선**:
-  - DAO 제거, MyBatis Mapper 직접 사용 (`CourseMapper`, `CourseMapper.xml`).
-  - Service 계층 추가 (`CourseService`)로 비즈니스 로직 분리.
-  - `@Transactional` 적용으로 트랜잭션 관리 강화.
+  - ✅ DAO 제거, MyBatis Mapper 직접 사용 (`CourseMapper`, `CourseMapper.xml`).
+  - ✅ Service 계층 추가 (`CourseService`)로 비즈니스 로직 분리.
+  - ✅ `@Transactional` 적용으로 트랜잭션 관리 강화.
 - **고민**:
   - 기존 서블릿과 JSP의 복잡한 로직을 Spring MVC로 자연스럽게 전환.
   - MyBatis 쿼리 호환성 유지 (기존 `CourseMapper.xml` 재사용).
@@ -222,9 +221,9 @@ JSP 기반 UI를 유지하되, 현대적인 템플릿 엔진 도입과 반응형
 ### 📅 마이그레이션 및 고도화 로드맵
 | 단계 | 작업 내용 | 예상 기간 | 우선순위 |
 |------|-----------|-----------|----------|
-| **1** | Spring Boot 3 및 Maven 마이그레이션 | ~2025.06 | ⭐⭐⭐ |
-| **2** | Service 계층 추가, DAO 제거 | ~2025.06 | ⭐⭐⭐ |
-| **3** | Spring Security 기본 적용 | ~2025.07 | ⭐⭐ |
+| **✅** | Spring Boot 3 및 Maven 마이그레이션 | ~2025.06 | ⭐⭐⭐ |
+| **✅** | Service 계층 추가, DAO 제거 | ~2025.06 | ⭐⭐⭐ |
+| **3** | 고도화 작업 | ~2025.xx | ⭐⭐ |
 
 
 ### 🤔 주요 고민
