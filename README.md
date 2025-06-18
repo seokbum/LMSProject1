@@ -4,7 +4,7 @@
 ![license](https://img.shields.io/badge/license-MIT-green.svg)
 ![status](https://img.shields.io/badge/status-ongoing-important)
 ![tech](https://img.shields.io/badge/tech-JSP%20%7C%20MyBatis%20%7C%20Bootstrap5-blueviolet)
-![frame](https://img.shields.io/badge/boot-Spring%20Boot-green.svg)
+![boot](https://img.shields.io/badge/boot-Spring%20Boot-green.svg)
 
 > JSP + SpringBoot + MyBatis 기반의 Model2 MVC 패턴 웹 프로젝트</br>
 > Bootstrap5 및 AdminLTE4 템플릿 기반 반응형 UI 학사관리 시스템</br>
