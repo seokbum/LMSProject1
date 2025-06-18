@@ -18,14 +18,22 @@
 <table>
   <tr>
     <th>메인 화면</th>
+    <th>개인정보 화면</th>
     <th>수강 신청 화면</th>
+    <th>강의 관리 화면</th>
   </tr>
   <tr>
     <td align="center">
-      <img src="./screenshots/index.jpg" alt="index" width="300"/>
+      <img src="./screenshots/main.png" alt="메인화면" width="300"/>
     </td>
     <td align="center">
-      <img src="./screenshots/courseapply.jpg" alt="수강 신청 화면" width="300"/>
+      <img src="./screenshots/개인정보.png" alt="개인정보 화면" width="300"/>
+    </td>
+    <td align="center">
+      <img src="./screenshots/수강신청.png" alt="수강 신청 화면" width="300"/>
+    </td>
+    <td align="center">
+      <img src="./screenshots/강의관리.png" alt="수강 신청 화면" width="300"/>
     </td>
   </tr>
 </table>
