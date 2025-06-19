@@ -241,21 +241,24 @@ body {
 			<div class="sidebar-wrapper">
 				<nav class="mt-2">
 					<!--begin::Sidebar Menu-->
+					
+					
 					<ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview"
-						role="menu" data-accordion="false">
+						role="menu" data-accordion="false">		
+							<c:if test="${login!='admin'}">		
 						<li class="nav-item menu-open"><a href="#"
 							class="nav-link active"> <i
-								class="nav-icon bi bi-speedometer"></i>
-								<p>
+								class="nav-icon bi bi-speedometer"></i>								 
+								 <p>
 									MyPage <i class="nav-arrow bi bi-chevron-right"></i>
-								</p>
+								</p>															
 						</a>
 							<ul class="nav nav-treeview">
 								<li class="nav-item"><a href="/mypage/userInfo"
 									class="nav-link active"> <i class="nav-icon bi bi-circle"></i>
 										<p>개인정보</p>
 								</a></li>
-								<%-- <c:if test="${fn:contains(sessionScope.login, 'S')}">--%>
+								 <c:if test="${fn:contains(sessionScope.login, 'S')}">
 								<li class="nav-item"><a
 									href="${path}/mypage/getCourseScores" class="nav-link"> <i
 										class="nav-icon bi bi-circle"></i>
@@ -266,9 +269,9 @@ body {
 										<i class="nav-icon bi bi-circle"></i>
 										<p>시간표조회</p>
 								</a></li>
-								<%--</c:if> --%>
-							</ul></li>
-						<%-- <c:if test="${fn:contains(sessionScope.login, 'S')}"> --%>
+								</c:if>
+							</ul></li></c:if>		
+					<c:if test="${fn:contains(sessionScope.login, 'S')}"> 
 						<li class="nav-item"><a href="#" class="nav-link"> <i
 								class="nav-icon bi bi-box-seam-fill"></i>
 								<p>
@@ -290,9 +293,9 @@ body {
 										<p>미정</p>
 								</a></li> -->
 							</ul></li>
-						<%-- </c:if> --%>
+						</c:if>
 
-						<%-- <c:if test="${fn:contains(sessionScope.login, 'P')}"> --%>
+						 <c:if test="${fn:contains(sessionScope.login, 'P')}">
 						<li class="nav-item"><a href="#" class="nav-link"> <i
 								class="nav-icon bi bi-clipboard-fill"></i>
 								<p>
@@ -321,7 +324,7 @@ body {
 										<p>출석관리</p>
 								</a></li>
 							</ul></li>
-						<%-- </c:if> --%>
+						 </c:if> 
 						<!--  교수지원쪽부분을 교수가아니면 아예 뜨지않게 막아놓을거임-->
 
 						<li class="nav-item"><a href="/notice/getNotices"

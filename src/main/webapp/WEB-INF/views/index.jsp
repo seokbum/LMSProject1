@@ -28,12 +28,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url("/dist/assets/picture/backWon${randomImageNumber}.jpg");
-            background-size: 510px 900px;
-            background-position: 100% 25%;
+            background-image: url("/dist/assets/picture/backSchool2.jpg");
+            background-size: cover; /* Changed to cover to fill the entire screen */
+            background-position: center; /* Centered the background */
             background-repeat: no-repeat;
             background-attachment: fixed;
-            filter: brightness(0.7);
+            opacity: 0.7; /* Added slight transparency */
             z-index: -1;
         }
         .container-custom {
