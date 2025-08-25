@@ -18,15 +18,11 @@
 
 <table>
   <tr>
-    <th>메인 화면</th>
     <th>개인정보 화면</th>
     <th>수강 신청 화면</th>
     <th>강의 관리 화면</th>
   </tr>
   <tr>
-    <td align="center">
-      <img src="./screenshots/main.png" alt="메인화면" width="300"/>
-    </td>
     <td align="center">
       <img src="./screenshots/개인정보.png" alt="개인정보 화면" width="300"/>
     </td>
